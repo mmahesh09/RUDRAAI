@@ -1,0 +1,2 @@
+*.zip filter=lfs diff=lfs merge=lfs -text
+myfile.bin filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 6%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 24 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 5% 15%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 24 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 6% 12%;
+    --input: 240 6% 12%;
+    --ring: 24 100% 50%;
+    --radius: 0.75rem;
+    --chart-1: 24 100% 50%;
+    --chart-2: 259 94% 51%;
+    --chart-3: 158 64% 52%;
+    --chart-4: 217 91% 60%;
+    --chart-5: 38 92% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#09090B] text-foreground font-body antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background: rgba(255, 107, 0, 0.3);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #09090B;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 107, 0, 0.4);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 107, 0, 0.7);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .neo-card {
+    background: #111117;
+    box-shadow: 8px 8px 16px rgba(0,0,0,0.6), -2px -2px 8px rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .orange-glow {
+    box-shadow: 0 0 30px rgba(255, 107, 0, 0.25), 0 0 60px rgba(255, 107, 0, 0.1);
+  }
+
+  .text-gradient-orange {
+    background: linear-gradient(135deg, #FF6B00 0%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-white {
+    background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-padding {
+    @apply py-20 md:py-28 lg:py-32;
+  }
+
+  .container-wide {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .grid-bg {
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .badge-orange {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium font-subheading;
+    background: rgba(255, 107, 0, 0.1);
+    border: 1px solid rgba(255, 107, 0, 0.3);
+    color: #FF6B00;
+  }
+
+  .cta-button {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl font-heading font-bold text-sm transition-all duration-300;
+    background: linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(255, 107, 0, 0.4);
+  }
+
+  .cta-button:hover {
+    box-shadow: 0 6px 30px rgba(255, 107, 0, 0.6);
+    transform: translateY(-1px);
+  }
+
+  .cta-button:active {
+    transform: translateY(0);
+  }
+
+  .outline-button {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl font-heading font-semibold text-sm transition-all duration-300;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #A1A1AA;
+  }
+
+  .outline-button:hover {
+    border-color: rgba(255, 107, 0, 0.5);
+    color: #FF6B00;
+    background: rgba(255, 107, 0, 0.05);
+  }
+}
+
+@layer utilities {
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+  .animation-delay-700 { animation-delay: 700ms; }
+  .animation-delay-1000 { animation-delay: 1000ms; }
+}

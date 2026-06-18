@@ -1,0 +1,22 @@
+# Environment — never commit
+.env
+.env.local
+.env.*.local
+
+# Next.js build
+.next/
+out/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# OS
+.DS_Store
+Thumbs.db

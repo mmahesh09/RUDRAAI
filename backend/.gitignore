@@ -1,0 +1,17 @@
+# Environment — never commit
+.env
+.env.local
+.env.*.local
+
+# Build
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# TypeScript
+*.tsbuildinfo
