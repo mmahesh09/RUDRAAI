@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Zap, Mail, MapPin, Phone, Twitter, Linkedin, Github, Youtube, Send } from "lucide-react";
+import { ArrowRight, Zap, Mail, MapPin, Phone, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import dynamic from "next/dynamic";
@@ -35,11 +35,29 @@ const footerLinks = {
   ],
 };
 
+// Custom X (Twitter) icon — the bird logo was retired
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.733-8.835L2.25 2.25h6.961l4.263 5.632 4.77-5.632Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  );
+}
+
+// Custom Instagram icon — not in lucide-react
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+    </svg>
+  );
+}
+
 const social = [
-  { icon: Twitter, label: "Twitter", href: "#" },
-  { icon: Linkedin, label: "LinkedIn", href: "#" },
-  { icon: Github, label: "GitHub", href: "#" },
-  { icon: Youtube, label: "YouTube", href: "#" },
+  { icon: XIcon, label: "X (Twitter)", href: "https://x.com/GowriRudrai" },
+  { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/rudrai.in?igsh=NmF3azZuNWJlenk4" },
 ];
 
 export default function Footer() {
@@ -252,6 +270,8 @@ export default function Footer() {
                     key={label}
                     href={href}
                     aria-label={label}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-9 h-9 rounded-lg border border-white/08 flex items-center justify-center text-[#71717A] hover:text-white hover:border-[rgba(255,107,0,0.4)] hover:bg-[rgba(255,107,0,0.08)] transition-all duration-200"
                   >
                     <Icon className="w-4 h-4" />

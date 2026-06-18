@@ -39,7 +39,7 @@ interface CoachSchedulingProps {
 }
 
 const defaultCoach: Coach = {
-  name: "Avnish Mishra",
+  name: process.env.NEXT_PUBLIC_CONSULTANT_NAME || "Automation Consultant",
   title: "Automation Consultant",
   location: "Remote (Zoom / Google Meet)",
   rating: 4.9,

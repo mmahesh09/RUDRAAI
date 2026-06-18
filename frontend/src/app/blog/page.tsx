@@ -5,87 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ArrowRight, Clock, Calendar } from "lucide-react";
 import type { Metadata } from "next";
+import { posts, categoryColors } from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "Blog — RudraAI | Automation Tips & AI Insights",
   description:
     "Practical guides on n8n, AI agents, workflow automation, and business process optimization from the RudraAI team.",
-};
-
-const posts = [
-  {
-    slug: "n8n-vs-zapier-make-2025",
-    category: "Comparison",
-    title: "n8n vs Zapier vs Make in 2025: Which Automation Platform Wins?",
-    excerpt: "A deep technical comparison of the three leading automation platforms — breaking down real-world performance, pricing, integration depth, and who should use each.",
-    readTime: "8 min read",
-    date: "Jan 15, 2025",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80",
-    featured: true,
-    color: "#FF6B00",
-  },
-  {
-    slug: "build-lead-qualification-ai-agent",
-    category: "Tutorial",
-    title: "Build a Lead Qualification AI Agent in n8n (Step-by-Step)",
-    excerpt: "Complete walkthrough of building an autonomous AI agent that scores leads, enriches data from 3 APIs, and routes to the right sales rep — with zero manual intervention.",
-    readTime: "12 min read",
-    date: "Jan 8, 2025",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
-    featured: false,
-    color: "#8B5CF6",
-  },
-  {
-    slug: "ai-agents-vs-traditional-automation",
-    category: "Strategy",
-    title: "AI Agents vs Traditional Automation: When to Use Each",
-    excerpt: "Know exactly when to reach for a simple n8n workflow vs building a full AI agent. This decision framework has saved our clients thousands in over-engineered solutions.",
-    readTime: "6 min read",
-    date: "Dec 28, 2024",
-    image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=800&q=80",
-    featured: false,
-    color: "#10B981",
-  },
-  {
-    slug: "automate-customer-support-gpt4",
-    category: "Tutorial",
-    title: "How We Built a Customer Support Bot That Handles 80% of Tickets",
-    excerpt: "Full technical breakdown of our e-commerce client's support automation — architecture, prompt engineering, escalation logic, and the 3 mistakes we made along the way.",
-    readTime: "15 min read",
-    date: "Dec 20, 2024",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
-    featured: false,
-    color: "#3B82F6",
-  },
-  {
-    slug: "n8n-self-hosted-guide",
-    category: "DevOps",
-    title: "Complete Guide to Self-Hosting n8n in 2025",
-    excerpt: "Step-by-step tutorial for deploying n8n on a VPS, configuring SSL, setting up PostgreSQL, enabling queue mode, and monitoring with Grafana.",
-    readTime: "10 min read",
-    date: "Dec 12, 2024",
-    image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=800&q=80",
-    featured: false,
-    color: "#F59E0B",
-  },
-  {
-    slug: "roi-calculation-automation",
-    category: "Strategy",
-    title: "How to Calculate ROI Before You Automate (With Real Examples)",
-    excerpt: "The exact framework we use during automation audits to calculate payback period, hourly cost of manual work, and total annual value — with 4 real client examples.",
-    readTime: "7 min read",
-    date: "Dec 5, 2024",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80",
-    featured: false,
-    color: "#EC4899",
-  },
-];
-
-const categoryColors: Record<string, string> = {
-  Comparison: "#FF6B00",
-  Tutorial: "#8B5CF6",
-  Strategy: "#10B981",
-  DevOps: "#F59E0B",
 };
 
 export default function BlogPage() {
@@ -129,7 +54,13 @@ export default function BlogPage() {
                     </div>
                     <div className="p-8 md:p-10">
                       <div className="flex items-center gap-3 mb-4">
-                        <Badge style={{ color: categoryColors[featured.category], background: `${categoryColors[featured.category]}15`, borderColor: `${categoryColors[featured.category]}30` }}>
+                        <Badge
+                          style={{
+                            color: categoryColors[featured.category],
+                            background: `${categoryColors[featured.category]}15`,
+                            borderColor: `${categoryColors[featured.category]}30`,
+                          }}
+                        >
                           {featured.category}
                         </Badge>
                         <Badge variant="default" className="text-[10px]">Featured</Badge>
@@ -164,7 +95,11 @@ export default function BlogPage() {
                     <div className="absolute top-3 left-3">
                       <span
                         className="text-[10px] font-body px-2 py-1 rounded"
-                        style={{ color: categoryColors[post.category] || "#A1A1AA", background: `${categoryColors[post.category] || "#A1A1AA"}15`, border: `1px solid ${categoryColors[post.category] || "#A1A1AA"}30` }}
+                        style={{
+                          color: categoryColors[post.category] || "#A1A1AA",
+                          background: `${categoryColors[post.category] || "#A1A1AA"}15`,
+                          border: `1px solid ${categoryColors[post.category] || "#A1A1AA"}30`,
+                        }}
                       >
                         {post.category}
                       </span>

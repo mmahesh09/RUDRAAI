@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
 import { contactRouter } from "./routes/contact";
 import { bookingRouter } from "./routes/booking";
+import { calRouter } from "./routes/cal";
 
 dotenv.config();
 
@@ -75,6 +76,7 @@ app.use(express.urlencoded({ extended: false, limit: "50kb" }));
 // Routes
 app.use("/api/contact", contactRouter);
 app.use("/api/booking", bookingRouter);
+app.use("/api/cal", calRouter);
 
 // Health check — no sensitive data
 app.get("/health", (_req, res) => {

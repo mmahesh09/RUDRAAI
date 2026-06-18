@@ -47,9 +47,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    site: "@GowriRudrai",
+    creator: "@GowriRudrai",
     title: "RudraAI — AI Automation Agency",
     description:
       "Stop hiring for repetitive work. Deploy AI automations instead.",
+  },
+  verification: {
+    google: "googlec10c12c5cb4346d7",
   },
 };
 

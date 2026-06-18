@@ -74,7 +74,11 @@ contactRouter.post("/", async (req: Request, res: Response) => {
   const safeBudget  = budget ? escapeHtml(budget) : "—";
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br>");
 
+  // Skip email entirely if SMTP isn't configured (dev without credentials)
+  const smtpReady = !!(process.env.SMTP_USER && process.env.SMTP_PASS && process.env.CONTACT_TO);
+
   try {
+    if (smtpReady) {
     const transporter = createTransporter();
 
     // ── Email to owner ────────────────────────────────────────────
@@ -98,6 +102,7 @@ contactRouter.post("/", async (req: Request, res: Response) => {
 
     // ── Confirmation email to client ──────────────────────────────
     const bookingUrl = `${process.env.FRONTEND_URL || "https://rudraai.io"}/booking`;
+    const consultantName = process.env.CONSULTANT_NAME || "The RudraAI Team";
     await transporter.sendMail({
       from: process.env.SMTP_FROM,
       to: email,
@@ -109,8 +114,8 @@ contactRouter.post("/", async (req: Request, res: Response) => {
           <p>While you wait, you're welcome to <a href="${bookingUrl}" style="color:#FF6B00">book a free 60-minute automation audit</a> — no pitch, just a practical look at your workflows and what's worth automating first.</p>
           <br>
           <p>Talk soon,<br>
-          <strong>Avnish</strong><br>
-          <span style="color:#888">Founder, RudraAI</span></p>
+          <strong>${escapeHtml(consultantName)}</strong><br>
+          <span style="color:#888">RudraAI — Automation Agency</span></p>
           <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
           <p style="font-size:0.8em;color:#aaa">RudraAI — n8n Workflow Automation Agency</p>
         </div>
@@ -136,6 +141,8 @@ contactRouter.post("/", async (req: Request, res: Response) => {
         body: JSON.stringify({ name, email, company, budget, message }),
       }).catch(() => {});
     }
+
+    } // end smtpReady block
 
     return res.json({ success: true, message: "Message sent successfully." });
   } catch (error) {

@@ -1,36 +1,31 @@
 import type { NextConfig } from "next";
 
 const securityHeaders = [
-  // Prevent DNS prefetch leaking navigation intent
   { key: "X-DNS-Prefetch-Control", value: "on" },
-  // Force HTTPS for 2 years, include subdomains
   {
     key: "Strict-Transport-Security",
     value: "max-age=63072000; includeSubDomains; preload",
   },
-  // Block clickjacking — only allow framing by same origin
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
-  // Prevent MIME-type sniffing
   { key: "X-Content-Type-Options", value: "nosniff" },
-  // Control referrer info sent with requests
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  // Disable browser features we don't use
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=()",
   },
-  // Content Security Policy
   {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Next.js requires unsafe-inline for styles; nonce approach needs middleware
-      "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+      // Next.js requires unsafe-inline; Cal.com embed.js loaded from their CDN
+      "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.cal.com https://cal.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com https://html.tailus.io https://images.unsplash.com",
+      "img-src 'self' data: blob: https://images.unsplash.com https://html.tailus.io",
       "font-src 'self' https://fonts.gstatic.com",
-      // Allow API calls to our backend
-      "connect-src 'self' http://localhost:4000 https://localhost:4000",
+      // API calls go to same origin via Next.js rewrite proxy — only Cal.com needs extra allow
+      "connect-src 'self' https://app.cal.com https://cal.com",
+      // Cal.com scheduling embed + Google Maps (contact page)
+      "frame-src 'self' https://app.cal.com https://cal.com https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
@@ -52,6 +47,18 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+    ];
+  },
+
+  // Proxy /api/* to the Express backend — browser always talks to same origin,
+  // which eliminates CORS entirely and keeps the backend URL out of client JS.
+  async rewrites() {
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:4000";
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
