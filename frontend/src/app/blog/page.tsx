@@ -30,7 +30,7 @@ export default function BlogPage() {
             Automation <span className="text-gradient-orange">Insights</span>
           </h1>
           <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto">
-            Practical guides, tutorials, and strategies from our team of automation engineers.
+            Practical guides, tutorials, and strategies from my work building real automations.
           </p>
         </div>
       </div>

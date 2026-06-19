@@ -1,8 +1,8 @@
 ---
 title: RudraAI Backend
 emoji: ⚡
-colorFrom: orange
-colorTo: red
+colorFrom: red
+colorTo: yellow
 sdk: docker
 pinned: false
 app_port: 7860

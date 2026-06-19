@@ -1,0 +1,113 @@
+{
+  "name": "03 — Cal.com Booking Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "wh-booking",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\n\n// Cal.com sends payload.payload for booking events\nconst payload = body.payload || body;\nconst attendee = (payload.attendees && payload.attendees[0]) || {};\n\nreturn [{\n  json: {\n    eventType: payload.type || 'BOOKING_CREATED',\n    name: attendee.name || payload.name || '',\n    email: attendee.email || payload.email || '',\n    startTime: payload.startTime || '',\n    endTime: payload.endTime || '',\n    timezone: attendee.timeZone || 'UTC',\n    meetingUrl: payload.metadata?.videoCallUrl || '',\n    notes: payload.description || '',\n    receivedAt: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "parse-booking",
+      "name": "Parse Booking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "apiKey",
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": { "__rl": true, "value": "={{$env.NOTION_LEADS_DB}}", "mode": "id" },
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "Name|title", "titleValue": "={{$json.name}}" },
+            { "key": "Email|email", "emailValue": "={{$json.email}}" },
+            { "key": "Status|select", "selectValue": "Call Booked" },
+            { "key": "Meeting Time|date", "dateValue": "={{$json.startTime}}" },
+            { "key": "Meeting URL|url", "urlValue": "={{$json.meetingUrl}}" },
+            { "key": "Notes|rich_text", "textValue": "={{$json.notes}}" },
+            { "key": "Submitted At|date", "dateValue": "={{$json.receivedAt}}" }
+          ]
+        }
+      },
+      "id": "notion-booking",
+      "name": "Add to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [680, 200],
+      "credentials": { "notionApi": { "id": "notion-creds", "name": "Notion API" } },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$json.email}}",
+        "subject": "Your call with RudraAI is confirmed — see you soon!",
+        "emailFormat": "html",
+        "message": "<div style=\"font-family:sans-serif;max-width:560px;margin:0 auto;color:#333\">\n  <h2 style=\"color:#FF6B00\">Your call is confirmed! 🎉</h2>\n  <p>Hi {{$json.name}},</p>\n  <p>We're looking forward to speaking with you about your automation goals.</p>\n  <table style=\"width:100%;border-collapse:collapse;margin:16px 0\">\n    <tr><td style=\"padding:8px;background:#f5f5f5\"><strong>Date & Time</strong></td><td style=\"padding:8px\">{{$json.startTime}}</td></tr>\n    <tr><td style=\"padding:8px;background:#f5f5f5\"><strong>Timezone</strong></td><td style=\"padding:8px\">{{$json.timezone}}</td></tr>\n    <tr><td style=\"padding:8px;background:#f5f5f5\"><strong>Meeting Link</strong></td><td style=\"padding:8px\"><a href=\"{{$json.meetingUrl}}\">Join Meeting</a></td></tr>\n  </table>\n  <p>To make the most of our time, think about:</p>\n  <ul>\n    <li>Which manual tasks take the most time in your business?</li>\n    <li>What tools do you currently use (CRM, email, spreadsheets)?</li>\n    <li>What would automating these save you each week?</li>\n  </ul>\n  <p>See you soon!<br><strong>The RudraAI Team</strong></p>\n</div>"
+      },
+      "id": "send-confirmation",
+      "name": "Send Confirmation Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 400],
+      "credentials": {
+        "smtp": { "id": "smtp-creds", "name": "SMTP" }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SLACK_WEBHOOK_URL}}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=📅 *New Booking!*\n*Name:* {{$('Parse Booking').item.json.name}}\n*Email:* {{$('Parse Booking').item.json.email}}\n*Time:* {{$('Parse Booking').item.json.startTime}}\n*Meeting:* {{$('Parse Booking').item.json.meetingUrl}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "slack-booking",
+      "name": "Notify Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 300],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Parse Booking", "type": "main", "index": 0 }]]
+    },
+    "Parse Booking": {
+      "main": [
+        [
+          { "node": "Add to Notion", "type": "main", "index": 0 },
+          { "node": "Send Confirmation Email", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Add to Notion": {
+      "main": [[{ "node": "Notify Slack", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
+}

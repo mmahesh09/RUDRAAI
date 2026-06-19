@@ -23,6 +23,7 @@ const securityHeaders = [
       "img-src 'self' data: blob: https://images.unsplash.com https://html.tailus.io",
       "font-src 'self' https://fonts.gstatic.com",
       // API calls go to same origin via Next.js rewrite proxy — only Cal.com needs extra allow
+      // Chat widget calls /api/chat (same-origin) — no extra connect-src needed
       "connect-src 'self' https://app.cal.com https://cal.com",
       // Cal.com scheduling embed + Google Maps (contact page)
       "frame-src 'self' https://app.cal.com https://cal.com https://www.google.com https://maps.google.com",

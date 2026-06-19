@@ -48,6 +48,9 @@ export async function fetchCalSlots(
   url.searchParams.set("eventTypeId", String(eventTypeId));
 
   const res = await fetch(url.toString(), { headers: calHeaders() });
+  if (!res.ok) {
+    throw new Error(`Cal.com slots API returned ${res.status}`);
+  }
   return res.json() as Promise<{ status: string; data?: { slots: Record<string, { time: string }[]> } }>;
 }
 

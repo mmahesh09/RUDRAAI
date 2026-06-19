@@ -9,7 +9,7 @@ export const bookingRouter = Router();
 const bookingSchema = z.object({
   name: z.string().min(2).max(100).trim(),
   email: z.string().email().max(254).trim(),
-  company: z.string().min(1).max(100).trim(),
+  company: z.string().max(100).trim().optional().default(""),
   role: z.string().max(100).trim().optional(),
   timeSlot: z.string().min(3).max(80).trim(),
   isoTime: z.string().max(50).trim().optional(), // ISO start time for Cal.com booking
@@ -276,19 +276,19 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
 
     } // end smtpReady block
 
-    // ── Google Sheets ─────────────────────────────────────────────
+    // ── Google Sheets (non-fatal) ─────────────────────────────────
     const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
     await appendToGoogleSheet([
       submittedAt,
       name,
       email,
-      company,
+      company || "",
       role || "",
       timeSlot,
       goal,
       zoomLink || "",
       "New",
-    ]);
+    ]).catch((e: Error) => console.warn("Google Sheets skipped:", e.message));
 
     return res.json({ success: true, message: "Booking confirmed." });
   } catch (error) {

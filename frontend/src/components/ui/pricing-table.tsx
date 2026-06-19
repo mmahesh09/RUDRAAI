@@ -23,7 +23,6 @@ export interface PricingTier {
   name: string;
   description: string;
   price?: number;
-  inrPrice?: number;
   priceLabel?: string;
   billingPeriod?: string;
   buttonText: string;
@@ -62,7 +61,6 @@ export function Pricing({
 }: PricingProps) {
   const [annualBilling, setAnnualBilling] = useState<Record<string, boolean>>({});
   const [selectedCredits, setSelectedCredits] = useState<Record<string, string>>({});
-  const [currency, setCurrency] = useState<"USD" | "INR">("USD");
 
   return (
     <div className={cn("w-full py-16 px-4", className)}>
@@ -73,31 +71,6 @@ export function Pricing({
           <h1 className="text-4xl sm:text-5xl font-heading font-black text-white mb-4">{title}</h1>
           <p className="text-[#A1A1AA] font-body text-lg max-w-2xl mx-auto mb-8">{subtitle}</p>
 
-          {/* Currency Toggle */}
-          <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-white/[0.05] border border-white/10">
-            <button
-              onClick={() => setCurrency("USD")}
-              className={cn(
-                "px-5 py-2 rounded-lg text-sm font-subheading font-semibold transition-all duration-200",
-                currency === "USD"
-                  ? "bg-[#FF6B00] text-white shadow-md"
-                  : "text-[#71717A] hover:text-white"
-              )}
-            >
-              $ USD
-            </button>
-            <button
-              onClick={() => setCurrency("INR")}
-              className={cn(
-                "px-5 py-2 rounded-lg text-sm font-subheading font-semibold transition-all duration-200",
-                currency === "INR"
-                  ? "bg-[#FF6B00] text-white shadow-md"
-                  : "text-[#71717A] hover:text-white"
-              )}
-            >
-              ₹ INR
-            </button>
-          </div>
         </div>
 
         {/* Pricing Cards */}
@@ -125,13 +98,7 @@ export function Pricing({
               <div className="mb-6">
                 {tier.price !== undefined ? (
                   <div className="flex items-baseline gap-1">
-                    {currency === "USD" ? (
-                      <span className="text-4xl font-heading font-black text-white">${tier.price.toLocaleString()}</span>
-                    ) : (
-                      <span className="text-4xl font-heading font-black text-white">
-                        ₹{(tier.inrPrice ?? Math.round(tier.price * 84)).toLocaleString("en-IN")}
-                      </span>
-                    )}
+                    <span className="text-4xl font-heading font-black text-white">${tier.price.toLocaleString()}</span>
                     <span className="text-[#71717A] font-body text-sm">{tier.billingPeriod || "/mo"}</span>
                   </div>
                 ) : (

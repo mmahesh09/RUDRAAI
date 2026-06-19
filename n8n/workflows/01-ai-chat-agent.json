@@ -1,0 +1,134 @@
+{
+  "name": "01 — AI Chat Agent (Homepage Assistant)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-chat-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\nconst message = body.message || '';\nconst history = body.history || [];\n\nconst messages = [\n  {\n    role: 'system',\n    content: `You are an AI assistant for RudraAI, an n8n automation agency based in Hyderabad, India. You help visitors understand our services, pricing, and how AI automation can save their business time and money.\n\nServices we offer:\n- n8n workflow automation (from $50 for 1 automation)\n- AI agent development\n- Lead qualification automations\n- CRM integrations\n- Email sequence automation\n- Client onboarding automation\n\nPricing:\n- 1 automation: $50\n- 3 automations: $100\n- 5 automations: $200\n- 5+ automations: Contact us\n\nAlways be helpful, concise, and guide users to book a free audit call at /booking. Do not make up information.`\n  },\n  ...history,\n  { role: 'user', content: message }\n];\n\nreturn [{ json: { messages, message } }];"
+      },
+      "id": "code-prep",
+      "name": "Prepare Messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.OPENROUTER_API_KEY}}" },
+            { "name": "HTTP-Referer", "value": "https://rudraai.io" },
+            { "name": "X-Title", "value": "RudraAI Chat" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "meta-llama/llama-3.2-3b-instruct:free" },
+            { "name": "messages", "value": "={{$json.messages}}" },
+            { "name": "max_tokens", "value": 512 }
+          ]
+        },
+        "options": {}
+      },
+      "id": "openrouter-call",
+      "name": "OpenRouter (Optional Fallback)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.OLLAMA_BASE_URL}}/api/chat",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "llama3.2" },
+            { "name": "messages", "value": "={{$('Prepare Messages').item.json.messages}}" },
+            { "name": "stream", "value": false }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ollama-fallback",
+      "name": "Ollama (Primary)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 400],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const openRouterResult = $('OpenRouter (Primary)').first();\nconst ollamaResult = $('Ollama (Fallback)').first();\n\nlet reply = 'Sorry, I am having trouble connecting. Please email hello@rudraai.io.';\n\ntry {\n  const orData = openRouterResult.json;\n  if (orData && orData.choices && orData.choices[0]) {\n    reply = orData.choices[0].message.content;\n  } else {\n    const olData = ollamaResult.json;\n    if (olData && olData.message) {\n      reply = olData.message.content;\n    }\n  }\n} catch (e) {}\n\nreturn [{ json: { reply } }];"
+      },
+      "id": "code-merge",
+      "name": "Merge & Extract Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300],
+      "parameters": {
+        "jsCode": "// Ollama is PRIMARY — OpenRouter is optional fallback\nconst ollamaResult = $('Ollama (Primary)').first();\nconst openRouterResult = $('OpenRouter (Optional Fallback)').first();\n\nlet reply = 'Sorry, I am having trouble connecting. Please email hello@rudraai.io.';\n\ntry {\n  const olData = ollamaResult.json;\n  if (olData && olData.message && olData.message.content) {\n    reply = olData.message.content;\n  } else {\n    const orData = openRouterResult.json;\n    if (orData && orData.choices && orData.choices[0]) {\n      reply = orData.choices[0].message.content;\n    }\n  }\n} catch (e) {}\n\nreturn [{ json: { reply } }];"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ reply: $json.reply }) }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Content-Type", "value": "application/json" }
+            ]
+          }
+        }
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Prepare Messages", "type": "main", "index": 0 }]]
+    },
+    "Prepare Messages": {
+      "main": [
+        [
+          { "node": "OpenRouter (Primary)", "type": "main", "index": 0 },
+          { "node": "Ollama (Fallback)", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "OpenRouter (Primary)": {
+      "main": [[{ "node": "Merge & Extract Reply", "type": "main", "index": 0 }]]
+    },
+    "Ollama (Fallback)": {
+      "main": [[{ "node": "Merge & Extract Reply", "type": "main", "index": 0 }]]
+    },
+    "Merge & Extract Reply": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
+}

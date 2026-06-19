@@ -86,7 +86,7 @@ export default function ServicesPage() {
             {[
               { step: "01", title: "Free Audit", desc: "We map your workflows and find automation opportunities — free, no obligation." },
               { step: "02", title: "Custom Roadmap", desc: "You get a tailored plan with estimated ROI, tool stack, and timeline." },
-              { step: "03", title: "Build & Integrate", desc: "Our engineers build your n8n workflows and AI agents with your existing tools." },
+              { step: "03", title: "Build & Integrate", desc: "I build your n8n workflows and AI agents, integrated directly with your existing tools." },
               { step: "04", title: "Launch in 48h", desc: "Go live in under 48 hours. We monitor, support, and iterate post-launch." },
             ].map((s) => (
               <motion.div

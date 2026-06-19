@@ -1,0 +1,113 @@
+{
+  "name": "09 — SEO Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "seo-generate",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-seo",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.OPENROUTER_API_KEY}}" },
+            { "name": "HTTP-Referer", "value": "https://rudraai.io" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "meta-llama/llama-3.2-3b-instruct:free" },
+            {
+              "name": "messages",
+              "value": "=[{\"role\":\"system\",\"content\":\"You are an SEO content writer for RudraAI, an n8n automation agency. Write SEO-optimized content that targets small business owners and startups. Always include: a compelling H1, meta description (under 160 chars), 3-5 H2 subheadings, body paragraphs with keyword density, and a CTA pointing to rudraai.io/booking. Format as JSON: {\\\"title\\\": \\\"\\\", \\\"metaDescription\\\": \\\"\\\", \\\"slug\\\": \\\"\\\", \\\"content\\\": \\\"\\\", \\\"keywords\\\": []}\"},{\"role\":\"user\",\"content\":\"Topic: {{$json.body.topic}}\\nTarget keyword: {{$json.body.keyword}}\\nContent type: {{$json.body.contentType || 'blog post'}}\\nTone: {{$json.body.tone || 'professional and approachable'}}\"}]"
+            },
+            { "name": "max_tokens", "value": 2000 }
+          ]
+        },
+        "options": {}
+      },
+      "id": "generate-content",
+      "name": "Generate SEO Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const resp = $input.first().json;\nlet parsed = { title: '', metaDescription: '', slug: '', content: '', keywords: [] };\ntry {\n  const raw = resp.choices[0].message.content;\n  // Extract JSON from response (may have markdown fencing)\n  const match = raw.match(/\\{[\\s\\S]*\\}/);\n  if (match) parsed = JSON.parse(match[0]);\n} catch (e) {}\nreturn [{ json: { ...parsed, generatedAt: new Date().toISOString() } }];"
+      },
+      "id": "parse-content",
+      "name": "Parse Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "apiKey",
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": { "__rl": true, "value": "={{$env.NOTION_LEADS_DB}}", "mode": "id" },
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "Name|title", "titleValue": "={{$json.title}}" },
+            { "key": "Slug|rich_text", "textValue": "={{$json.slug}}" },
+            { "key": "Meta Description|rich_text", "textValue": "={{$json.metaDescription}}" },
+            { "key": "Keywords|rich_text", "textValue": "={{$json.keywords.join(', ')}}" },
+            { "key": "Status|select", "selectValue": "Draft" },
+            { "key": "Submitted At|date", "dateValue": "={{$json.generatedAt}}" }
+          ]
+        }
+      },
+      "id": "save-notion",
+      "name": "Save Draft to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [900, 300],
+      "credentials": { "notionApi": { "id": "notion-creds", "name": "Notion API" } },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{JSON.stringify($('Parse Content').item.json)}}",
+        "options": {}
+      },
+      "id": "respond-seo",
+      "name": "Respond with Content",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Generate SEO Content", "type": "main", "index": 0 }]]
+    },
+    "Generate SEO Content": {
+      "main": [[{ "node": "Parse Content", "type": "main", "index": 0 }]]
+    },
+    "Parse Content": {
+      "main": [[{ "node": "Save Draft to Notion", "type": "main", "index": 0 }]]
+    },
+    "Save Draft to Notion": {
+      "main": [[{ "node": "Respond with Content", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
+}

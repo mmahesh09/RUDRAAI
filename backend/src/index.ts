@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit";
 import { contactRouter } from "./routes/contact";
 import { bookingRouter } from "./routes/booking";
 import { calRouter } from "./routes/cal";
+import { chatRouter } from "./routes/chat";
 
 dotenv.config();
 
@@ -65,9 +66,19 @@ const formLimiter = rateLimit({
   message: { error: "Too many submissions from this IP. Please try again in an hour." },
 });
 
+// Chat: tighter limit — 20 messages per 15 min per IP
+const chatLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many chat messages. Please wait a moment." },
+});
+
 app.use("/api/", globalLimiter);
 app.use("/api/contact", formLimiter);
 app.use("/api/booking", formLimiter);
+app.use("/api/chat", chatLimiter);
 
 // Body parsing — keep limit tight
 app.use(express.json({ limit: "50kb" }));
@@ -77,6 +88,7 @@ app.use(express.urlencoded({ extended: false, limit: "50kb" }));
 app.use("/api/contact", contactRouter);
 app.use("/api/booking", bookingRouter);
 app.use("/api/cal", calRouter);
+app.use("/api/chat", chatRouter);
 
 // Health check — no sensitive data
 app.get("/health", (_req, res) => {

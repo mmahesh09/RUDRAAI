@@ -1,0 +1,104 @@
+{
+  "name": "05 — Proposal Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-proposal",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-proposal",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{$env.OPENROUTER_API_KEY}}" },
+            { "name": "HTTP-Referer", "value": "https://rudraai.io" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "meta-llama/llama-3.2-3b-instruct:free" },
+            {
+              "name": "messages",
+              "value": "=[{\"role\":\"system\",\"content\":\"You are a proposal writer for RudraAI, an n8n automation agency. Write a professional, concise automation proposal in HTML format. Include: executive summary, proposed automations (with specific n8n workflow descriptions), timeline (48hr deployment), investment, and expected ROI. Use RudraAI branding (orange #FF6B00). Keep it under 600 words.\"},{\"role\":\"user\",\"content\":\"Client: {{$json.body.name}} from {{$json.body.company}}\\nBudget: {{$json.body.budget}}\\nNeeds: {{$json.body.message}}\"}]"
+            },
+            { "name": "max_tokens", "value": 1200 }
+          ]
+        },
+        "options": {}
+      },
+      "id": "generate-proposal",
+      "name": "Generate Proposal (OpenRouter)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $('Webhook').first().json.body ?? $('Webhook').first().json;\nconst aiResp = $input.first().json;\nlet proposalHtml = '<p>We could not generate a proposal at this time. Please contact us directly.</p>';\ntry {\n  proposalHtml = aiResp.choices[0].message.content || proposalHtml;\n} catch (e) {}\nreturn [{ json: { ...body, proposalHtml } }];"
+      },
+      "id": "extract-proposal",
+      "name": "Extract Proposal",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$json.email}}",
+        "subject": "Your Custom Automation Proposal from RudraAI",
+        "emailFormat": "html",
+        "message": "<div style=\"font-family:sans-serif;max-width:640px;margin:0 auto;color:#333\">\n  <div style=\"background:#FF6B00;padding:24px;border-radius:8px 8px 0 0\">\n    <h1 style=\"color:#fff;margin:0;font-size:24px\">RudraAI — Custom Proposal</h1>\n    <p style=\"color:rgba(255,255,255,0.85);margin:4px 0 0\">Prepared for {{$json.name}} · {{$json.company}}</p>\n  </div>\n  <div style=\"padding:24px;border:1px solid #eee;border-top:none;border-radius:0 0 8px 8px\">\n    {{$json.proposalHtml}}\n    <hr style=\"margin:24px 0;border:none;border-top:1px solid #eee\">\n    <p style=\"color:#888;font-size:0.85em\">Ready to proceed? <a href=\"https://rudraai.io/booking\" style=\"color:#FF6B00\">Book your kickoff call</a> and we'll get started within 48 hours.</p>\n  </div>\n</div>"
+      },
+      "id": "send-proposal",
+      "name": "Email Proposal to Client",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 300],
+      "credentials": { "smtp": { "id": "smtp-creds", "name": "SMTP" } },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"success\": true, \"message\": \"Proposal sent to \" + $('Extract Proposal').item.json.email}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Generate Proposal (OpenRouter)", "type": "main", "index": 0 }]]
+    },
+    "Generate Proposal (OpenRouter)": {
+      "main": [[{ "node": "Extract Proposal", "type": "main", "index": 0 }]]
+    },
+    "Extract Proposal": {
+      "main": [[{ "node": "Email Proposal to Client", "type": "main", "index": 0 }]]
+    },
+    "Email Proposal to Client": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
+}

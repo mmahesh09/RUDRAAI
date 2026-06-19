@@ -5,6 +5,7 @@ import "./globals.css";
 import SmoothScrollProvider from "@/components/smooth-scroll-provider";
 import CookieConsent from "@/components/cookie-consent";
 import { Providers } from "@/components/providers";
+import ChatWidget from "@/components/chat-widget";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -75,6 +76,7 @@ export default function RootLayout({
           <Providers>{children}</Providers>
         </SmoothScrollProvider>
         <CookieConsent />
+        <ChatWidget />
       </body>
       <GoogleAnalytics gaId="G-9KTTCR1MJH" />
     </html>

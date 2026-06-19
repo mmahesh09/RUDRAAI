@@ -1,0 +1,108 @@
+{
+  "name": "06 — Email Follow-up Sequence (5-Day)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-followup",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "wh-followup",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$json.body.email ?? $json.email}}",
+        "subject": "Quick question about your automation goals — RudraAI",
+        "emailFormat": "html",
+        "message": "<p>Hi {{$json.body.name ?? $json.name}},</p>\n<p>Thanks for your interest in RudraAI. I wanted to follow up on your inquiry.</p>\n<p>We work with businesses just like yours to automate repetitive tasks using n8n — saving 10–30 hours per week on average.</p>\n<p>Quick question: <strong>What's the #1 manual task eating the most time in your business right now?</strong></p>\n<p>Just reply to this email — I read every response personally.</p>\n<p>Best,<br>Gowri<br>RudraAI</p>"
+      },
+      "id": "email-day1",
+      "name": "Day 1 — Initial Follow-up",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [460, 300],
+      "credentials": { "smtp": { "id": "smtp-creds", "name": "SMTP" } },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "days"
+      },
+      "id": "wait-2d",
+      "name": "Wait 2 Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$('Webhook').item.json.body.email ?? $('Webhook').item.json.email}}",
+        "subject": "3 automations most businesses wish they had sooner",
+        "emailFormat": "html",
+        "message": "<p>Hi {{$('Webhook').item.json.body.name ?? $('Webhook').item.json.name}},</p>\n<p>Here are the 3 automations our clients say made the biggest immediate difference:</p>\n<ol>\n  <li><strong>Lead capture → CRM</strong> — Every contact form submission lands in Notion instantly, scored and categorized.</li>\n  <li><strong>Meeting booking → Client prep</strong> — When a call is booked, an AI drafts their intake summary automatically.</li>\n  <li><strong>Invoice → Follow-up</strong> — Overdue invoices trigger a polite email sequence without you lifting a finger.</li>\n</ol>\n<p>Any of these sound relevant? <a href=\"https://rudraai.io/booking\">Book a free 30-min call</a> and we'll map it out for you.</p>\n<p>Gowri | RudraAI</p>"
+      },
+      "id": "email-day3",
+      "name": "Day 3 — Value Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [900, 300],
+      "credentials": { "smtp": { "id": "smtp-creds", "name": "SMTP" } },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "days"
+      },
+      "id": "wait-2d-2",
+      "name": "Wait 2 More Days",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "={{$env.SMTP_FROM}}",
+        "toEmail": "={{$('Webhook').item.json.body.email ?? $('Webhook').item.json.email}}",
+        "subject": "Last note from me — RudraAI",
+        "emailFormat": "html",
+        "message": "<p>Hi {{$('Webhook').item.json.body.name ?? $('Webhook').item.json.name}},</p>\n<p>This is my last email in this sequence — I don't want to clutter your inbox.</p>\n<p>If you're ready to explore how automation can save your team 10+ hours a week, I'd love to show you what's possible in a free 30-minute call.</p>\n<p><a href=\"https://rudraai.io/booking\" style=\"background:#FF6B00;color:#fff;padding:10px 20px;border-radius:6px;text-decoration:none\">Book Free Automation Audit →</a></p>\n<p>If the timing isn't right, no worries at all. You can always reach me at hello@rudraai.io.</p>\n<p>Best,<br>Gowri | RudraAI</p>"
+      },
+      "id": "email-day5",
+      "name": "Day 5 — Final Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1340, 300],
+      "credentials": { "smtp": { "id": "smtp-creds", "name": "SMTP" } },
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Day 1 — Initial Follow-up", "type": "main", "index": 0 }]]
+    },
+    "Day 1 — Initial Follow-up": {
+      "main": [[{ "node": "Wait 2 Days", "type": "main", "index": 0 }]]
+    },
+    "Wait 2 Days": {
+      "main": [[{ "node": "Day 3 — Value Email", "type": "main", "index": 0 }]]
+    },
+    "Day 3 — Value Email": {
+      "main": [[{ "node": "Wait 2 More Days", "type": "main", "index": 0 }]]
+    },
+    "Wait 2 More Days": {
+      "main": [[{ "node": "Day 5 — Final Email", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
+}

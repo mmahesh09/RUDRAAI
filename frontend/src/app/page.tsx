@@ -4,10 +4,8 @@ import { CustomersSectionDemo } from "@/components/ui/customers-section";
 import StatsSection from "@/components/stats-section";
 import ServicesSection from "@/components/services-section";
 import FeaturesSection from "@/components/features-section";
-import CaseStudiesSection from "@/components/case-studies-section";
-import IndustriesSection from "@/components/industries-section";
 import HowItWorksSection from "@/components/how-it-works-section";
-import TestimonialsSection from "@/components/testimonials-section";
+import FounderSection from "@/components/founder-section";
 import QuoteSection from "@/components/quote-section";
 import FaqSection from "@/components/faq-section";
 import CTASection from "@/components/cta-section";
@@ -22,10 +20,8 @@ export default function HomePage() {
       <StatsSection />
       <ServicesSection />
       <FeaturesSection />
-      <CaseStudiesSection />
       <HowItWorksSection />
-      <IndustriesSection />
-      <TestimonialsSection />
+      <FounderSection />
       <QuoteSection />
       <FaqSection />
       <CTASection />

@@ -38,18 +38,6 @@ export default function CTASection() {
           <div className="absolute bottom-0 right-0 w-[300px] h-[300px] bg-[rgba(139,92,246,0.08)] blur-3xl" />
 
           <div className="relative z-10 px-8 py-16 md:px-16 md:py-20 text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,107,0,0.3)] bg-[rgba(255,107,0,0.08)] mb-6"
-            >
-              <Calendar className="w-4 h-4 text-[#FF6B00]" />
-              <span className="text-sm font-subheading font-medium text-[#FF6B00]">
-                Limited spots available this month
-              </span>
-            </motion.div>
-
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white mb-6 leading-tight">
               Your Competitors Are Already
               <br />
@@ -82,7 +70,7 @@ export default function CTASection() {
                 href="/contact"
                 className="outline-button h-14 px-8 text-base"
               >
-                Talk to an Engineer First
+                Talk to Me First
               </Link>
             </div>
           </div>

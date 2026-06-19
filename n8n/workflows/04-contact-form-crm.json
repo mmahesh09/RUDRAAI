@@ -1,0 +1,74 @@
+{
+  "name": "04 — Contact Form → Notion CRM",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "contact-form",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "wh-contact",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "authentication": "apiKey",
+        "resource": "databasePage",
+        "operation": "create",
+        "databaseId": { "__rl": true, "value": "={{$env.NOTION_LEADS_DB}}", "mode": "id" },
+        "propertiesUi": {
+          "propertyValues": [
+            { "key": "Name|title", "titleValue": "={{$json.body.name ?? $json.name}}" },
+            { "key": "Email|email", "emailValue": "={{$json.body.email ?? $json.email}}" },
+            { "key": "Company|rich_text", "textValue": "={{$json.body.company ?? $json.company ?? ''}}" },
+            { "key": "Budget|rich_text", "textValue": "={{$json.body.budget ?? $json.budget ?? ''}}" },
+            { "key": "Message|rich_text", "textValue": "={{$json.body.message ?? $json.message}}" },
+            { "key": "Status|select", "selectValue": "New" },
+            { "key": "Source|select", "selectValue": "Contact Form" },
+            { "key": "Submitted At|date", "dateValue": "={{new Date().toISOString()}}" }
+          ]
+        }
+      },
+      "id": "notion-contact",
+      "name": "Create Notion Record",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [460, 300],
+      "credentials": { "notionApi": { "id": "notion-creds", "name": "Notion API" } }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook/lead-qualify",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "body", "value": "={{$('Webhook').item.json.body ?? $('Webhook').item.json}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "trigger-qualify",
+      "name": "Trigger Lead Qualification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [680, 300],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Create Notion Record", "type": "main", "index": 0 }]]
+    },
+    "Create Notion Record": {
+      "main": [[{ "node": "Trigger Lead Qualification", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": { "executionOrder": "v1" },
+  "meta": { "templateCredsSetupCompleted": true }
+}
