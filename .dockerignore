@@ -1,0 +1,12 @@
+node_modules
+frontend
+n8n
+.git
+.github
+*.md
+*.log
+*.env
+.env*
+backend/node_modules
+backend/dist
+backend/.env*
