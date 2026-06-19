@@ -17,43 +17,26 @@ const chatSchema = z.object({
     .default([]),
 });
 
-const SYSTEM_PROMPT = `You are an AI assistant for RudraAI, an n8n automation agency based in Hyderabad, India. Help visitors understand our services, pricing, and how AI automation saves time and money.
+const SYSTEM_PROMPT = `You are an AI assistant for RudraAI, an n8n automation agency based in Hyderabad, India run by Mahesh. Help visitors understand our services, pricing, and how AI automation saves time and money.
 
-Services: n8n workflow automation, AI agent development, lead qualification, CRM integrations, email sequences, client onboarding.
+Services: n8n workflow automation, AI agent development, lead qualification, CRM integrations, email sequences, client onboarding, proposal generation, SEO content automation.
 
-Pricing: 1 automation = $50 | 3 automations = $100 | 5 automations = $200 | 5+ = Contact us.
+Pricing:
+- Starter: $50 — 1 automation
+- Growth: $100 — 3 automations (most popular)
+- Scale: $200 — 5 automations
+- Enterprise: Contact us — 5+ automations with dedicated support
 
-Process: Free 60-min audit → design → 48-hour deployment → 30-day support.
+Process: Free 60-min audit → custom design → 48-hour deployment → 30-day monitoring and support.
 
-Be helpful and concise (2–4 sentences). Guide interested users to book at /booking. Do not make up information.`;
+Be helpful, friendly, and concise (2–4 sentences per reply). Guide interested users to book a free audit at /booking. Do not make up information or pricing you are unsure about.`;
 
-// ── Ollama (PRIMARY — local, free, llama3.2:3b) ──────────────────────────────
-async function callOllama(
-  messages: Array<{ role: string; content: string }>
-): Promise<string> {
-  const baseUrl = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-  const model = process.env.OLLAMA_MODEL || "llama3.2:3b";
-
-  const res = await fetch(`${baseUrl}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model, messages, stream: false }),
-    signal: AbortSignal.timeout(30_000),
-  });
-
-  if (!res.ok) throw new Error(`Ollama ${res.status}`);
-  const data = await res.json();
-  const content = data.message?.content || data.response || "";
-  if (!content) throw new Error("Ollama returned empty content");
-  return content as string;
-}
-
-// ── OpenRouter (OPTIONAL fallback — only used when Ollama is unreachable) ───
+// ── OpenRouter (PRIMARY — reliable, API key set) ──────────────────────────────
 async function callOpenRouter(
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
   const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) throw new Error("OpenRouter key not set");
+  if (!apiKey) throw new Error("OpenRouter key not configured");
 
   const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -64,19 +47,49 @@ async function callOpenRouter(
       "X-Title": "RudraAI Chat",
     },
     body: JSON.stringify({
-      // Cheapest capable free-tier model on OpenRouter
-      model: "meta-llama/llama-3.2-3b-instruct:free",
+      model: "meta-llama/llama-3.1-8b-instruct:free",
       messages,
-      max_tokens: 512,
+      max_tokens: 400,
       temperature: 0.7,
     }),
-    signal: AbortSignal.timeout(15_000),
+    signal: AbortSignal.timeout(20_000),
   });
 
-  if (!res.ok) throw new Error(`OpenRouter ${res.status}`);
-  const data = await res.json();
-  const content = data.choices?.[0]?.message?.content;
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`OpenRouter ${res.status}: ${err.slice(0, 200)}`);
+  }
+  const data = (await res.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+  };
+  const content = data.choices?.[0]?.message?.content?.trim();
   if (!content) throw new Error("OpenRouter returned empty content");
+  return content as string;
+}
+
+// ── Ollama (OPTIONAL local fallback — only if OLLAMA_BASE_URL is set) ─────────
+async function callOllama(
+  messages: Array<{ role: string; content: string }>
+): Promise<string> {
+  const baseUrl = process.env.OLLAMA_BASE_URL;
+  if (!baseUrl) throw new Error("Ollama not configured");
+
+  const model = process.env.OLLAMA_MODEL || "llama3.2:3b";
+
+  const res = await fetch(`${baseUrl}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model, messages, stream: false }),
+    signal: AbortSignal.timeout(8_000), // quick fail — don't block UX
+  });
+
+  if (!res.ok) throw new Error(`Ollama ${res.status}`);
+  const data = (await res.json()) as {
+    message?: { content?: string };
+    response?: string;
+  };
+  const content = (data.message?.content || data.response || "").trim();
+  if (!content) throw new Error("Ollama returned empty content");
   return content as string;
 }
 
@@ -94,21 +107,25 @@ chatRouter.post("/", async (req: Request, res: Response) => {
   ];
 
   let reply: string;
-  let provider = "ollama";
+  let provider = "openrouter";
 
-  // Try Ollama first (local, free)
+  // 1. Try OpenRouter first (primary)
   try {
-    reply = await callOllama(messages);
-  } catch (ollamaErr) {
-    console.warn("Ollama unavailable, trying OpenRouter fallback:", (ollamaErr as Error).message);
-    provider = "openrouter";
+    reply = await callOpenRouter(messages);
+  } catch (orErr) {
+    console.warn("OpenRouter failed, trying Ollama:", (orErr as Error).message);
+    provider = "ollama";
+
+    // 2. Fallback to local Ollama
     try {
-      reply = await callOpenRouter(messages);
-    } catch (orErr) {
-      console.error("OpenRouter fallback also failed:", (orErr as Error).message);
-      reply =
-        "The AI assistant is temporarily offline. Please email hello@rudraai.io or book a call at rudraai.io/booking.";
-      provider = "none";
+      reply = await callOllama(messages);
+    } catch (ollamaErr) {
+      console.error("Both providers failed:", (ollamaErr as Error).message);
+      return res.json({
+        reply:
+          "The AI assistant is temporarily offline. Please email hello@rudraai.io or book a call at /booking.",
+        provider: "none",
+      });
     }
   }
 
@@ -121,5 +138,5 @@ chatRouter.post("/", async (req: Request, res: Response) => {
     }).catch(() => {});
   }
 
-  return res.json({ reply });
+  return res.json({ reply, provider });
 });
