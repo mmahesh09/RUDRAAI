@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Raleway, DM_Sans } from "next/font/google";
-import Script from "next/script";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 import SmoothScrollProvider from "@/components/smooth-scroll-provider";
 import CookieConsent from "@/components/cookie-consent";
@@ -71,23 +71,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-[#09090B] text-white antialiased overflow-x-hidden">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-9KTTCR1MJH"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-9KTTCR1MJH');
-          `}
-        </Script>
         <SmoothScrollProvider>
           <Providers>{children}</Providers>
         </SmoothScrollProvider>
         <CookieConsent />
       </body>
+      <GoogleAnalytics gaId="G-9KTTCR1MJH" />
     </html>
   );
 }
