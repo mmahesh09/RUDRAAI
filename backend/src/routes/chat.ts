@@ -31,7 +31,9 @@ Process: Free 60-min audit → custom design → 48-hour deployment → 30-day m
 
 Be helpful, friendly, and concise (2–4 sentences per reply). Guide interested users to book a free audit at /booking. Do not make up information or pricing you are unsure about.`;
 
-// ── OpenRouter (PRIMARY — reliable, API key set) ──────────────────────────────
+// ── OpenRouter (PRIMARY — multi-model fallback routing) ───────────────────────
+// Uses the `models` array so if the first model is rate-limited, OpenRouter
+// automatically tries the next one. All are free-tier models.
 async function callOpenRouter(
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
@@ -47,12 +49,16 @@ async function callOpenRouter(
       "X-Title": "RudraAI Chat",
     },
     body: JSON.stringify({
-      model: "meta-llama/llama-3.1-8b-instruct:free",
+      models: [
+        "meta-llama/llama-3.3-70b-instruct:free",
+        "google/gemma-4-31b-it:free",
+        "openai/gpt-oss-20b:free",
+      ],
       messages,
       max_tokens: 400,
       temperature: 0.7,
     }),
-    signal: AbortSignal.timeout(20_000),
+    signal: AbortSignal.timeout(25_000),
   });
 
   if (!res.ok) {
