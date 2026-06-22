@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Play, Star, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Star, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import WorkflowAnimation from "@/components/workflow-animation";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
@@ -44,19 +44,19 @@ export default function Hero() {
           >
             {/* Announcement badge */}
             <motion.div variants={itemVariants} className="flex items-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,107,0,0.25)] bg-[rgba(255,107,0,0.07)] cursor-pointer hover:border-[rgba(255,107,0,0.5)] transition-colors group">
+              <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,107,0,0.25)] bg-[rgba(255,107,0,0.07)] hover:border-[rgba(255,107,0,0.5)] transition-colors group">
                 <span className="flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-[#FF6B00] opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF6B00]" />
                 </span>
                 <AnimatedShinyText
                   shimmerWidth={180}
-                  className="text-xs font-subheading font-medium text-[#A1A1AA] hover:text-white transition-colors"
+                  className="text-xs font-subheading font-medium text-[#A1A1AA] group-hover:text-white transition-colors"
                 >
-                 Check our Latest's Blog
+                  Read Our Latest Blog
                 </AnimatedShinyText>
                 <ArrowRight className="w-3 h-3 text-[#FF6B00] group-hover:translate-x-0.5 transition-transform" />
-              </div>
+              </Link>
             </motion.div>
 
             {/* Headline */}
@@ -103,12 +103,9 @@ export default function Hero() {
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <button className="outline-button h-12 px-6 flex items-center gap-2 group">
-                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-[rgba(255,107,0,0.15)] transition-colors">
-                  <Play className="w-3 h-3 text-white fill-white ml-0.5" />
-                </div>
-                Watch Demo
-              </button>
+              <Link href="/services" className="outline-button h-12 px-6 flex items-center gap-2 group">
+                See How It Works
+              </Link>
             </motion.div>
 
             {/* Social Proof */}

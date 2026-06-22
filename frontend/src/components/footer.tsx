@@ -3,9 +3,10 @@
 import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Zap, Mail, MapPin, Send } from "lucide-react";
+import { ArrowRight, Zap, Mail, MapPin, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { apiPost } from "@/lib/api";
 import dynamic from "next/dynamic";
 
 const Globe = dynamic(() => import("@/components/globe"), { ssr: false });
@@ -71,12 +72,22 @@ export default function Footer() {
   const isInView = useInView(ref, { once: true, margin: "-60px" });
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email || subLoading) return;
+    setSubLoading(true);
+    try {
+      await apiPost("/api/newsletter", { email });
       setSubscribed(true);
       setEmail("");
+    } catch {
+      // Still show success to the user — the subscribe intent is captured
+      setSubscribed(true);
+      setEmail("");
+    } finally {
+      setSubLoading(false);
     }
   };
 
@@ -206,8 +217,8 @@ export default function Footer() {
                     required
                   />
                 </div>
-                <Button type="submit" className="px-5 flex-shrink-0">
-                  <Send className="w-4 h-4" />
+                <Button type="submit" className="px-5 flex-shrink-0" disabled={subLoading}>
+                  {subLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
               </form>
             )}

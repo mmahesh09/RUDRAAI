@@ -20,7 +20,7 @@ const securityHeaders = [
       // Next.js requires unsafe-inline; Cal.com embed.js loaded from their CDN
       "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.cal.com https://cal.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "img-src 'self' data: blob: https://images.unsplash.com https://html.tailus.io",
+      "img-src 'self' data: blob: https://images.unsplash.com https://html.tailus.io https://cdn.simpleicons.org",
       "font-src 'self' https://fonts.gstatic.com",
       // API calls go to same origin via Next.js rewrite proxy — only Cal.com needs extra allow
       // Chat widget calls /api/chat (same-origin) — no extra connect-src needed
@@ -40,6 +40,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "html.tailus.io" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
+      { protocol: "https", hostname: "cdn.simpleicons.org" },
     ],
   },
 

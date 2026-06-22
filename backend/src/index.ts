@@ -7,6 +7,7 @@ import { contactRouter } from "./routes/contact";
 import { bookingRouter } from "./routes/booking";
 import { calRouter } from "./routes/cal";
 import { chatRouter } from "./routes/chat";
+import { newsletterRouter } from "./routes/newsletter";
 
 dotenv.config();
 
@@ -78,6 +79,7 @@ const chatLimiter = rateLimit({
 app.use("/api/", globalLimiter);
 app.use("/api/contact", formLimiter);
 app.use("/api/booking", formLimiter);
+app.use("/api/newsletter", formLimiter);
 app.use("/api/chat", chatLimiter);
 
 // Body parsing — keep limit tight
@@ -89,6 +91,7 @@ app.use("/api/contact", contactRouter);
 app.use("/api/booking", bookingRouter);
 app.use("/api/cal", calRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/newsletter", newsletterRouter);
 
 // Health check — no sensitive data
 app.get("/health", (_req, res) => {
