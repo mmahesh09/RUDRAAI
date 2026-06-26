@@ -6,12 +6,12 @@ import { Zap, ShieldCheck, TrendingUp, Rocket, DollarSign, Building2 } from "luc
 import type { LucideIcon } from "lucide-react";
 
 const stats: { Icon: LucideIcon; value: string; label: string; color: string }[] = [
-  { Icon: Zap,         value: "0",   label: "Automations Deployed",  color: "#FF6B00" },
-  { Icon: ShieldCheck, value: "--", label: "Uptime Guarantee",      color: "#10B981" },
-  { Icon: TrendingUp,  value: "--",    label: "Avg Productivity Gain", color: "#8B5CF6" },
-  { Icon: Rocket,      value: "--",   label: "Deploy Time",           color: "#3B82F6" },
-  { Icon: DollarSign,  value: "--", label: "Client Cost Savings",   color: "#F59E0B" },
-  { Icon: Building2,   value: "0",    label: "Happy Clients",         color: "#EC4899" },
+  { Icon: Zap,         value: "12+",   label: "Automations Deployed",  color: "#FF6B00" },
+  { Icon: ShieldCheck, value: "99.9%", label: "Uptime Guarantee",      color: "#10B981" },
+  { Icon: TrendingUp,  value: "20h+",  label: "Saved Per Client/Week", color: "#8B5CF6" },
+  { Icon: Rocket,      value: "48h",   label: "Avg Deploy Time",       color: "#3B82F6" },
+  { Icon: DollarSign,  value: "$30K+", label: "Client Cost Savings",   color: "#F59E0B" },
+  { Icon: Building2,   value: "8+",    label: "Happy Clients",         color: "#EC4899" },
 ];
 
 export default function StatsSection() {

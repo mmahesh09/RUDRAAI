@@ -16,8 +16,8 @@ newsletterRouter.post("/", async (req: Request, res: Response) => {
   const { email } = parsed.data;
 
   // Forward to n8n webhook for CRM logging (fire-and-forget)
-  if (process.env.N8N_WEBHOOK_CONTACT) {
-    fetch(process.env.N8N_WEBHOOK_CONTACT, {
+  if (process.env.N8N_WEBHOOK_NEWSLETTER) {
+    fetch(process.env.N8N_WEBHOOK_NEWSLETTER, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "newsletter_signup", email }),

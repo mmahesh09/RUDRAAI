@@ -161,7 +161,7 @@ export default function FeaturesSection() {
   const [activeFeature, setActiveFeature] = useState(0);
 
   return (
-    <section id="features" className="section-padding relative overflow-hidden">
+    <section id="features" className="py-16 md:py-20 relative overflow-hidden">
       <div className="absolute inset-0 bg-[#0D0D14]" />
       <div className="absolute inset-0 grid-bg opacity-30" />
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />

@@ -78,7 +78,9 @@ export default function RootLayout({
         <CookieConsent />
         <ChatWidget />
       </body>
-      <GoogleAnalytics gaId="G-9KTTCR1MJH" />
+      {process.env.NEXT_PUBLIC_GA_ID && (
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
+      )}
     </html>
   );
 }

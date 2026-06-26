@@ -93,10 +93,10 @@ export function CustomersSection({
 const customers = [
   { src: "https://cdn.simpleicons.org/n8n", alt: "n8n", height: 24 },
   { src: "https://cdn.simpleicons.org/notion", alt: "Notion", height: 24 },
-  { src: "https://cdn.simpleicons.org/slack", alt: "Slack", height: 22 },
+  { src: "https://cdn.simpleicons.org/zapier", alt: "Zapier", height: 22 },
   { src: "https://cdn.simpleicons.org/zoom", alt: "Zoom", height: 22 },
   { src: "https://cdn.simpleicons.org/googlesheets", alt: "Google Sheets", height: 22 },
-  { src: "https://cdn.simpleicons.org/openai", alt: "OpenAI", height: 22 },
+  { src: "https://cdn.simpleicons.org/hubspot", alt: "HubSpot", height: 22 },
   { src: "https://cdn.simpleicons.org/docker", alt: "Docker", height: 24 },
   { src: "https://cdn.simpleicons.org/github", alt: "GitHub", height: 22 },
 ];
