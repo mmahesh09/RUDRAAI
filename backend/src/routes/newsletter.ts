@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
+import { supabase } from "../lib/supabase";
+import logger from "../lib/logger";
 
 export const newsletterRouter = Router();
 
@@ -22,6 +24,11 @@ newsletterRouter.post("/", async (req: Request, res: Response) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "newsletter_signup", email }),
     }).catch(() => {});
+  }
+
+  if (supabase) {
+    supabase.from("newsletter_subscribers").upsert({ email }, { onConflict: "email", ignoreDuplicates: true })
+      .then(({ error: e }) => { if (e) logger.warn({ err: e.message }, "Supabase newsletter insert failed"); });
   }
 
   return res.json({ success: true });

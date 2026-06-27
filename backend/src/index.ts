@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -11,6 +12,14 @@ import { chatRouter } from "./routes/chat";
 import { newsletterRouter } from "./routes/newsletter";
 
 dotenv.config();
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || "development",
+    tracesSampleRate: 0.1,
+  });
+}
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -106,6 +115,11 @@ app.get("/health", (_req, res) => {
 app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
+
+// Sentry error handler must come before the custom one
+if (process.env.SENTRY_DSN) {
+  app.use(Sentry.expressErrorHandler() as unknown as express.ErrorRequestHandler);
+}
 
 // Error handler — never leak stack traces or internal details
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

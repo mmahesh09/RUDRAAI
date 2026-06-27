@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { escapeHtml, createTransporter } from "../lib/email";
 import { appendToSheet } from "../lib/sheets";
+import { supabase } from "../lib/supabase";
 import logger from "../lib/logger";
 
 export const contactRouter = Router();
@@ -101,6 +102,11 @@ contactRouter.post("/", async (req: Request, res: Response) => {
     }
 
     } // end smtpReady block
+
+    if (supabase) {
+      supabase.from("contacts").insert({ name, email, company, budget, message })
+        .then(({ error: e }) => { if (e) logger.warn({ err: e.message }, "Supabase contacts insert failed"); });
+    }
 
     return res.json({ success: true, message: "Message sent successfully." });
   } catch (error) {

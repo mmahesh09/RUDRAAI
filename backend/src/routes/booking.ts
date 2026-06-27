@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getEventTypeId, createCalBooking } from "../lib/calcom";
 import { escapeHtml, createTransporter } from "../lib/email";
 import { appendToSheet } from "../lib/sheets";
+import { supabase } from "../lib/supabase";
 import logger from "../lib/logger";
 
 export const bookingRouter = Router();
@@ -248,6 +249,11 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
       zoomLink || "",
       "New",
     ]).catch((e: Error) => logger.warn({ err: e.message }, "Google Sheets skipped"));
+
+    if (supabase) {
+      supabase.from("bookings").insert({ name, email, company, role, time_slot: timeSlot, goal, zoom_link: zoomLink })
+        .then(({ error: e }) => { if (e) logger.warn({ err: e.message }, "Supabase bookings insert failed"); });
+    }
 
     return res.json({ success: true, message: "Booking confirmed." });
   } catch (error) {
