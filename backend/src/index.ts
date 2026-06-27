@@ -1,4 +1,5 @@
 import * as Sentry from "@sentry/node";
+import compression from "compression";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -25,6 +26,8 @@ if (process.env.SENTRY_DSN) {
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+app.use(compression());
 
 // Security middleware
 app.use(helmet({
