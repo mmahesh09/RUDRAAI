@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
+import logger from "../lib/logger";
 
 export const chatRouter = Router();
 
@@ -119,14 +120,14 @@ chatRouter.post("/", async (req: Request, res: Response) => {
   try {
     reply = await callOpenRouter(messages);
   } catch (orErr) {
-    console.warn("OpenRouter failed, trying Ollama:", (orErr as Error).message);
+    logger.warn({ err: (orErr as Error).message }, "OpenRouter failed, trying Ollama");
     provider = "ollama";
 
     // 2. Fallback to local Ollama
     try {
       reply = await callOllama(messages);
     } catch (ollamaErr) {
-      console.error("Both providers failed:", (ollamaErr as Error).message);
+      logger.error({ err: (ollamaErr as Error).message }, "Both AI providers failed");
       return res.json({
         reply:
           "The AI assistant is temporarily offline. Please email hello@rudraai.io or book a call at /booking.",

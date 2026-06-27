@@ -1,7 +1,8 @@
 import { Router, Request, Response } from "express";
-import nodemailer from "nodemailer";
-import { google } from "googleapis";
 import { z } from "zod";
+import { escapeHtml, createTransporter } from "../lib/email";
+import { appendToSheet } from "../lib/sheets";
+import logger from "../lib/logger";
 
 export const contactRouter = Router();
 
@@ -14,48 +15,6 @@ const contactSchema = z.object({
   website: z.string().max(0).optional(), // honeypot
 });
 
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
-}
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
-
-async function appendContactToSheet(row: string[]) {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const key = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  const sheetId = process.env.GOOGLE_SHEETS_ID;
-
-  if (!email || !key || !sheetId) return;
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: { client_email: email, private_key: key },
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-
-  const sheets = google.sheets({ version: "v4", auth });
-
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: sheetId,
-    range: "Contacts!A:G",
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: [row] },
-  });
-}
 
 contactRouter.post("/", async (req: Request, res: Response) => {
   const parsed = contactSchema.safeParse(req.body);
@@ -122,9 +81,8 @@ contactRouter.post("/", async (req: Request, res: Response) => {
       `,
     });
 
-    // ── Google Sheets ─────────────────────────────────────────────
     const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-    await appendContactToSheet([
+    await appendToSheet("Contacts!A:G", [
       submittedAt,
       name,
       email,
@@ -146,7 +104,7 @@ contactRouter.post("/", async (req: Request, res: Response) => {
 
     return res.json({ success: true, message: "Message sent successfully." });
   } catch (error) {
-    console.error("Contact error:", (error as Error).message);
+    logger.error({ err: (error as Error).message }, "Contact error");
     return res.status(500).json({ error: "Failed to send message. Please try again." });
   }
 });

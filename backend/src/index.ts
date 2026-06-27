@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import rateLimit from "express-rate-limit";
+import logger from "./lib/logger";
 import { contactRouter } from "./routes/contact";
 import { bookingRouter } from "./routes/booking";
 import { calRouter } from "./routes/cal";
@@ -37,8 +38,11 @@ const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (curl, Postman, server-to-server)
-      if (!origin) return callback(null, true);
+      if (!origin) {
+        // Allow no-origin in dev (curl, Postman); reject in production
+        if (process.env.NODE_ENV !== "production") return callback(null, true);
+        return callback(new Error("Not allowed by CORS"));
+      }
       if (allowedOrigins.includes(origin)) return callback(null, true);
       callback(new Error("Not allowed by CORS"));
     },
@@ -105,12 +109,12 @@ app.use((_req, res) => {
 
 // Error handler — never leak stack traces or internal details
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error("Unhandled error:", err.message);
+  logger.error({ err: err.message }, "Unhandled error");
   res.status(500).json({ error: "Internal server error" });
 });
 
 app.listen(PORT, () => {
-  console.log(`RudraAI API running at http://localhost:${PORT}`);
+  logger.info(`RudraAI API running at http://localhost:${PORT}`);
 });
 
 export default app;

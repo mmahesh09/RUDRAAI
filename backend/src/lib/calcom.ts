@@ -1,3 +1,5 @@
+import logger from "./logger";
+
 const CALCOM_BASE = "https://api.cal.com/v2";
 const API_VERSION = "2024-09-04";
 
@@ -81,7 +83,7 @@ export async function createCalBooking(params: {
 
     if (!res.ok) {
       const err = await res.json();
-      console.error("Cal.com booking failed:", JSON.stringify(err));
+      logger.error({ err }, "Cal.com booking failed");
       return null;
     }
 
@@ -90,7 +92,7 @@ export async function createCalBooking(params: {
     };
     return data.data ?? null;
   } catch (e) {
-    console.error("Cal.com booking error:", (e as Error).message);
+    logger.error({ err: (e as Error).message }, "Cal.com booking error");
     return null;
   }
 }

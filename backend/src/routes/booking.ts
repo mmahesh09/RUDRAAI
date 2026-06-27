@@ -1,8 +1,9 @@
 import { Router, Request, Response } from "express";
-import nodemailer from "nodemailer";
-import { google } from "googleapis";
 import { z } from "zod";
 import { getEventTypeId, createCalBooking } from "../lib/calcom";
+import { escapeHtml, createTransporter } from "../lib/email";
+import { appendToSheet } from "../lib/sheets";
+import logger from "../lib/logger";
 
 export const bookingRouter = Router();
 
@@ -12,53 +13,10 @@ const bookingSchema = z.object({
   company: z.string().max(100).trim().optional().default(""),
   role: z.string().max(100).trim().optional(),
   timeSlot: z.string().min(3).max(80).trim(),
-  isoTime: z.string().max(50).trim().optional(), // ISO start time for Cal.com booking
+  isoTime: z.string().max(50).trim().optional(),
   goal: z.string().min(20).max(2000).trim(),
   website: z.string().max(0).optional(), // honeypot
 });
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
-}
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
-
-async function appendToGoogleSheet(row: string[]) {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const key = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  const sheetId = process.env.GOOGLE_SHEETS_ID;
-
-  if (!email || !key || !sheetId) return;
-
-  const auth = new google.auth.GoogleAuth({
-    credentials: { client_email: email, private_key: key },
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-
-  const sheets = google.sheets({ version: "v4", auth });
-
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: sheetId,
-    range: "Sheet1!A:I",
-    valueInputOption: "USER_ENTERED",
-    requestBody: { values: [row] },
-  });
-}
 
 // ── Zoom: Server-to-Server OAuth meeting creation ─────────────────────────────
 async function createZoomMeeting(topic: string, timeSlot: string): Promise<string | null> {
@@ -116,7 +74,7 @@ async function createZoomMeeting(topic: string, timeSlot: string): Promise<strin
     const meeting = (await meetingRes.json()) as { join_url?: string };
     return meeting.join_url ?? null;
   } catch (e) {
-    console.error("Zoom meeting creation failed:", (e as Error).message);
+    logger.error({ err: (e as Error).message }, "Zoom meeting creation failed");
     return null;
   }
 }
@@ -165,10 +123,10 @@ async function logToNotion(data: {
 
     if (!res.ok) {
       const err = await res.json();
-      console.error("Notion logging failed:", JSON.stringify(err));
+      logger.error({ err }, "Notion logging failed");
     }
   } catch (e) {
-    console.error("Notion logging failed:", (e as Error).message);
+    logger.error({ err: (e as Error).message }, "Notion logging failed");
   }
 }
 
@@ -209,11 +167,13 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
     // ── Log to Notion for onboarding (non-fatal) ──────────────────
     logToNotion({ name, email, company, role, timeSlot, goal, zoomLink }).catch(() => {});
 
-    const zoomSection = zoomLink
+    const safeZoomLink = zoomLink ? escapeHtml(zoomLink) : null;
+
+    const zoomSection = safeZoomLink
       ? `
           <div style="background:#e8f4ff;border-left:4px solid #2D8CFF;padding:12px 16px;margin:16px 0;border-radius:4px">
             <strong style="color:#2D8CFF">📹 Your Zoom Link:</strong><br>
-            <a href="${zoomLink}" style="color:#2D8CFF;word-break:break-all">${zoomLink}</a>
+            <a href="${safeZoomLink}" style="color:#2D8CFF;word-break:break-all">${safeZoomLink}</a>
           </div>`
       : `<p><em>I'll send your Zoom link to this email within 1 hour.</em></p>`;
 
@@ -236,7 +196,7 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
           <tr><td><strong>Company</strong></td><td>${safeCompany}</td></tr>
           <tr><td><strong>Role</strong></td><td>${safeRole}</td></tr>
           <tr><td><strong>Time Slot</strong></td><td>${safeTimeSlot}</td></tr>
-          ${zoomLink ? `<tr><td><strong>Zoom Link</strong></td><td><a href="${zoomLink}">${zoomLink}</a></td></tr>` : ""}
+          ${safeZoomLink ? `<tr><td><strong>Zoom Link</strong></td><td><a href="${safeZoomLink}">${safeZoomLink}</a></td></tr>` : ""}
         </table>
         <h3>Automation Goal</h3>
         <p style="background:#f5f5f5;padding:12px;border-radius:6px">${safeGoal}</p>
@@ -276,9 +236,8 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
 
     } // end smtpReady block
 
-    // ── Google Sheets (non-fatal) ─────────────────────────────────
     const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-    await appendToGoogleSheet([
+    await appendToSheet("Sheet1!A:I", [
       submittedAt,
       name,
       email,
@@ -288,11 +247,11 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
       goal,
       zoomLink || "",
       "New",
-    ]).catch((e: Error) => console.warn("Google Sheets skipped:", e.message));
+    ]).catch((e: Error) => logger.warn({ err: e.message }, "Google Sheets skipped"));
 
     return res.json({ success: true, message: "Booking confirmed." });
   } catch (error) {
-    console.error("Booking error:", (error as Error).message);
+    logger.error({ err: (error as Error).message }, "Booking error");
     return res.status(500).json({ error: "Failed to confirm booking. Please try again." });
   }
 });
