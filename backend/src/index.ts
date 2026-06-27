@@ -13,6 +13,7 @@ import { chatRouter } from "./routes/chat";
 import { newsletterRouter } from "./routes/newsletter";
 import { ragRouter } from "./routes/rag";
 import { chatwootRouter } from "./routes/chatwoot";
+import { requireApiKey } from "./middleware/apiKey";
 
 dotenv.config();
 
@@ -114,7 +115,7 @@ app.use("/api/booking", bookingRouter);
 app.use("/api/cal", calRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/newsletter", newsletterRouter);
-app.use("/api/rag", ragRouter);
+app.use("/api/rag", requireApiKey, ragRouter);
 
 // Health check — no sensitive data
 app.get("/health", (_req, res) => {
