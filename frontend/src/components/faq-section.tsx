@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Faq5 } from "@/components/ui/faq-5";
+import { Faq5 } from "@/components/ui/faq-accordion";
 
 const faqs = [
   {

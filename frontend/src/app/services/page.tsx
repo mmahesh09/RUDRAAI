@@ -5,7 +5,7 @@ import Footer from "@/components/footer";
 import ServicesSection from "@/components/services-section";
 import CTASection from "@/components/cta-section";
 import { Badge } from "@/components/ui/badge";
-import { AnimatedRoadmap } from "@/components/ui/hero-section-5";
+import { AnimatedRoadmap } from "@/components/ui/animated-roadmap";
 import { motion } from "framer-motion";
 
 const milestones = [
