@@ -6,6 +6,7 @@ import CookieConsent from "@/components/cookie-consent";
 import { Providers } from "@/components/providers";
 import ChatWidget from "@/components/chat-widget";
 import GaScript from "@/components/ga-script";
+import ChatwootWidget from "@/components/chatwoot-widget";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -82,6 +83,7 @@ export default function RootLayout({
         <CookieConsent />
         <ChatWidget />
         <GaScript />
+        <ChatwootWidget />
       </body>
     </html>
   );
