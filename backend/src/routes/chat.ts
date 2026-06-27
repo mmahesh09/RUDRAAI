@@ -1,11 +1,13 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
 import logger from "../lib/logger";
+import { supabase } from "../lib/supabase";
 
 export const chatRouter = Router();
 
 const chatSchema = z.object({
   message: z.string().min(1).max(1000).trim(),
+  session_id: z.string().uuid().optional(),
   history: z
     .array(
       z.object({
@@ -100,13 +102,36 @@ async function callOllama(
   return content as string;
 }
 
+// Persist a turn to Supabase chat tables (fire-and-forget)
+async function persistTurn(
+  sessionId: string,
+  userMessage: string,
+  assistantReply: string,
+  provider: string
+): Promise<void> {
+  if (!supabase) return;
+  try {
+    // Upsert session so it exists before inserting messages
+    await supabase
+      .from("chat_sessions")
+      .upsert({ id: sessionId, updated_at: new Date().toISOString() }, { onConflict: "id" });
+
+    await supabase.from("chat_messages").insert([
+      { session_id: sessionId, role: "user", content: userMessage },
+      { session_id: sessionId, role: "assistant", content: assistantReply, provider },
+    ]);
+  } catch (err) {
+    logger.warn({ err: (err as Error).message }, "Chat persistence failed");
+  }
+}
+
 chatRouter.post("/", async (req: Request, res: Response) => {
   const parsed = chatSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: "Invalid request." });
   }
 
-  const { message, history } = parsed.data;
+  const { message, session_id, history } = parsed.data;
   const messages = [
     { role: "system", content: SYSTEM_PROMPT },
     ...history,
@@ -136,14 +161,19 @@ chatRouter.post("/", async (req: Request, res: Response) => {
     }
   }
 
+  // Fire-and-forget: persist to Supabase if session_id provided
+  if (session_id) {
+    persistTurn(session_id, message, reply, provider).catch(() => {});
+  }
+
   // Fire-and-forget to n8n (logs chat to Notion if configured)
   if (process.env.N8N_WEBHOOK_CHAT) {
     fetch(process.env.N8N_WEBHOOK_CHAT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, reply, provider, history }),
+      body: JSON.stringify({ message, reply, provider, history, session_id }),
     }).catch(() => {});
   }
 
-  return res.json({ reply, provider });
+  return res.json({ reply, provider, session_id });
 });

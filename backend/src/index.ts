@@ -10,6 +10,7 @@ import { bookingRouter } from "./routes/booking";
 import { calRouter } from "./routes/cal";
 import { chatRouter } from "./routes/chat";
 import { newsletterRouter } from "./routes/newsletter";
+import { ragRouter } from "./routes/rag";
 
 dotenv.config();
 
@@ -105,6 +106,7 @@ app.use("/api/booking", bookingRouter);
 app.use("/api/cal", calRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/newsletter", newsletterRouter);
+app.use("/api/rag", ragRouter);
 
 // Health check — no sensitive data
 app.get("/health", (_req, res) => {

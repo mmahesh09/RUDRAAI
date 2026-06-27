@@ -10,6 +10,7 @@
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {
+    "@qdrant/js-client-rest": "^1.18.0",
     "@sentry/node": "^10.62.0",
     "@supabase/supabase-js": "^2.108.2",
     "cors": "^2.8.5",
