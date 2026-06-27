@@ -100,7 +100,11 @@ app.use("/api/booking", formLimiter);
 app.use("/api/newsletter", formLimiter);
 app.use("/api/chat", chatLimiter);
 
-// Body parsing — keep limit tight
+// Chatwoot webhook must be mounted before express.json() so that its
+// route-level express.raw() middleware can read the raw Buffer for HMAC verification.
+app.use("/api/chatwoot", chatwootRouter);
+
+// Body parsing for all other routes — keep limit tight
 app.use(express.json({ limit: "50kb" }));
 app.use(express.urlencoded({ extended: false, limit: "50kb" }));
 
@@ -111,7 +115,6 @@ app.use("/api/cal", calRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/newsletter", newsletterRouter);
 app.use("/api/rag", ragRouter);
-app.use("/api/chatwoot", chatwootRouter);
 
 // Health check — no sensitive data
 app.get("/health", (_req, res) => {
