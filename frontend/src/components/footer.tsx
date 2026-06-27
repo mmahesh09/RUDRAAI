@@ -1,12 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Zap, Mail, MapPin, Send, Loader2 } from "lucide-react";
+import { ArrowRight, Zap, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { apiPost } from "@/lib/api";
 import dynamic from "next/dynamic";
 
 const Globe = dynamic(() => import("@/components/globe"), { ssr: false });
@@ -15,7 +13,6 @@ const footerLinks = {
   "Quick Links": [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
-    { label: "Templates", href: "/templates" },
     { label: "About", href: "/about" },
     { label: "Blog", href: "/blog" },
   ],
@@ -70,26 +67,6 @@ const social = [
 export default function Footer() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
-  const [subLoading, setSubLoading] = useState(false);
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || subLoading) return;
-    setSubLoading(true);
-    try {
-      await apiPost("/api/newsletter", { email });
-      setSubscribed(true);
-      setEmail("");
-    } catch {
-      // Still show success to the user — the subscribe intent is captured
-      setSubscribed(true);
-      setEmail("");
-    } finally {
-      setSubLoading(false);
-    }
-  };
 
   return (
     <footer ref={ref} className="relative overflow-hidden">
@@ -183,46 +160,6 @@ export default function Footer() {
             </div>
           </motion.div>
 
-          {/* Newsletter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.2 }}
-            className="max-w-xl mx-auto text-center mb-16"
-          >
-            <h3 className="text-2xl font-heading font-bold text-white mb-2">
-              Subscribe to Our Newsletter
-            </h3>
-            <p className="text-sm font-body text-[#71717A] mb-6">
-              Weekly automation tips, n8n tutorials, and AI news — curated for operators.
-            </p>
-            {subscribed ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 font-body"
-              >
-                ✓ You're in! Check your inbox.
-              </motion.div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="flex gap-2">
-                <div className="relative flex-1">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#71717A]" />
-                  <Input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="pl-9"
-                    required
-                  />
-                </div>
-                <Button type="submit" className="px-5 flex-shrink-0" disabled={subLoading}>
-                  {subLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-                </Button>
-              </form>
-            )}
-          </motion.div>
         </div>
       </div>
 

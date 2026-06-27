@@ -1,7 +1,6 @@
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
 import { CustomersSectionDemo } from "@/components/ui/customers-section";
-import StatsSection from "@/components/stats-section";
 import ServicesSection from "@/components/services-section";
 import FeaturesSection from "@/components/features-section";
 import HowItWorksSection from "@/components/how-it-works-section";
@@ -30,7 +29,6 @@ export default function HomePage() {
       <Navbar />
       <Hero />
       <CustomersSectionDemo />
-      <StatsSection />
       <ServicesSection />
       <FeaturesSection />
       <HowItWorksSection />
