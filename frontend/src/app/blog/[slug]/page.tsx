@@ -46,8 +46,20 @@ export default async function BlogPostPage({ params }: Props) {
 
   const color = categoryColors[post.category] ?? "#A1A1AA";
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt,
+    image: post.image,
+    datePublished: post.date,
+    author: { "@type": "Organization", name: "RudraAI", url: "https://rudraai.io" },
+    publisher: { "@type": "Organization", name: "RudraAI", logo: { "@type": "ImageObject", url: "https://rudraai.io/logo.png" } },
+  };
+
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <Navbar />
 
       {/* Hero */}

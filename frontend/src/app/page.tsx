@@ -12,9 +12,21 @@ import FaqSection from "@/components/faq-section";
 import CTASection from "@/components/cta-section";
 import Footer from "@/components/footer";
 
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "RudraAI",
+  url: "https://rudraai.io",
+  logo: "https://rudraai.io/logo.png",
+  description: "AI automation agency building n8n workflows and AI agents for businesses.",
+  sameAs: ["https://twitter.com/GowriRudrai"],
+  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://rudraai.io/contact" },
+};
+
 export default function HomePage() {
   return (
     <main>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <Navbar />
       <Hero />
       <CustomersSectionDemo />

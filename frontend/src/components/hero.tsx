@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Star, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,16 @@ const itemVariants = {
 };
 
 export default function Hero() {
+  const prefersReducedMotion = useReducedMotion();
+
+  const resolvedContainer = prefersReducedMotion
+    ? { hidden: { opacity: 1 }, visible: { opacity: 1, transition: { staggerChildren: 0 } } }
+    : containerVariants;
+
+  const resolvedItem = prefersReducedMotion
+    ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
+    : itemVariants;
+
   return (
     <section className="relative min-h-screen flex items-center pt-28 md:pt-32 pb-16 overflow-hidden">
       {/* Background effects */}
@@ -37,13 +48,13 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Content */}
           <motion.div
-            variants={containerVariants}
+            variants={resolvedContainer}
             initial="hidden"
             animate="visible"
             className="flex flex-col gap-6"
           >
             {/* Announcement badge */}
-            <motion.div variants={itemVariants} className="flex items-center">
+            <motion.div variants={resolvedItem} className="flex items-center">
               <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,107,0,0.25)] bg-[rgba(255,107,0,0.07)] hover:border-[rgba(255,107,0,0.5)] transition-colors group">
                 <span className="flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-[#FF6B00] opacity-75" />
@@ -60,7 +71,7 @@ export default function Hero() {
             </motion.div>
 
             {/* Headline */}
-            <motion.div variants={itemVariants} className="space-y-2">
+            <motion.div variants={resolvedItem} className="space-y-2">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white leading-[1.08] tracking-tight">
                 Stop Hiring For{" "}
                 <span className="relative">
@@ -84,7 +95,7 @@ export default function Hero() {
 
             {/* Sub-headline */}
             <motion.p
-              variants={itemVariants}
+              variants={resolvedItem}
               className="text-base sm:text-lg text-[#A1A1AA] font-body leading-relaxed max-w-xl"
             >
               We build intelligent n8n workflows and AI agents that run 24/7,
@@ -94,7 +105,7 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <motion.div
-              variants={itemVariants}
+              variants={resolvedItem}
               className="flex flex-wrap gap-3 items-center"
             >
               <Button asChild size="lg" className="h-12 px-7 text-base font-bold group">
@@ -110,23 +121,25 @@ export default function Hero() {
 
             {/* Social Proof */}
             <motion.div
-              variants={itemVariants}
+              variants={resolvedItem}
               className="flex flex-wrap items-center gap-4 pt-2"
             >
               {/* Avatars */}
               <div className="flex items-center gap-2">
                 <div className="flex -space-x-2">
                   {[
-                    "/avatars/avatar-boy.png",
-                    "/avatars/avatar-girl.png",
-                    "/avatars/avatar-boy.png",
-                    "/avatars/avatar-girl.png",
-                  ].map((src, i) => (
-                    <img
+                    { src: "/avatars/avatar-boy.png", alt: "Happy client" },
+                    { src: "/avatars/avatar-girl.png", alt: "Happy client" },
+                    { src: "/avatars/avatar-boy.png", alt: "Happy client" },
+                    { src: "/avatars/avatar-girl.png", alt: "Happy client" },
+                  ].map((avatar, i) => (
+                    <Image
                       key={i}
-                      src={src}
-                      alt="Customer"
-                      className="w-8 h-8 rounded-full border-2 border-[#09090B] object-cover"
+                      src={avatar.src}
+                      alt={avatar.alt}
+                      width={32}
+                      height={32}
+                      className="rounded-full border-2 border-[#09090B] object-cover"
                     />
                   ))}
                 </div>

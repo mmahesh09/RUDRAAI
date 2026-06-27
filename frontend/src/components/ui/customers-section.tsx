@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { AnimatedGroup } from "@/components/ui/animated-group";
@@ -75,12 +76,13 @@ export function CustomersSection({
         >
           {customers.map((logo, index) => (
             <div key={index} className="flex items-center justify-center">
-              <img
-                className="mx-auto h-auto w-fit opacity-50 hover:opacity-80 transition-opacity duration-300 invert"
+              <Image
+                className="mx-auto opacity-50 hover:opacity-80 transition-opacity duration-300 invert"
                 src={logo.src}
                 alt={logo.alt}
                 height={logo.height}
-                width="auto"
+                width={logo.height}
+                unoptimized
               />
             </div>
           ))}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView, useReducedMotion, AnimatePresence } from "framer-motion";
 import { CheckCircle2, Zap, Shield, Clock, BarChart2, Code2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -159,6 +159,7 @@ export default function FeaturesSection() {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
   const [activeFeature, setActiveFeature] = useState(0);
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <section id="features" className="py-16 md:py-20 relative overflow-hidden">
@@ -171,9 +172,9 @@ export default function FeaturesSection() {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Dashboard Mockup */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: prefersReducedMotion ? 0 : -40 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.7 }}
             className="relative order-2 lg:order-1"
           >
             <div className="absolute -inset-4 bg-[rgba(255,107,0,0.05)] rounded-3xl blur-2xl" />
@@ -182,9 +183,9 @@ export default function FeaturesSection() {
 
           {/* Right — Features list */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: prefersReducedMotion ? 0 : 40 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1 }}
+            transition={{ duration: prefersReducedMotion ? 0 : 0.7, delay: prefersReducedMotion ? 0 : 0.1 }}
             className="order-1 lg:order-2"
           >
             <Badge className="mb-4">Why RudraAI</Badge>
