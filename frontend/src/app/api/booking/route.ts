@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
         .then(() => {});
     }
 
-    return NextResponse.json({ success: true, message: "Booking confirmed." });
+    return NextResponse.json({ success: true, message: "Booking confirmed.", zoomLink });
   } catch (error) {
     console.error("Booking error:", error);
     return NextResponse.json({ error: "Failed to confirm booking. Please try again." }, { status: 500 });

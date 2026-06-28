@@ -116,6 +116,7 @@ export default function BookingPage() {
   const [selectedSlotISO, setSelectedSlotISO] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [booked, setBooked] = useState(false);
+  const [zoomLink, setZoomLink] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", email: "", company: "", role: "", goal: "" });
@@ -256,12 +257,13 @@ export default function BookingPage() {
     setError(null);
     setLoading(true);
     try {
-      await apiPost("/api/booking", {
+      const res = await apiPost<{ success: boolean; zoomLink?: string }>("/api/booking", {
         ...form,
         timeSlot,
         ...(selectedSlotISO ? { isoTime: selectedSlotISO } : {}),
         website: honeypot,
       });
+      setZoomLink(res.zoomLink ?? null);
       setBooked(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to confirm booking. Please try again.");
@@ -368,13 +370,28 @@ export default function BookingPage() {
                     </div>
                   </div>
                 )}
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-sky-500/05 border border-sky-500/15">
-                  <Video className="w-5 h-5 text-sky-400 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-heading font-semibold text-sky-400">Zoom</p>
-                    <p className="text-xs font-body text-[#71717A]">Link in email</p>
+                {zoomLink ? (
+                  <a
+                    href={zoomLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-4 rounded-xl bg-sky-500/10 border border-sky-500/30 hover:bg-sky-500/15 transition-colors"
+                  >
+                    <Video className="w-5 h-5 text-sky-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-heading font-semibold text-sky-400">Zoom — Join Meeting</p>
+                      <p className="text-xs font-body text-sky-300 underline truncate max-w-[160px]">{zoomLink}</p>
+                    </div>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-sky-500/05 border border-sky-500/15">
+                    <Video className="w-5 h-5 text-sky-400 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs font-heading font-semibold text-sky-400">Zoom</p>
+                      <p className="text-xs font-body text-[#71717A]">Link sent to email</p>
+                    </div>
                   </div>
-                </div>
+                )}
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-purple-500/05 border border-purple-500/15">
                   <FileText className="w-5 h-5 text-purple-400 flex-shrink-0" />
                   <div>
