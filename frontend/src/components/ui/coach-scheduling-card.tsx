@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, ChevronDown, Star } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TimeSlot {
@@ -39,7 +39,7 @@ interface CoachSchedulingProps {
 }
 
 const defaultCoach: Coach = {
-  name: process.env.NEXT_PUBLIC_CONSULTANT_NAME || "Automation Consultant",
+  name: "RudraAI",
   title: "Automation Consultant",
   location: "Remote (Zoom / Google Meet)",
   rating: 4.9,
@@ -53,38 +53,42 @@ const defaultLocations = [
   "Remote (Microsoft Teams)",
 ];
 
-function generateWeekSchedule(): DaySchedule[] {
+// Returns only Saturday and Sunday for the given week offset (0 = current week).
+// Saturday = monday+5, Sunday = monday+6.
+function generateWeekendSchedule(weekOffset: number = 0): DaySchedule[] {
   const today = new Date();
-  const dayOfWeek = today.getDay();
+  const dayOfWeek = today.getDay(); // 0=Sun…6=Sat
   const monday = new Date(today);
-  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + weekOffset * 7);
+  monday.setHours(0, 0, 0, 0);
 
   const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri"];
   const slots = [
     "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
     "11:00 AM", "11:30 AM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM",
   ];
+  const todayMidnight = new Date();
+  todayMidnight.setHours(0, 0, 0, 0);
 
-  return Array.from({ length: 5 }, (_, i) => {
+  return [
+    { offset: 5, dayName: "Sat" },
+    { offset: 6, dayName: "Sun" },
+  ].map(({ offset, dayName }) => {
     const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    const isPast = d < new Date(new Date().setHours(0, 0, 0, 0));
+    d.setDate(monday.getDate() + offset);
+    const isPast = d < todayMidnight;
     const dateStr = `${shortMonths[d.getMonth()]} ${d.getDate()}`;
-
     return {
       date: dateStr,
-      dayName: dayNames[i],
+      dayName,
       dayNumber: d.getDate(),
       hasAvailability: !isPast,
-      slots: isPast
-        ? []
-        : slots.map((time, si) => ({ time, available: si !== 5 })),
+      slots: isPast ? [] : slots.map((time, si) => ({ time, available: si !== 5 })),
     };
   });
 }
 
-const defaultWeekSchedule = generateWeekSchedule();
+const defaultWeekSchedule = generateWeekendSchedule();
 
 export function CoachSchedulingCard({
   coach = defaultCoach,
@@ -110,6 +114,11 @@ export function CoachSchedulingCard({
 
   const [currentWeek, setCurrentWeek] = useState(weekSchedule);
   const [weekOffset, setWeekOffset] = useState(0);
+
+  // Sync when the parent provides updated real Cal.com slots
+  useEffect(() => {
+    setCurrentWeek(weekSchedule);
+  }, [weekSchedule]);
 
   const weekRange =
     currentWeek.length > 0
@@ -161,33 +170,7 @@ export function CoachSchedulingCard({
     const newOffset = direction === "next" ? weekOffset + 1 : weekOffset - 1;
     if (direction === "prev" && newOffset < 0) return;
     setWeekOffset(newOffset);
-
-    const base = new Date();
-    const dayOfWeek = base.getDay();
-    const monday = new Date(base);
-    monday.setDate(base.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + newOffset * 7);
-
-    const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-    const slots = [
-      "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
-      "11:00 AM", "11:30 AM", "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM",
-    ];
-
-    const newWeek = Array.from({ length: 5 }, (_, i) => {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const isPast = d < new Date(new Date().setHours(0, 0, 0, 0));
-      return {
-        date: `${shortMonths[d.getMonth()]} ${d.getDate()}`,
-        dayName: dayNames[i],
-        dayNumber: d.getDate(),
-        hasAvailability: !isPast,
-        slots: isPast ? [] : slots.map((time, si) => ({ time, available: si !== 5 })),
-      };
-    });
-
-    setCurrentWeek(newWeek);
+    setCurrentWeek(generateWeekendSchedule(newOffset));
     onWeekChange?.(direction);
   };
 
@@ -254,12 +237,6 @@ export function CoachSchedulingCard({
               <div className="flex-1 min-w-0 space-y-2">
                 <h2 className="text-lg font-heading font-bold text-white">{coach.name}</h2>
                 <div className="flex items-center gap-2 text-sm text-[#A1A1AA] font-body flex-wrap">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3.5 h-3.5 fill-[#FF6B00] text-[#FF6B00]" />
-                    <span className="font-medium text-white">{coach.rating}</span>
-                    <span className="text-[#71717A]">({coach.reviewCount} reviews)</span>
-                  </div>
-                  <span className="text-white/20">•</span>
                   <span>{coach.title}</span>
                 </div>
               </div>
@@ -267,7 +244,7 @@ export function CoachSchedulingCard({
               <div className="text-right flex-shrink-0">
                 <p className="text-[10px] text-[#71717A] uppercase tracking-wider mb-1 font-body">Free</p>
                 <p className="text-2xl font-heading font-black text-[#10B981]">$0</p>
-                <p className="text-[10px] text-[#71717A] font-body">60 min audit</p>
+                <p className="text-[10px] text-[#71717A] font-body">15 min call</p>
               </div>
             </div>
           </motion.div>
@@ -487,7 +464,7 @@ export function CoachSchedulingCard({
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/[0.06]">
                     <span className="text-sm font-body text-[#A1A1AA]">Duration:</span>
-                    <span className="text-sm font-body text-white">60 minutes</span>
+                    <span className="text-sm font-body text-white">15 minutes</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
                     <span className="text-sm font-body text-[#A1A1AA]">Price:</span>
@@ -517,3 +494,6 @@ export function CoachSchedulingCard({
     </motion.div>
   );
 }
+
+
+

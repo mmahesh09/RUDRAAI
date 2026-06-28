@@ -76,7 +76,7 @@ export default function RootLayout({
       className={`${montserrat.variable} ${raleway.variable} ${dmSans.variable} dark`}
       suppressHydrationWarning
     >
-      <body className="bg-[#09090B] text-white antialiased overflow-x-hidden">
+      <body className="bg-[#09090B] text-white antialiased overflow-x-hidden" suppressHydrationWarning>
         <SmoothScrollProvider>
           <Providers>{children}</Providers>
         </SmoothScrollProvider>

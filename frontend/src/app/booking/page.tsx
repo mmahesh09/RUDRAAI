@@ -45,7 +45,8 @@ interface DaySchedule {
   hasAvailability: boolean;
 }
 
-// Convert Cal.com API response to DaySchedule[] and build a (date→time→ISO) map
+// Convert Cal.com API response to DaySchedule[] and build a (date→time→ISO) map.
+// Only Saturday (6) and Sunday (0) are included — weekday slots are discarded.
 function convertCalSlots(
   calSlots: Record<string, { time: string }[]>
 ): { schedule: DaySchedule[]; slotMap: Record<string, Record<string, string>> } {
@@ -54,6 +55,11 @@ function convertCalSlots(
   const slotMap: Record<string, Record<string, string>> = {};
 
   const schedule = Object.entries(calSlots)
+    .filter(([dateStr]) => {
+      const [year, month, day] = dateStr.split("-").map(Number);
+      const dow = new Date(year, month - 1, day).getDay();
+      return dow === 0 || dow === 6; // 0=Sun, 6=Sat
+    })
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dateStr, slots]) => {
       // dateStr is "YYYY-MM-DD" — treat as local date to avoid UTC-shift
@@ -285,7 +291,7 @@ export default function BookingPage() {
             <span className="text-gradient-orange">Automation Audit</span>
           </h1>
           <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto">
-            60 minutes. No sales pitch. Walk away with a custom roadmap and ROI analysis for your business.
+            15 minutes. No sales pitch. Walk away with a custom roadmap and ROI analysis for your business.
           </p>
           {/* Integration badges */}
           <div className="flex items-center justify-center gap-3 mt-5 flex-wrap">
@@ -338,10 +344,7 @@ export default function BookingPage() {
                 <div className="w-20 h-20 rounded-3xl bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-10 h-10 text-green-400" />
                 </div>
-                <h2 className="text-2xl font-heading font-black text-white mb-1">
-                  You&apos;re booked,{" "}
-                  <span className="text-[#FF6B00]">{form.name || "friend"}</span>!
-                </h2>
+                <h2 className="text-2xl font-heading font-black text-white mb-1">Hi {form.name},</h2>
                 <p className="text-[#A1A1AA] font-body mb-2">
                   Your Automation Audit is confirmed for{" "}
                   <span className="text-white font-medium">{timeSlot}</span>.
@@ -423,7 +426,7 @@ export default function BookingPage() {
                   <div className="mt-5 pt-5 border-t border-white/[0.06]">
                     <div className="flex items-center gap-2 text-sm font-body text-[#A1A1AA]">
                       <Clock className="w-4 h-4 text-[#FF6B00]" />
-                      <span>60 minutes · Free · No strings attached</span>
+                      <span>15 minutes · Free · No strings attached</span>
                     </div>
                   </div>
                 </div>
@@ -619,3 +622,4 @@ export default function BookingPage() {
     </main>
   );
 }
+

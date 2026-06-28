@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { getEventTypeId, createCalBooking } from "../lib/calcom";
-import { escapeHtml, createTransporter } from "../lib/email";
+import { escapeHtml, sendEmail, emailReady } from "../lib/email";
 import { appendToSheet } from "../lib/sheets";
 import { supabase } from "../lib/supabase";
 import logger from "../lib/logger";
@@ -131,6 +131,26 @@ async function logToNotion(data: {
   }
 }
 
+// Returns true only if the booking falls on a Saturday or Sunday.
+// Prefers the ISO timestamp when available; falls back to parsing the display string.
+function isWeekendBooking(isoTime: string | undefined, timeSlot: string): boolean {
+  if (isoTime) {
+    const d = new Date(isoTime);
+    if (!isNaN(d.getTime())) {
+      const dow = d.getDay();
+      return dow === 0 || dow === 6;
+    }
+  }
+  // Fallback: parse display string like "Jun 28 at 10:00 AM IST"
+  const cleaned = timeSlot.replace(/ IST$/i, "").replace(" at ", " ");
+  const d = new Date(`${cleaned} ${new Date().getFullYear()}`);
+  if (!isNaN(d.getTime())) {
+    const dow = d.getDay();
+    return dow === 0 || dow === 6;
+  }
+  return true; // Cannot determine day — allow (fail open)
+}
+
 // ── Main booking handler ──────────────────────────────────────────────────────
 bookingRouter.post("/", async (req: Request, res: Response) => {
   const parsed = bookingSchema.safeParse(req.body);
@@ -179,63 +199,63 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
       : `<p><em>I'll send your Zoom link to this email within 1 hour.</em></p>`;
 
     const consultantName = process.env.CONSULTANT_NAME || "The RudraAI Team";
-    const smtpReady = !!(process.env.SMTP_USER && process.env.SMTP_PASS && process.env.CONTACT_TO);
 
-    if (smtpReady) {
-    const transporter = createTransporter();
+    if (emailReady()) {
+      try {
+        // ── Notification to owner ─────────────────────────────────
+        if (process.env.CONTACT_TO) {
+          await sendEmail({
+            to: process.env.CONTACT_TO,
+            subject: `New Booking: ${safeName} (${safeCompany}) — ${safeTimeSlot}`,
+            html: `
+              <h2 style="color:#FF6B00">New Automation Audit Booking</h2>
+              <table cellpadding="8" style="border-collapse:collapse">
+                <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
+                <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
+                <tr><td><strong>Company</strong></td><td>${safeCompany}</td></tr>
+                <tr><td><strong>Role</strong></td><td>${safeRole}</td></tr>
+                <tr><td><strong>Time Slot</strong></td><td>${safeTimeSlot}</td></tr>
+                ${safeZoomLink ? `<tr><td><strong>Zoom Link</strong></td><td><a href="${safeZoomLink}">${safeZoomLink}</a></td></tr>` : ""}
+              </table>
+              <h3>Automation Goal</h3>
+              <p style="background:#f5f5f5;padding:12px;border-radius:6px">${safeGoal}</p>
+              <p style="color:#888;font-size:0.85em"><em>Notion onboarding record created automatically.</em></p>
+            `,
+          });
+        }
 
-    // ── Email to owner ────────────────────────────────────────────
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: process.env.CONTACT_TO,
-      subject: `New Booking: ${safeName} (${safeCompany}) — ${safeTimeSlot}`,
-      html: `
-        <h2 style="color:#FF6B00">New Automation Audit Booking</h2>
-        <table cellpadding="8" style="border-collapse:collapse">
-          <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
-          <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
-          <tr><td><strong>Company</strong></td><td>${safeCompany}</td></tr>
-          <tr><td><strong>Role</strong></td><td>${safeRole}</td></tr>
-          <tr><td><strong>Time Slot</strong></td><td>${safeTimeSlot}</td></tr>
-          ${safeZoomLink ? `<tr><td><strong>Zoom Link</strong></td><td><a href="${safeZoomLink}">${safeZoomLink}</a></td></tr>` : ""}
-        </table>
-        <h3>Automation Goal</h3>
-        <p style="background:#f5f5f5;padding:12px;border-radius:6px">${safeGoal}</p>
-        <p style="color:#888;font-size:0.85em"><em>Notion onboarding record created automatically.</em></p>
-      `,
-    });
-
-    // ── Confirmation email to client ──────────────────────────────
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: "Your Automation Audit is Confirmed — RudraAI",
-      html: `
-        <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
-          <h2 style="color:#FF6B00">You're booked, ${safeName}! 🎉</h2>
-          <p>Your <strong>Free Automation Audit</strong> is confirmed for:</p>
-          <div style="background:#fff8f0;border-left:4px solid #FF6B00;padding:12px 16px;margin:16px 0;border-radius:4px">
-            <strong style="font-size:1.1em">${safeTimeSlot}</strong>
-          </div>
-          ${zoomSection}
-          <p><strong>What happens next:</strong></p>
-          <ol style="line-height:1.8">
-            <li>Join the Zoom call at your booked time</li>
-            <li>You'll receive a short pre-call questionnaire 24 hours before</li>
-            <li>On the call, we'll map your workflows and identify your top automation opportunities</li>
-          </ol>
-          <p>Need to reschedule? Just reply to this email and we'll sort it out.</p>
-          <br>
-          <p>Looking forward to it!<br>
-          <strong>${escapeHtml(consultantName)}</strong><br>
-          <span style="color:#888">RudraAI — Automation Agency</span></p>
-          <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
-          <p style="font-size:0.8em;color:#aaa">RudraAI — n8n Workflow Automation Agency</p>
-        </div>
-      `,
-    });
-
-    } // end smtpReady block
+        // ── Confirmation email to client ──────────────────────────
+        await sendEmail({
+          to: email,
+          subject: "Your Automation Audit is Confirmed — RudraAI",
+          html: `
+            <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
+              <h2 style="color:#FF6B00">You're booked, ${safeName}! 🎉</h2>
+              <p>Your <strong>Free Automation Audit</strong> is confirmed for:</p>
+              <div style="background:#fff8f0;border-left:4px solid #FF6B00;padding:12px 16px;margin:16px 0;border-radius:4px">
+                <strong style="font-size:1.1em">${safeTimeSlot}</strong>
+              </div>
+              ${zoomSection}
+              <p><strong>What happens next:</strong></p>
+              <ol style="line-height:1.8">
+                <li>Join the Zoom call at your booked time</li>
+                <li>You'll receive a short pre-call questionnaire 24 hours before</li>
+                <li>On the call, we'll map your workflows and identify your top automation opportunities</li>
+              </ol>
+              <p>Need to reschedule? Just reply to this email and we'll sort it out.</p>
+              <br>
+              <p>Looking forward to it!<br>
+              <strong>${escapeHtml(consultantName)}</strong><br>
+              <span style="color:#888">RudraAI — Automation Agency</span></p>
+              <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+              <p style="font-size:0.8em;color:#aaa">RudraAI — n8n Workflow Automation Agency</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        logger.warn({ err: (emailErr as Error).message }, "Email send failed — booking still confirmed");
+      }
+    } // end emailReady block
 
     const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
     await appendToSheet("Sheet1!A:I", [

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import { escapeHtml, createTransporter } from "../lib/email";
+import { escapeHtml, sendEmail, emailReady } from "../lib/email";
 import { appendToSheet } from "../lib/sheets";
 import { supabase } from "../lib/supabase";
 import logger from "../lib/logger";
@@ -34,53 +34,54 @@ contactRouter.post("/", async (req: Request, res: Response) => {
   const safeBudget  = budget ? escapeHtml(budget) : "—";
   const safeMessage = escapeHtml(message).replace(/\n/g, "<br>");
 
-  // Skip email entirely if SMTP isn't configured (dev without credentials)
-  const smtpReady = !!(process.env.SMTP_USER && process.env.SMTP_PASS && process.env.CONTACT_TO);
-
   try {
-    if (smtpReady) {
-    const transporter = createTransporter();
+    if (emailReady()) {
+      try {
+        // ── Notification to owner ───────────────────────────────────
+        if (process.env.CONTACT_TO) {
+          await sendEmail({
+            to: process.env.CONTACT_TO,
+            subject: `New Contact: ${safeName} from ${safeCompany}`,
+            replyTo: email,
+            html: `
+              <h2 style="color:#FF6B00">New Contact Form Submission</h2>
+              <table cellpadding="8" style="border-collapse:collapse">
+                <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
+                <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
+                <tr><td><strong>Company</strong></td><td>${safeCompany}</td></tr>
+                <tr><td><strong>Budget</strong></td><td>${safeBudget}</td></tr>
+              </table>
+              <h3>Message</h3>
+              <p style="background:#f5f5f5;padding:12px;border-radius:6px">${safeMessage}</p>
+              <p style="color:#888"><em>Reply directly to ${escapeHtml(email)}</em></p>
+            `,
+          });
+        }
 
-    // ── Email to owner ────────────────────────────────────────────
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: process.env.CONTACT_TO,
-      subject: `New Contact: ${safeName} from ${safeCompany}`,
-      html: `
-        <h2 style="color:#FF6B00">New Contact Form Submission</h2>
-        <table cellpadding="8" style="border-collapse:collapse">
-          <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
-          <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
-          <tr><td><strong>Company</strong></td><td>${safeCompany}</td></tr>
-          <tr><td><strong>Budget</strong></td><td>${safeBudget}</td></tr>
-        </table>
-        <h3>Message</h3>
-        <p style="background:#f5f5f5;padding:12px;border-radius:6px">${safeMessage}</p>
-        <p style="color:#888"><em>Reply directly to ${escapeHtml(email)}</em></p>
-      `,
-    });
-
-    // ── Confirmation email to client ──────────────────────────────
-    const bookingUrl = `${process.env.FRONTEND_URL || "https://rudraai.io"}/booking`;
-    const consultantName = process.env.CONSULTANT_NAME || "The RudraAI Team";
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: email,
-      subject: "Got your message — I'll be in touch soon | RudraAI",
-      html: `
-        <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
-          <h2 style="color:#FF6B00">Thanks for reaching out, ${safeName}!</h2>
-          <p>I've received your message and will get back to you within <strong>4 business hours</strong>.</p>
-          <p>While you wait, you're welcome to <a href="${bookingUrl}" style="color:#FF6B00">book a free 60-minute automation audit</a> — no pitch, just a practical look at your workflows and what's worth automating first.</p>
-          <br>
-          <p>Talk soon,<br>
-          <strong>${escapeHtml(consultantName)}</strong><br>
-          <span style="color:#888">RudraAI — Automation Agency</span></p>
-          <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
-          <p style="font-size:0.8em;color:#aaa">RudraAI — n8n Workflow Automation Agency</p>
-        </div>
-      `,
-    });
+        // ── Confirmation email to client ──────────────────────────
+        const bookingUrl = `${process.env.FRONTEND_URL || "https://rudraai.io"}/booking`;
+        const consultantName = process.env.CONSULTANT_NAME || "The RudraAI Team";
+        await sendEmail({
+          to: email,
+          subject: "Got your message — I'll be in touch soon | RudraAI",
+          html: `
+            <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
+              <h2 style="color:#FF6B00">Thanks for reaching out, ${safeName}!</h2>
+              <p>I've received your message and will get back to you within <strong>4 business hours</strong>.</p>
+              <p>While you wait, you're welcome to <a href="${bookingUrl}" style="color:#FF6B00">book a free 60-minute automation audit</a> — no pitch, just a practical look at your workflows and what's worth automating first.</p>
+              <br>
+              <p>Talk soon,<br>
+              <strong>${escapeHtml(consultantName)}</strong><br>
+              <span style="color:#888">RudraAI — Automation Agency</span></p>
+              <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+              <p style="font-size:0.8em;color:#aaa">RudraAI — n8n Workflow Automation Agency</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        logger.warn({ err: (emailErr as Error).message }, "Email send failed — contact still recorded");
+      }
+    }
 
     const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
     await appendToSheet("Contacts!A:G", [
@@ -91,17 +92,15 @@ contactRouter.post("/", async (req: Request, res: Response) => {
       budget || "",
       message,
       "New",
-    ]);
+    ]).catch((e: Error) => logger.warn({ err: e.message }, "Google Sheets skipped"));
 
     if (process.env.N8N_WEBHOOK_CONTACT) {
-      await fetch(process.env.N8N_WEBHOOK_CONTACT, {
+      fetch(process.env.N8N_WEBHOOK_CONTACT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, company, budget, message }),
       }).catch(() => {});
     }
-
-    } // end smtpReady block
 
     if (supabase) {
       supabase.from("contacts").insert({ name, email, company, budget, message })

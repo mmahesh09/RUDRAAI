@@ -121,7 +121,7 @@ export default function ServicesSection() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.4, delay: 0.2 + i * 0.08 }}
-                  className="p-4 rounded-xl bg-white/[0.03] border border-white/08"
+                  className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08]"
                 >
                   <p className="text-xs font-subheading font-bold text-[#FF6B00] uppercase tracking-wide mb-3">{uc.category}</p>
                   <ul className="space-y-2">
