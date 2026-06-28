@@ -609,9 +609,6 @@ export default function BookingPage() {
                   )}
                 </Button>
 
-                <p className="text-center text-xs text-[#71717A] font-body">
-                  A Zoom link will be sent to your email · Logged to Notion for onboarding
-                </p>
               </form>
             </div>
           )}
@@ -622,4 +619,5 @@ export default function BookingPage() {
     </main>
   );
 }
+
 

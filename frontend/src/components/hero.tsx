@@ -1,9 +1,8 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Star, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import WorkflowAnimation from "@/components/workflow-animation";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
@@ -119,52 +118,14 @@ export default function Hero() {
               </Link>
             </motion.div>
 
-            {/* Social Proof */}
-            <motion.div
-              variants={resolvedItem}
-              className="flex flex-wrap items-center gap-4 pt-2"
-            >
-              {/* Avatars */}
-              <div className="flex items-center gap-2">
-                <div className="flex -space-x-2">
-                  {[
-                    { src: "/avatars/avatar-boy.png", alt: "Happy client" },
-                    { src: "/avatars/avatar-girl.png", alt: "Happy client" },
-                    { src: "/avatars/avatar-boy.png", alt: "Happy client" },
-                    { src: "/avatars/avatar-girl.png", alt: "Happy client" },
-                  ].map((avatar, i) => (
-                    <Image
-                      key={i}
-                      src={avatar.src}
-                      alt={avatar.alt}
-                      width={32}
-                      height={32}
-                      className="rounded-full border-2 border-[#09090B] object-cover"
-                    />
-                  ))}
+            {/* Benefits */}
+            <motion.div variants={resolvedItem} className="flex flex-wrap gap-3 pt-1">
+              {["48h deployment", "99.9% uptime", "No code needed"].map((text) => (
+                <div key={text} className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+                  <span className="text-xs font-body text-[#A1A1AA]">{text}</span>
                 </div>
-                <div>
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-[#FF6B00] text-[#FF6B00]" />
-                    ))}
-                    <span className="text-xs font-body text-white ml-1 font-medium">4.9</span>
-                  </div>
-                  <p className="text-xs text-[#71717A] font-body">8+ happy clients</p>
-                </div>
-              </div>
-
-              <div className="w-px h-8 bg-white/10 hidden sm:block" />
-
-              {/* Quick benefits */}
-              <div className="flex flex-wrap gap-3">
-                {["48h deployment", "99.9% uptime", "No code needed"].map((text) => (
-                  <div key={text} className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
-                    <span className="text-xs font-body text-[#A1A1AA]">{text}</span>
-                  </div>
-                ))}
-              </div>
+              ))}
             </motion.div>
           </motion.div>
 
