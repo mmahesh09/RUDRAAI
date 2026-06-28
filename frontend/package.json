@@ -16,17 +16,21 @@
     "@radix-ui/react-select": "^2.3.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@sentry/nextjs": "^10.62.0",
+    "@supabase/supabase-js": "^2.108.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cobe": "^0.6.3",
     "framer-motion": "^11.15.0",
+    "googleapis": "^173.0.0",
     "lenis": "^1.1.14",
     "lucide-react": "^0.469.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "resend": "^6.16.0",
     "tailwind-merge": "^2.5.5",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20",
