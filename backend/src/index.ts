@@ -53,11 +53,8 @@ const allowedOrigins = (process.env.FRONTEND_URL || "http://localhost:3000")
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) {
-        // Allow no-origin in dev (curl, Postman); reject in production
-        if (process.env.NODE_ENV !== "production") return callback(null, true);
-        return callback(new Error("Not allowed by CORS"));
-      }
+      // No origin = server-to-server, curl, health checks — always allow
+      if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
       callback(new Error("Not allowed by CORS"));
     },
@@ -138,8 +135,11 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: "Internal server error" });
 });
 
-app.listen(PORT, () => {
-  logger.info(`RudraAI API running at http://localhost:${PORT}`);
-});
+// Skip HTTP server on Vercel (serverless uses the exported handler)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    logger.info(`RudraAI API running at http://localhost:${PORT}`);
+  });
+}
 
 export default app;

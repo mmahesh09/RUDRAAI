@@ -1,13 +1,3 @@
----
-title: RudraAI Backend
-emoji: ⚡
-colorFrom: red
-colorTo: yellow
-sdk: docker
-pinned: false
-app_port: 7860
----
-
 # RudraAI Backend API
 
 Express.js + TypeScript backend for the RudraAI automation agency platform.
@@ -39,13 +29,13 @@ The Next.js frontend proxies all `/api/*` calls to this backend via `next.config
 
 **Production (Vercel):** In Vercel dashboard → Settings → Environment Variables, set:
 ```
-BACKEND_URL=https://<your-hf-space-name>.hf.space
+BACKEND_URL=https://<your-render-or-railway-url>
 ```
-Your HF Space URL is visible on the Space page (e.g. `https://mmahesh09-rudraai-backend.hf.space`).
+Your backend URL is available in the Render/Railway dashboard after deploying.
 
 ## Environment Variables
 
-Set these in Hugging Face Spaces **Settings → Variables and secrets**:
+Set these in your deployment platform (Render → Environment, Railway → Variables):
 
 ### Required
 

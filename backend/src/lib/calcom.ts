@@ -1,12 +1,11 @@
 import logger from "./logger";
 
 const CALCOM_BASE = "https://api.cal.com/v2";
-const API_VERSION = "2024-09-04";
 
-function calHeaders() {
+function calHeaders(version = "2024-06-11") {
   return {
     Authorization: `Bearer ${process.env.CALCOM_API_KEY}`,
-    "cal-api-version": API_VERSION,
+    "cal-api-version": version,
     "Content-Type": "application/json",
   };
 }
@@ -20,18 +19,23 @@ export async function getEventTypeId(): Promise<number | null> {
   const slug = process.env.CALCOM_EVENT_SLUG || "60min";
 
   try {
-    const res = await fetch(`${CALCOM_BASE}/event-types`, { headers: calHeaders() });
+    // 2024-06-11 is required — 2024-09-04 returns 404 for this endpoint
+    const res = await fetch(`${CALCOM_BASE}/event-types`, { headers: calHeaders("2024-06-11") });
     if (!res.ok) return null;
 
     const data = (await res.json()) as {
       status?: string;
-      data?: { eventTypes?: { id: number; slug: string }[] };
+      data?: {
+        eventTypeGroups?: { eventTypes?: { id: number; slug: string }[] }[];
+      };
     };
 
-    const et = data.data?.eventTypes?.find((e) => e.slug === slug);
-    if (et) {
-      cachedEventTypeId = et.id;
-      return et.id;
+    for (const group of data.data?.eventTypeGroups ?? []) {
+      const et = group.eventTypes?.find((e) => e.slug === slug);
+      if (et) {
+        cachedEventTypeId = et.id;
+        return et.id;
+      }
     }
     return null;
   } catch {

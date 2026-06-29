@@ -13,10 +13,9 @@ RUN npm run build
 # Remove dev dependencies after build
 RUN npm prune --production
 
-# Hugging Face Spaces requires port 7860
-EXPOSE 7860
+EXPOSE 4000
 
-ENV PORT=7860
+ENV PORT=4000
 ENV NODE_ENV=production
 
 CMD ["node", "dist/index.js"]
