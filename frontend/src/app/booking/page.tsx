@@ -46,7 +46,7 @@ interface DaySchedule {
 }
 
 // Convert Cal.com API response to DaySchedule[] and build a (date→time→ISO) map.
-// Shows all days Cal.com returns — availability is controlled by the Cal.com schedule config.
+// Only Saturday (6) and Sunday (0) are included — bookings are weekend-only.
 function convertCalSlots(
   calSlots: Record<string, { time: string }[]>
 ): { schedule: DaySchedule[]; slotMap: Record<string, Record<string, string>> } {
@@ -55,6 +55,11 @@ function convertCalSlots(
   const slotMap: Record<string, Record<string, string>> = {};
 
   const schedule = Object.entries(calSlots)
+    .filter(([dateStr]) => {
+      const [year, month, day] = dateStr.split("-").map(Number);
+      const dow = new Date(year, month - 1, day).getDay();
+      return dow === 0 || dow === 6; // weekend-only
+    })
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dateStr, slots]) => {
       // dateStr is "YYYY-MM-DD" — treat as local date to avoid UTC-shift

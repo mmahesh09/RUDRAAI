@@ -52,7 +52,7 @@ const testimonials = [
   },
   {
     quote:
-      "The 48-hour deployment promise sounded too good to be true. They delivered our full lead automation workflow in 36 hours. It's been 6 months — not a single failure. Absolutely exceptional work.",
+      "The 3–7 day deployment promise sounded too good to be true. They delivered our full lead automation workflow in just 4 days. It's been 6 months — not a single failure. Absolutely exceptional work.",
     name: "Ravi Mehta",
     role: "Growth Lead",
     company: "FinTech Ventures",

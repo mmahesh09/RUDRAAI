@@ -8,7 +8,7 @@ const faqs = [
   {
     question: "How quickly can you deploy an automation for my business?",
     answer:
-      "Our standard deployment time is 48 hours from the moment we agree on the workflow scope. For more complex multi-system automations involving AI agents, it can take 3–5 business days. Either way, you'll have a live, tested automation faster than any in-house team could deliver.",
+      "Our standard deployment time is 3–7 business days from the moment we agree on the workflow scope. For more complex multi-system automations involving AI agents, it can take up to 2 weeks. Either way, you'll have a live, tested automation faster than any in-house team could deliver.",
   },
   {
     question: "Do I need any technical knowledge to use or manage the automations?",

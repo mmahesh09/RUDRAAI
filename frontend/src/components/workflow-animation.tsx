@@ -230,7 +230,7 @@ export default function WorkflowAnimation() {
         className="absolute -bottom-3 -left-2 glass border border-white/10 rounded-xl px-3 py-1.5 flex items-center gap-2"
       >
         <Zap className="w-3.5 h-3.5 text-[#FF6B00]" />
-        <span className="text-xs font-body text-white">48h deployment</span>
+        <span className="text-xs font-body text-white">3–7 day deploy</span>
       </motion.div>
     </div>
   );

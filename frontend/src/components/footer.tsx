@@ -134,7 +134,7 @@ export default function Footer() {
                 <div className="flex gap-8 mt-8 pt-8 border-t border-white/06">
                   {[
                     { value: "India+", label: "Global Remote" },
-                    { value: "48h", label: "Deployment" },
+                    { value: "3–7d", label: "Deployment" },
                     { value: "30d", label: "Support" },
                   ].map((s) => (
                     <div key={s.label}>

@@ -29,7 +29,7 @@ const milestones = [
   },
   {
     id: 4,
-    name: "Launch in 48h",
+    name: "Launch in 3–7d",
     status: "pending" as const,
     position: { top: "8%", right: "12%" },
   },
@@ -70,7 +70,7 @@ export default function ServicesPage() {
           >
             <Badge className="mb-4">Our Process</Badge>
             <h2 className="text-3xl sm:text-4xl font-heading font-black text-white mb-4">
-              From Audit to <span className="text-gradient-orange">Live in 48 Hours</span>
+              From Audit to <span className="text-gradient-orange">Live in 3–7 Days</span>
             </h2>
             <p className="text-[#A1A1AA] font-body text-lg max-w-xl mx-auto">
               A proven, fast-track deployment path that gets your automation running before your competitors even finish planning.
@@ -87,7 +87,7 @@ export default function ServicesPage() {
               { step: "01", title: "Free Audit", desc: "We map your workflows and find automation opportunities — free, no obligation." },
               { step: "02", title: "Custom Roadmap", desc: "You get a tailored plan with estimated ROI, tool stack, and timeline." },
               { step: "03", title: "Build & Integrate", desc: "I build your n8n workflows and AI agents, integrated directly with your existing tools." },
-              { step: "04", title: "Launch in 48h", desc: "Go live in under 48 hours. We monitor, support, and iterate post-launch." },
+              { step: "04", title: "Launch in 3–7 Days", desc: "Go live in 3–7 days. We monitor, support, and iterate post-launch." },
             ].map((s) => (
               <motion.div
                 key={s.step}

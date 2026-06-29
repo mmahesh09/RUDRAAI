@@ -21,7 +21,7 @@ const steps = [
     title: "Custom Blueprint",
     description:
       "I design a detailed automation architecture tailored to your stack and goals. You get a visual workflow map, tech spec, timeline, and fixed-price quote — all before I write a single line.",
-    duration: "48h turnaround",
+    duration: "3–7 day turnaround",
     color: "#8B5CF6",
   },
   {

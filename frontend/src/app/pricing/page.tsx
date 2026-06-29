@@ -50,7 +50,7 @@ export default function PricingPage() {
                 features: [
                   { text: "1 custom n8n automation workflow" },
                   { text: "Up to 3 integrations (Slack, Gmail, CRM, etc.)" },
-                  { text: "48-hour deployment guarantee" },
+                  { text: "3–7 day deployment" },
                   { text: "30-day post-launch support" },
                   { text: "Full workflow documentation" },
                 ],
@@ -91,22 +91,6 @@ export default function PricingPage() {
                   { text: "Custom reporting dashboards" },
                 ],
                 featuresTitle: "What's included",
-              },
-              {
-                name: "Enterprise",
-                description: "Need more than 5 automations? We'll build exactly what your business requires.",
-                priceLabel: "Contact Us",
-                buttonText: "Contact Us",
-                buttonHref: "/contact",
-                features: [
-                  { text: "Unlimited automation workflows" },
-                  { text: "Multi-team deployment" },
-                  { text: "Custom LLM fine-tuning", hasInfo: true },
-                  { text: "On-premise or self-hosted options" },
-                  { text: "Enterprise SLAs & compliance" },
-                  { text: "Dedicated account team" },
-                ],
-                featuresTitle: "Tailored to your needs",
               },
             ]}
             footerTitle="Not sure which plan fits?"

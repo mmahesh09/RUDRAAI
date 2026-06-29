@@ -172,8 +172,8 @@ function N8nWorkflowCanvas() {
 const features = [
   {
     icon: Zap,
-    title: "Deploy in 48 Hours",
-    description: "Battle-tested n8n workflow templates and expert builds — production-ready in 48 hours, not weeks.",
+    title: "Deploy in 3–7 Days",
+    description: "Battle-tested n8n workflow templates and expert builds — production-ready in 3–7 days, not weeks.",
     color: "#FF6B00",
   },
   {
