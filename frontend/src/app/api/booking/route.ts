@@ -97,19 +97,23 @@ export async function POST(req: NextRequest) {
       const slug = process.env.CALCOM_EVENT_SLUG ?? "15min";
       const calHeaders = {
         Authorization: `Bearer ${process.env.CALCOM_API_KEY}`,
-        "cal-api-version": "2024-09-04",
+        "cal-api-version": "2024-06-11",
         "Content-Type": "application/json",
       };
       fetch("https://api.cal.com/v2/event-types", { headers: calHeaders }).then(async (r) => {
         if (!r.ok) return;
-        const data = await r.json() as { data?: { eventTypes?: { id: number; slug: string }[] } };
-        const et = data.data?.eventTypes?.find((e) => e.slug === slug);
-        if (!et) return;
+        const data = await r.json() as { data?: { eventTypeGroups?: { eventTypes?: { id: number; slug: string }[] }[] } };
+        let eventTypeId: number | undefined;
+        for (const group of data.data?.eventTypeGroups ?? []) {
+          const et = group.eventTypes?.find((e) => e.slug === slug);
+          if (et) { eventTypeId = et.id; break; }
+        }
+        if (!eventTypeId) return;
         return fetch("https://api.cal.com/v2/bookings", {
           method: "POST",
           headers: calHeaders,
           body: JSON.stringify({
-            start: isoTime, eventTypeId: et.id,
+            start: isoTime, eventTypeId,
             attendee: { name, email, timeZone: "Asia/Kolkata", language: "en" },
             metadata: goal ? { notes: goal } : {},
           }),
