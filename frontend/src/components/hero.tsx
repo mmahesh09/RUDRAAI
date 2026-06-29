@@ -109,7 +109,7 @@ export default function Hero() {
             >
               <Button asChild size="lg" className="h-12 px-7 text-base font-bold group">
                 <Link href="/booking">
-                  Book Free Automation Audit
+                  Book Free call
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
@@ -120,7 +120,7 @@ export default function Hero() {
 
             {/* Benefits */}
             <motion.div variants={resolvedItem} className="flex flex-wrap gap-3 pt-1">
-              {["3–7 day deploy", "99.9% uptime", "No code needed"].map((text) => (
+              {["3–7 day deploy", "Real Time Support", "No code needed"].map((text) => (
                 <div key={text} className="flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
                   <span className="text-xs font-body text-[#A1A1AA]">{text}</span>

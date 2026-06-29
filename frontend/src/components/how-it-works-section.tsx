@@ -12,8 +12,8 @@ const steps = [
     step: "01",
     title: "Free Automation Audit",
     description:
-      "We spend 60 minutes with you mapping your current workflows, identifying the highest-ROI automation opportunities, and calculating your potential time/cost savings. No sales pitch — pure strategy.",
-    duration: "60 min call",
+      "We spend 15 minutes with you mapping your current workflows, identifying the highest-ROI automation opportunities, and calculating your potential time/cost savings. No sales pitch — pure strategy.",
+    duration: "15 min call",
     color: "#FF6B00",
   },
   {
@@ -137,7 +137,7 @@ export default function HowItWorksSection() {
         >
           <Button asChild size="lg">
             <Link href="/booking">
-              Start Your Free Audit Today
+              Book Free call
               <ArrowRight className="w-4 h-4" />
             </Link>
           </Button>
