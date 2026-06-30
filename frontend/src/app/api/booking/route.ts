@@ -1,6 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { escapeHtml, getSupabase, appendToSheet, sendEmail } from "@/lib/server-utils";
+import { createSupabaseAdminClient } from "@/lib/supabase/server";
+
+async function autoOnboard({
+  email, name, company, timeSlot, bookingId,
+}: {
+  email: string; name: string; company: string; timeSlot: string; bookingId: string | null;
+}) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.FRONTEND_URL ?? "";
+  if (!siteUrl) return;
+
+  const admin = createSupabaseAdminClient();
+
+  // Find or invite the user
+  const { data: usersData } = await admin.auth.admin.listUsers();
+  let userId: string | null = null;
+  const existing = usersData?.users?.find((u) => u.email === email);
+
+  if (existing) {
+    userId = existing.id;
+  } else {
+    const { data: invited } = await admin.auth.admin.inviteUserByEmail(email, {
+      redirectTo: `${siteUrl}/auth/callback?next=/portal`,
+    });
+    userId = invited?.user?.id ?? null;
+  }
+
+  if (!userId) return;
+
+  // Create a project and link it to the booking + user
+  await admin.from("projects").insert({
+    user_id: userId,
+    booking_id: bookingId,
+    title: `Automation Audit — ${company || name}`,
+    status: "audit",
+  });
+
+  // Update booking with user_id
+  if (bookingId) {
+    await admin.from("bookings").update({ user_id: userId }).eq("id", bookingId);
+  }
+}
 
 const bookingSchema = z.object({
   name: z.string().min(2).max(100).trim(),
@@ -182,11 +223,17 @@ export async function POST(req: NextRequest) {
     appendToSheet("Sheet1!A:I", [submittedAt, name, email, company, role ?? "", timeSlot, goal, zoomLink ?? "", "New"]).catch(() => {});
 
     const supabase = getSupabase();
+    let bookingId: string | null = null;
     if (supabase) {
-      supabase.from("bookings")
+      const { data: booking } = await supabase.from("bookings")
         .insert({ name, email, company, role, time_slot: timeSlot, goal, zoom_link: zoomLink })
-        .then(() => {});
+        .select("id")
+        .single();
+      bookingId = booking?.id ?? null;
     }
+
+    // Auto-onboard: invite the client to the portal and create their project
+    autoOnboard({ email, name, company, timeSlot, bookingId }).catch(() => {});
 
     return NextResponse.json({ success: true, message: "Booking confirmed.", zoomLink });
   } catch (error) {

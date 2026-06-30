@@ -61,3 +61,77 @@ ALTER TABLE bookings                ENABLE ROW LEVEL SECURITY;
 ALTER TABLE newsletter_subscribers  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_sessions           ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_messages           ENABLE ROW LEVEL SECURITY;
+
+-- ── Client Portal Schema ────────────────────────────────────────────────────
+
+-- Link existing tables to auth users
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+ALTER TABLE contacts ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+
+-- Project lifecycle (one project per engagement)
+CREATE TABLE IF NOT EXISTS projects (
+  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id          UUID        REFERENCES auth.users(id) ON DELETE CASCADE,
+  booking_id       UUID        REFERENCES bookings(id) ON DELETE SET NULL,
+  title            TEXT        NOT NULL,
+  status           TEXT        NOT NULL DEFAULT 'audit'
+                   CHECK (status IN ('audit','proposal','signed','in_dev','deployed','support')),
+  budget_approved  NUMERIC,
+  timeline_start   DATE,
+  timeline_end     DATE,
+  notes            TEXT,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Deliverables (files, workflows, docs) per project
+CREATE TABLE IF NOT EXISTS deliverables (
+  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id    UUID        NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  name          TEXT        NOT NULL,
+  type          TEXT        CHECK (type IN ('workflow','documentation','training','recording','other')),
+  file_url      TEXT,
+  status        TEXT        NOT NULL DEFAULT 'planned'
+                CHECK (status IN ('planned','in_progress','completed','deployed')),
+  due_date      DATE,
+  completed_at  TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- ROI metrics per project
+CREATE TABLE IF NOT EXISTS automation_metrics (
+  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id       UUID        NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  metric_name      TEXT        NOT NULL,
+  baseline_value   NUMERIC,
+  current_value    NUMERIC,
+  unit             TEXT,
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Activity feed (status changes, notes, client questions)
+CREATE TABLE IF NOT EXISTS project_updates (
+  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id   UUID        NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  author_role  TEXT        NOT NULL CHECK (author_role IN ('admin','client')),
+  content      TEXT        NOT NULL,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- RLS: clients see only their own project data
+ALTER TABLE projects          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE deliverables      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE automation_metrics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE project_updates   ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "client_own_projects" ON projects
+  FOR ALL USING (user_id = auth.uid());
+
+CREATE POLICY "client_own_deliverables" ON deliverables
+  FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
+
+CREATE POLICY "client_own_metrics" ON automation_metrics
+  FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
+
+CREATE POLICY "client_own_updates" ON project_updates
+  FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));

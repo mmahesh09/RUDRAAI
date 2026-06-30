@@ -3,53 +3,9 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, TrendingUp, Clock, DollarSign } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-const caseStudies = [
-  {
-    industry: "SaaS / Sales",
-    title: "Lead Qualification Automation",
-    description:
-      "Built an AI agent that scores and qualifies inbound leads from 5 sources, enriches with firmographic data, and routes to the right sales rep — all in under 3 seconds.",
-    metrics: [
-      { icon: TrendingUp, value: "340%", label: "More qualified leads", color: "#10B981" },
-      { icon: Clock, value: "92%", label: "Reduction in response time", color: "#3B82F6" },
-      { icon: DollarSign, value: "$180K", label: "Pipeline added in 90 days", color: "#FF6B00" },
-    ],
-    tags: ["n8n", "GPT-4o", "HubSpot", "Clearbit"],
-    gradient: "from-[#FF6B00]/10 to-transparent",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
-  },
-  {
-    industry: "E-Commerce",
-    title: "Customer Support AI Agent",
-    description:
-      "Deployed a fully autonomous support agent that handles 80% of tickets end-to-end using knowledge base lookups, order data, and LLM reasoning — escalating only complex cases.",
-    metrics: [
-      { icon: TrendingUp, value: "80%", label: "Tickets auto-resolved", color: "#8B5CF6" },
-      { icon: Clock, value: "4 min", label: "Avg resolution time", color: "#10B981" },
-      { icon: DollarSign, value: "$95K", label: "Annual support savings", color: "#FF6B00" },
-    ],
-    tags: ["AI Agent", "Zendesk", "Shopify", "OpenAI"],
-    gradient: "from-[#8B5CF6]/10 to-transparent",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
-  },
-  {
-    industry: "Healthcare / Operations",
-    title: "Appointment Booking Automation",
-    description:
-      "Automated patient appointment scheduling, reminders, and follow-ups across 3 clinic locations — integrating EHR system, Google Calendar, and SMS in a single workflow.",
-    metrics: [
-      { icon: TrendingUp, value: "45%", label: "No-show reduction", color: "#EC4899" },
-      { icon: Clock, value: "28h", label: "Staff hours saved/week", color: "#3B82F6" },
-      { icon: DollarSign, value: "4.9★", label: "Patient satisfaction", color: "#F59E0B" },
-    ],
-    tags: ["n8n", "Twilio", "Google Calendar", "EHR API"],
-    gradient: "from-[#10B981]/10 to-transparent",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&q=80",
-  },
-];
+import { caseStudies } from "@/lib/case-studies";
 
 export default function CaseStudiesSection() {
   const ref = useRef<HTMLDivElement>(null);
@@ -72,7 +28,7 @@ export default function CaseStudiesSection() {
             <span className="text-gradient-orange">Real Results.</span>
           </h2>
           <p className="text-[#A1A1AA] font-body text-lg max-w-2xl mx-auto leading-relaxed">
-            Every engagement starts with a deep-dive audit. Here's what we've built
+            Every engagement starts with a deep-dive audit. Here&apos;s what we&apos;ve built
             for companies just like yours.
           </p>
         </motion.div>
@@ -80,7 +36,7 @@ export default function CaseStudiesSection() {
         <div className="grid lg:grid-cols-3 gap-6">
           {caseStudies.map((study, i) => (
             <motion.div
-              key={study.title}
+              key={study.slug}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: i * 0.12 }}
@@ -135,7 +91,7 @@ export default function CaseStudiesSection() {
                 </div>
 
                 <Link
-                  href="/case-studies"
+                  href={`/case-studies/${study.slug}`}
                   className="inline-flex items-center gap-1 text-sm font-subheading font-medium text-[#A1A1AA] group-hover:text-[#FF6B00] transition-colors"
                 >
                   Read full case study
