@@ -177,8 +177,6 @@ export const caseStudies: CaseStudy[] = [
 </ul>
     `,
   },
-];
-
   {
     slug: "email-marketing-automation",
     industry: "Marketing Agency",
