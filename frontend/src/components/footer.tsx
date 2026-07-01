@@ -61,9 +61,9 @@ function LinkedInIcon({ className }: { className?: string }) {
 }
 
 const social = [
-  { icon: XIcon, label: "X (Twitter)", href: "https://x.com/GowriRudrai" },
+  { icon: XIcon, label: "X (Twitter)", href: "https://x.com/Rudraai2" },
   { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/rudrai.in?igsh=NmF3azZuNWJlenk4" },
-  { icon: LinkedInIcon, label: "LinkedIn", href: "https://www.linkedin.com/company/rudraai" },
+  { icon: LinkedInIcon, label: "LinkedIn", href: "https://www.linkedin.com/company/rudrai" },
 ];
 
 export default function Footer() {
