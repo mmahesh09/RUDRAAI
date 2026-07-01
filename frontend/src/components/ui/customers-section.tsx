@@ -53,7 +53,7 @@ export function CustomersSection({
         )}
         <div className="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100">
           <Link
-            href="/contact"
+            href="/services#contact"
             className="flex items-center gap-1 text-sm font-body text-[#FF6B00] duration-150 hover:opacity-75"
           >
             <span>Become a partner</span>

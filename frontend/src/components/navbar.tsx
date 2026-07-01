@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { label: "Services", href: "/services" },
+  { label: "Case Studies", href: "/case-studies" },
   { label: "Pricing", href: "/pricing" },
   { label: "About", href: "/about" },
   { label: "Blog", href: "/blog" },
@@ -94,7 +95,7 @@ export default function Navbar() {
             {/* Right Side */}
             <div className="hidden md:flex items-center gap-3">
               <Link
-                href="/contact"
+                href="/services#contact"
                 className="text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white transition-colors px-3 py-2"
               >
                 Contact
@@ -146,7 +147,7 @@ export default function Navbar() {
                 );
               })}
               <Link
-                href="/contact"
+                href="/services#contact"
                 className="px-4 py-3 rounded-xl text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white hover:bg-white/05 transition-colors"
               >
                 Contact

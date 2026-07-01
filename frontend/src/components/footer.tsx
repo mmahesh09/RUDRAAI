@@ -13,12 +13,14 @@ const footerLinks = {
   "Quick Links": [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
+    { label: "Case Studies", href: "/case-studies" },
     { label: "About", href: "/about" },
     { label: "Blog", href: "/blog" },
   ],
   Resources: [
     { label: "Book Free Audit", href: "/booking" },
-    { label: "Contact Us", href: "/contact" },
+    { label: "Contact Us", href: "/services#contact" },
+    { label: "Feedback", href: "/feedback" },
     { label: "Automation Guide", href: "/automation-guide" },
     { label: "Pricing", href: "/pricing" },
   ],

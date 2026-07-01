@@ -17,7 +17,7 @@ const organizationSchema = {
   logo: "https://rudraai.io/logo.png",
   description: "AI automation agency building n8n workflows and AI agents for businesses.",
   sameAs: ["https://twitter.com/GowriRudrai"],
-  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://rudraai.io/contact" },
+  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://rudraai.io/services#contact" },
 };
 
 export default function HomePage() {

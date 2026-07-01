@@ -3,6 +3,7 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ServicesSection from "@/components/services-section";
+import ServicesContactSection from "@/components/services-contact-section";
 import CTASection from "@/components/cta-section";
 import { Badge } from "@/components/ui/badge";
 import { AnimatedRoadmap } from "@/components/ui/animated-roadmap";
@@ -105,6 +106,8 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
+
+      <ServicesContactSection />
 
       <CTASection />
       <Footer />

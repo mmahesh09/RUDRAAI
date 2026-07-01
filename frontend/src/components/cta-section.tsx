@@ -67,7 +67,7 @@ export default function CTASection() {
                 </Link>
               </Button>
               <Link
-                href="/contact"
+                href="/services#contact"
                 className="outline-button h-14 px-8 text-base"
               >
                 Talk to Me First

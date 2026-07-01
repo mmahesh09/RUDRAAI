@@ -8,11 +8,11 @@ const staticRoutes = [
   { url: `${BASE}/services`, priority: 0.9 },
   { url: `${BASE}/booking`, priority: 0.9 },
   { url: `${BASE}/blog`, priority: 0.8 },
-  { url: `${BASE}/contact`, priority: 0.8 },
   { url: `${BASE}/about`, priority: 0.7 },
   { url: `${BASE}/pricing`, priority: 0.7 },
   { url: `${BASE}/industries`, priority: 0.6 },
   { url: `${BASE}/case-studies`, priority: 0.6 },
+  { url: `${BASE}/feedback`, priority: 0.5 },
   { url: `${BASE}/privacy`, priority: 0.3 },
   { url: `${BASE}/terms`, priority: 0.3 },
 ];
