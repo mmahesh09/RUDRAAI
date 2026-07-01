@@ -3,8 +3,9 @@ import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight, Clock, BookOpen } from "lucide-react";
 import { caseStudies } from "@/lib/case-studies";
+import { researchCaseStudies } from "@/lib/research-case-studies";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -117,6 +118,88 @@ export default function CaseStudiesPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Industry research */}
+      <section className="section-padding pt-0">
+        <div className="container-wide">
+          <div className="text-center mb-10">
+            <Badge className="mb-4">
+              <BookOpen className="w-3 h-3 mr-1.5" />
+              Industry Research
+            </Badge>
+            <h2 className="text-2xl sm:text-3xl font-heading font-black text-white mb-3">
+              What the market is learning about AI automation
+            </h2>
+            <p className="text-[#A1A1AA] font-body max-w-2xl mx-auto leading-relaxed">
+              Beyond our own client work, we track and analyze publicly published AI automation
+              case studies from sources like Medium and Google Cloud — every source is linked so
+              you can verify the numbers yourself.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            {researchCaseStudies.map((study) => (
+              <Link
+                key={study.slug}
+                href={`/case-studies/research/${study.slug}`}
+                className="group relative rounded-2xl neo-card overflow-hidden hover:border-white/12 transition-all duration-300 block"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${study.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+
+                <div className="relative h-44 overflow-hidden">
+                  <img
+                    src={study.image}
+                    alt={`${study.company} — ${study.category}`}
+                    className="w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-105 transition-all duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#111117] via-[#111117]/60 to-transparent" />
+                  <div className="absolute top-3 left-3 flex gap-2">
+                    <Badge variant="secondary" className="text-[10px]">{study.sourceType}</Badge>
+                    <Badge variant="secondary" className="text-[10px]">{study.company}</Badge>
+                  </div>
+                </div>
+
+                <div className="relative z-10 p-5">
+                  <h3 className="text-lg font-heading font-bold text-white mb-2 group-hover:text-[#FF6B00] transition-colors">
+                    {study.title}
+                  </h3>
+                  <p className="text-sm text-[#A1A1AA] font-body leading-relaxed mb-5">
+                    {study.description}
+                  </p>
+
+                  {/* Metrics */}
+                  <div className="grid grid-cols-3 gap-2 mb-5">
+                    {study.metrics.map((metric) => {
+                      const Icon = metric.icon;
+                      return (
+                        <div key={metric.label} className="text-center p-2 rounded-lg bg-white/03 border border-white/05">
+                          <div className="font-heading font-bold text-base" style={{ color: metric.color }}>
+                            {metric.value}
+                          </div>
+                          <div className="text-[9px] text-[#71717A] font-body leading-tight mt-0.5">{metric.label}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap gap-1.5">
+                      {study.tags.slice(0, 2).map((tag) => (
+                        <span key={tag} className="text-[10px] font-body text-[#71717A] px-2 py-0.5 rounded bg-white/05 border border-white/06">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-[#A1A1AA] group-hover:text-[#FF6B00] transition-colors whitespace-nowrap">
+                      Read research <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
