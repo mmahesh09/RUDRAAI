@@ -1,4 +1,4 @@
-import { TrendingUp, Clock, DollarSign, Users, type LucideIcon } from "lucide-react";
+import { TrendingUp, Clock, DollarSign, Users, Mail, FileText, BarChart3, type LucideIcon } from "lucide-react";
 
 export interface CaseStudyMetric {
   icon: LucideIcon;
@@ -174,6 +174,159 @@ export const caseStudies: CaseStudy[] = [
   <li><strong>Google Calendar API</strong> — real-time availability management</li>
   <li><strong>EHR API</strong> — patient record sync</li>
   <li><strong>Resend</strong> — email confirmations and follow-ups</li>
+</ul>
+    `,
+  },
+];
+
+  {
+    slug: "email-marketing-automation",
+    industry: "Marketing Agency",
+    title: "Email Marketing Automation",
+    description:
+      "Built a behaviour-triggered drip engine that segments leads in real time and sends hyper-personalised sequences — increasing email revenue by 210% without growing the team.",
+    challenge:
+      "A performance marketing agency managing 12 client email programmes was running every campaign manually. List segmentation, sequence writes, and send scheduling consumed 22 hours per week of strategist time. Campaigns were batch-and-blast; engagement rates were declining month-on-month.",
+    solution:
+      "We built a behaviour-triggered segmentation and send engine using n8n, Instantly, and a GPT-4o copy layer. The workflow watches website events, purchase history, and email engagement in real time, assigns contacts to micro-segments automatically, and generates personalised subject lines and body copy for each segment — then schedules sends at each contact's optimal open time.",
+    outcome:
+      "Open rates climbed from 19% to 41%. Click-through rates tripled. Email-attributed revenue across the 12 client accounts grew by 210% in 6 months. The team reallocated 18 hours per week from manual campaign ops to creative strategy.",
+    metrics: [
+      { icon: TrendingUp, value: "210%", label: "Email revenue growth", color: "#3B82F6" },
+      { icon: Mail, value: "41%", label: "Avg open rate (was 19%)", color: "#10B981" },
+      { icon: Clock, value: "18h", label: "Strategist hours saved/week", color: "#8B5CF6" },
+    ],
+    tags: ["n8n", "GPT-4o", "Instantly", "Segment", "Klaviyo"],
+    gradient: "from-[#3B82F6]/10 to-transparent",
+    accentColor: "#3B82F6",
+    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80",
+    timeline: "3 weeks build · 6-month results",
+    content: `
+<h2>The Problem</h2>
+<p>A performance marketing agency managing email programmes for 12 B2C and B2B clients was struggling with scale. Every campaign — welcome sequences, abandoned cart flows, win-back programmes — was being configured, written, and scheduled by hand. Two strategists were spending more than half their week on operational tasks rather than strategy.</p>
+<p>Worse, campaigns were sent as batch-and-blast blasts to entire lists with minimal segmentation. Open rates had dropped from 28% to 19% over 12 months as inbox providers tightened spam filters in response to low engagement signals. Revenue attribution from email was declining across every account.</p>
+
+<h2>The Automation We Built</h2>
+<p>We designed a behaviour-triggered email engine that treats every contact as an individual rather than a list member:</p>
+<ol>
+  <li><strong>Event ingestion:</strong> Website events (page views, product interactions, form fills, checkout steps) stream into the n8n workflow via webhook in real time.</li>
+  <li><strong>Live segmentation:</strong> Each event updates the contact's segment score across 14 micro-segments — cold, warm, high-intent, churned, VIP, category-specific, and more. Segment assignment happens within 2 seconds of the triggering event.</li>
+  <li><strong>AI copy generation:</strong> A GPT-4o agent generates a personalised subject line and email body for each contact based on their segment, recent behaviour, and purchase history. Each client has a stored brand voice and product catalogue the agent draws from.</li>
+  <li><strong>Optimal send timing:</strong> The workflow checks each contact's historical open-time data and schedules the send for their individual peak window rather than a global send time.</li>
+  <li><strong>Feedback loop:</strong> Open, click, and unsubscribe events feed back into the segmentation model, continuously improving targeting without manual intervention.</li>
+</ol>
+
+<h2>Results After 6 Months</h2>
+<p>Average open rates across all 12 accounts climbed from 19% to 41%. Click-through rates increased 3× as personalised content resonated with the right contacts at the right time. Email-attributed revenue grew by 210% — without any increase in send volume or ad spend.</p>
+<p>The two strategists reclaimed 18 hours per week from campaign operations, using that time to focus on higher-value creative and strategic work.</p>
+
+<h2>Tools Used</h2>
+<ul>
+  <li><strong>n8n</strong> — event processing, segmentation engine, and send orchestration</li>
+  <li><strong>GPT-4o</strong> — personalised subject line and copy generation</li>
+  <li><strong>Instantly / Klaviyo</strong> — email delivery per client stack</li>
+  <li><strong>Segment</strong> — event stream ingestion</li>
+</ul>
+    `,
+  },
+  {
+    slug: "real-estate-lead-nurturing",
+    industry: "Real Estate",
+    title: "Real Estate Lead Nurturing Pipeline",
+    description:
+      "Automated a full lead-to-listing pipeline for a property group — from portal enquiry through personalised follow-up, viewing scheduling, and agent briefing — cutting time-to-viewing by 67%.",
+    challenge:
+      "A mid-size residential property group was receiving 600+ inbound enquiries per month from Magicbricks, Housing.com, and their own website. Agents were manually calling every lead within business hours, missing evening and weekend enquiries. Of 600 monthly leads, only 80 converted to viewings. The rest went cold within 48 hours.",
+    solution:
+      "We built an end-to-end lead nurturing pipeline using n8n, Twilio WhatsApp, and a fine-tuned property assistant AI. Leads are captured from all portals, scored by budget and intent, enrolled in a personalised WhatsApp sequence, and self-book viewings — with a pre-briefing summary sent to the agent before each meeting.",
+    outcome:
+      "Time-to-first-contact dropped from 4 hours to 90 seconds. Viewing bookings increased from 80 to 214 per month — a 168% uplift. Agent briefing time per lead dropped from 20 minutes to zero. The group closed 22% more deals in Q1 without adding a single agent.",
+    metrics: [
+      { icon: TrendingUp, value: "168%", label: "More viewings booked", color: "#EC4899" },
+      { icon: Clock, value: "90s", label: "Time to first contact", color: "#F59E0B" },
+      { icon: Users, value: "22%", label: "More deals closed", color: "#10B981" },
+    ],
+    tags: ["n8n", "WhatsApp API", "Twilio", "Cal.com", "OpenAI"],
+    gradient: "from-[#EC4899]/10 to-transparent",
+    accentColor: "#EC4899",
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80",
+    timeline: "4 weeks build · 90-day results",
+    content: `
+<h2>The Problem</h2>
+<p>A residential property group operating across three cities was receiving over 600 inbound enquiries per month from property portals, Google Ads, and their own website. With a team of 14 agents, manually calling every lead was impossible — especially in the evenings and weekends when buyers were most active.</p>
+<p>The result was a leaking funnel: most leads never received contact within the critical first hour. Studies show that lead conversion rate drops 10× if the first contact takes longer than 5 minutes. This group's average was 4 hours. Of 600 monthly enquiries, only 80 converted to in-person viewings.</p>
+
+<h2>The Automation We Built</h2>
+<p>We designed a four-stage lead nurturing pipeline that operates 24 hours a day, 7 days a week:</p>
+<ol>
+  <li><strong>Instant capture and scoring:</strong> New leads from all portals trigger the workflow within seconds via webhook. An AI agent reads the enquiry, extracts budget, location preference, property type, and urgency signals, and assigns a priority score.</li>
+  <li><strong>Personalised WhatsApp sequence:</strong> The lead receives a personalised WhatsApp message within 90 seconds — addressing them by name, referencing the specific property they enquired about, and offering three available viewing slots. The message is written in the client's brand tone.</li>
+  <li><strong>Self-service booking:</strong> Confirmed viewings sync directly with the assigned agent's Cal.com calendar. The lead receives a confirmation with address, parking info, and what to bring.</li>
+  <li><strong>Agent pre-brief:</strong> 30 minutes before each viewing, the agent receives a WhatsApp summary of the lead: their stated budget, how many properties they've viewed, their urgency level, and three suggested talking points to personalise the conversation.</li>
+  <li><strong>Post-viewing follow-up:</strong> If no offer is made within 48 hours, an automated sequence offers alternative properties matching the buyer's stated criteria.</li>
+</ol>
+
+<h2>Results After 90 Days</h2>
+<p>Viewing bookings grew from 80 to 214 per month — a 168% increase — driven entirely by faster response and 24/7 availability. Agents reported spending zero time on lead briefing, as the pre-briefing summary replaced their manual CRM research. The group's deal close rate improved by 22% in Q1, directly attributed to higher-quality, better-prepared viewings.</p>
+
+<h2>Tools Used</h2>
+<ul>
+  <li><strong>n8n</strong> — lead capture, scoring, and sequence orchestration</li>
+  <li><strong>Twilio WhatsApp API</strong> — two-way lead communication</li>
+  <li><strong>OpenAI GPT-4o</strong> — personalised message generation and lead scoring</li>
+  <li><strong>Cal.com</strong> — agent calendar and viewing slot management</li>
+</ul>
+    `,
+  },
+  {
+    slug: "invoice-processing-automation",
+    industry: "Finance / Operations",
+    title: "Invoice & Accounts Payable Automation",
+    description:
+      "Eliminated manual invoice processing for a logistics company — automatically extracting, validating, coding, and approving 95% of invoices end-to-end, cutting processing cost by 73%.",
+    challenge:
+      "A regional logistics company processing 1,200+ vendor invoices per month was doing it entirely by hand. Three accounts payable clerks spent 90% of their time extracting data from PDFs, matching against POs, coding to cost centres, chasing approvals via email, and entering data into their ERP. Processing cost per invoice was $18. Errors caused late payment penalties averaging $12K per quarter.",
+    solution:
+      "We built a fully automated invoice processing pipeline using n8n, an LLM-powered OCR and extraction layer, and direct ERP integration. Invoices arrive by email, are read and validated against the PO database, automatically coded, routed for approval via Slack, and posted to the ERP — all without human touch for 95% of invoices.",
+    outcome:
+      "Processing cost per invoice dropped from $18 to $4.90 — a 73% reduction. Late payment penalties dropped to zero in the first full quarter. AP clerks were redeployed to vendor relationship management and cash flow forecasting. The company now processes invoices in 4 hours on average versus 6 business days.",
+    metrics: [
+      { icon: DollarSign, value: "73%", label: "Cost reduction per invoice", color: "#F59E0B" },
+      { icon: FileText, value: "95%", label: "Invoices processed hands-free", color: "#10B981" },
+      { icon: BarChart3, value: "4h", label: "Processing time (was 6 days)", color: "#3B82F6" },
+    ],
+    tags: ["n8n", "GPT-4o Vision", "Slack", "SAP", "PostgreSQL"],
+    gradient: "from-[#F59E0B]/10 to-transparent",
+    accentColor: "#F59E0B",
+    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=80",
+    timeline: "6 weeks build · 3-month results",
+    content: `
+<h2>The Problem</h2>
+<p>A regional logistics company with operations across four states was processing over 1,200 vendor invoices per month. The accounts payable team of three clerks was doing every step manually: downloading PDF invoices from email, re-keying line items into a spreadsheet, matching against purchase orders in their ERP, deciding on cost centre codes, emailing department heads for approval, and finally posting to SAP.</p>
+<p>Average processing time per invoice was 6 business days end-to-end. Processing cost per invoice — including labour, error correction, and late payment penalties — worked out to $18. The team was making 3–5 data entry errors per day, some of which triggered late payment penalties from vendors. Over Q3, these penalties totalled $12,000.</p>
+
+<h2>The Automation We Built</h2>
+<p>We designed a six-stage intelligent invoice pipeline:</p>
+<ol>
+  <li><strong>Capture:</strong> A dedicated accounts-payable email inbox is monitored by n8n. Every new email attachment is extracted and classified — invoice, statement, or other.</li>
+  <li><strong>AI extraction:</strong> GPT-4o Vision reads each invoice PDF and extracts structured data: vendor name, invoice number, date, line items, amounts, VAT, and payment terms. Extraction accuracy on this client's invoice corpus: 98.7%.</li>
+  <li><strong>PO matching:</strong> The extracted data is matched against open purchase orders in SAP via API. Matched invoices (within a 2% tolerance) proceed automatically. Mismatches are flagged for human review.</li>
+  <li><strong>Cost centre coding:</strong> An AI model trained on 18 months of historical coding decisions assigns the correct cost centre code for each line item. Accuracy on the validation set: 96%.</li>
+  <li><strong>Approval routing:</strong> Invoices above threshold amounts are posted to a Slack channel as an approval card. Approvers click one button — approve or query. Approved invoices post automatically to SAP within 60 seconds.</li>
+  <li><strong>Exception handling:</strong> Invoices that fail any validation step are queued in a human review dashboard with the specific failure reason highlighted, reducing resolution time from hours to minutes.</li>
+</ol>
+
+<h2>Results After 3 Months</h2>
+<p>95% of invoices now complete the full process from email receipt to ERP posting without any human involvement. Average processing time dropped from 6 business days to 4 hours. Per-invoice processing cost fell from $18 to $4.90 — a 73% reduction. Late payment penalties dropped to zero in the first full quarter of operation.</p>
+<p>The three AP clerks were reassigned to vendor relationship management and strategic cash flow forecasting — higher-value work the company previously had no capacity for.</p>
+
+<h2>Tools Used</h2>
+<ul>
+  <li><strong>n8n</strong> — pipeline orchestration and email monitoring</li>
+  <li><strong>GPT-4o Vision</strong> — PDF data extraction and cost centre coding</li>
+  <li><strong>SAP API</strong> — PO matching and ERP posting</li>
+  <li><strong>Slack</strong> — in-flow approval workflow</li>
+  <li><strong>PostgreSQL</strong> — audit trail and exception queue</li>
 </ul>
     `,
   },
