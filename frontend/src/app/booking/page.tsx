@@ -129,6 +129,7 @@ export default function BookingPage() {
   const [calSlotMap, setCalSlotMap] = useState<Record<string, Record<string, string>>>({});
   const [calWeekOffset, setCalWeekOffset] = useState(0);
   const [calSlotsLoading, setCalSlotsLoading] = useState(false);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   const timeSlot = selectedSlot ? `${selectedSlot.day} at ${selectedSlot.time} IST` : null;
 
@@ -256,7 +257,12 @@ export default function BookingPage() {
 
   const handleBook = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!timeSlot || honeypot) return;
+    if (honeypot) return;
+    if (!timeSlot) {
+      setError("No time slot selected. Please go back and choose a time.");
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
+      return;
+    }
     setError(null);
     setLoading(true);
     try {
@@ -270,6 +276,7 @@ export default function BookingPage() {
       setBooked(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to confirm booking. Please try again.");
+      setTimeout(() => errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 50);
     } finally {
       setLoading(false);
     }
@@ -538,6 +545,7 @@ export default function BookingPage() {
                 {/* Error banner */}
                 {error && (
                   <motion.div
+                    ref={errorRef}
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400"

@@ -153,7 +153,7 @@ export function CoachSchedulingCard({
     const dayInfo = currentWeek.find((d) => d.date === day);
     setSelectedTimeSlot({ day, time, dayName: dayInfo?.dayName || day });
     setShowConfirmationView(true);
-    onTimeSlotSelect?.(day, time);
+    // Don't call onTimeSlotSelect here — wait for the user to confirm
   };
 
   const handleBackToMain = () => {
@@ -162,6 +162,9 @@ export function CoachSchedulingCard({
   };
 
   const handleConfirmBooking = () => {
+    if (selectedTimeSlot) {
+      onTimeSlotSelect?.(selectedTimeSlot.day, selectedTimeSlot.time);
+    }
     setShowConfirmationView(false);
     setSelectedTimeSlot(null);
   };
