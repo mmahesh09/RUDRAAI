@@ -16,7 +16,7 @@ let cachedEventTypeId: number | null = null;
 export async function getEventTypeId(): Promise<number | null> {
   if (cachedEventTypeId !== null) return cachedEventTypeId;
 
-  const slug = process.env.CALCOM_EVENT_SLUG || "60min";
+  const slug = process.env.CALCOM_EVENT_SLUG || "15min";
 
   try {
     // 2024-06-11 is required — 2024-09-04 returns 404 for this endpoint

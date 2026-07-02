@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       userId = found.id;
     } else {
       const { data: invited } = await admin.auth.admin.inviteUserByEmail(userEmail, {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? process.env.FRONTEND_URL ?? ""}/auth/callback?next=/portal`,
+        redirectTo: `${process.env.FRONTEND_URL ?? ""}/auth/callback?next=/portal`,
       });
       userId = invited?.user?.id ?? null;
     }

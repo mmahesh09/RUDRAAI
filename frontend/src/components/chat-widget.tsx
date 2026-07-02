@@ -16,6 +16,11 @@ const SUGGESTED = [
   "How fast do you deploy?",
 ];
 
+function generateSessionId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -27,6 +32,7 @@ export default function ChatWidget() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const sessionId = useRef<string>(generateSessionId());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,6 +59,7 @@ export default function ChatWidget() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: msg,
+          session_id: sessionId.current,
           history: next.slice(-10).map((m) => ({
             role: m.role,
             content: m.content,
@@ -113,7 +120,7 @@ export default function ChatWidget() {
                   RudraAI Assistant
                 </p>
                 <p className="text-white/75 text-xs font-body">
-                  Powered by OpenRouter + Ollama
+                  AI-powered assistant
                 </p>
               </div>
               <button

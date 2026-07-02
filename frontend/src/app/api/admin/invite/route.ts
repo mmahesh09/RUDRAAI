@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   if (!email || !projectId) return NextResponse.json({ error: "email and projectId required" }, { status: 400 });
 
   const admin = createSupabaseAdminClient();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.FRONTEND_URL ?? "";
+  const siteUrl = process.env.FRONTEND_URL ?? "";
 
   const { data: invited, error } = await admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${siteUrl}/auth/callback?next=/portal`,

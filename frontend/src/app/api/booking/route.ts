@@ -8,7 +8,7 @@ async function autoOnboard({
 }: {
   email: string; name: string; company: string; timeSlot: string; bookingId: string | null;
 }) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? process.env.FRONTEND_URL ?? "";
+  const siteUrl = process.env.FRONTEND_URL ?? "";
   if (!siteUrl) return;
 
   const admin = createSupabaseAdminClient();
