@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const safeBudget  = budget ? escapeHtml(budget) : "—";
     const safeMessage = escapeHtml(message).replace(/\n/g, "<br>");
     const consultantName = process.env.CONSULTANT_NAME ?? "The RudraAI Team";
-    const bookingUrl = `${process.env.FRONTEND_URL ?? "https://rudraai-five.vercel.app"}/booking`;
+    const bookingUrl = `${process.env.FRONTEND_URL ?? "https://rudraai.online"}/booking`;
 
     if (process.env.RESEND_API_KEY) {
       try {
@@ -66,8 +66,8 @@ export async function POST(req: NextRequest) {
               <span style="color:#888">RudraAI — Automation Agency</span></p>
             </div>`,
         });
-      } catch {
-        // Email failure is non-fatal
+      } catch (emailErr) {
+        console.error("[contact] Email send failed:", (emailErr as Error).message);
       }
     }
 

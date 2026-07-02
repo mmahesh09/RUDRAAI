@@ -46,9 +46,16 @@ export interface SendEmailOptions {
 
 export async function sendEmail(opts: SendEmailOptions): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) {
+    console.error("[sendEmail] RESEND_API_KEY is not set — email not sent");
+    return;
+  }
+  const from = process.env.EMAIL_FROM;
+  if (!from) {
+    console.error("[sendEmail] EMAIL_FROM is not set — email not sent");
+    return;
+  }
   const resend = new Resend(apiKey);
-  const from = process.env.EMAIL_FROM ?? "RudraAI <onboarding@resend.dev>";
   const { error } = await resend.emails.send({
     from,
     to: opts.to,

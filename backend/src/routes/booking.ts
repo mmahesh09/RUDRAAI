@@ -60,7 +60,7 @@ async function createZoomMeeting(topic: string, timeSlot: string): Promise<strin
         topic,
         type: 2, // Scheduled
         start_time: startTime,
-        duration: 60,
+        duration: 15,
         timezone: "Asia/Kolkata",
         settings: {
           join_before_host: true,

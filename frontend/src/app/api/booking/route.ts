@@ -214,8 +214,8 @@ export async function POST(req: NextRequest) {
               <span style="color:#888">RudraAI — Automation Agency</span></p>
             </div>`,
         });
-      } catch {
-        // Email failure is non-fatal — booking is still confirmed
+      } catch (emailErr) {
+        console.error("[booking] Email send failed:", (emailErr as Error).message);
       }
     }
 
