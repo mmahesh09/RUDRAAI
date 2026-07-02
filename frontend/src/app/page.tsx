@@ -1,4 +1,4 @@
-import Navbar from "@/components/navbar";
+﻿import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
 import ServicesSection from "@/components/services-section";
 import FeaturesSection from "@/components/features-section";
@@ -13,11 +13,11 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "RudraAI",
-  url: "https://rudraai.io",
-  logo: "https://rudraai.io/logo.png",
+  url: "https://rudraai.online",
+  logo: "https://rudraai.online/logo.png",
   description: "AI automation agency building n8n workflows and AI agents for businesses.",
   sameAs: ["https://twitter.com/GowriRudrai"],
-  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://rudraai.io/services#contact" },
+  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://rudraai.online/services#contact" },
 };
 
 export default function HomePage() {

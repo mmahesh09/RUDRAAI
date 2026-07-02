@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+﻿import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { escapeHtml, sendEmail, emailReady } from "../lib/email";
 import { appendToSheet } from "../lib/sheets";
@@ -59,7 +59,7 @@ contactRouter.post("/", async (req: Request, res: Response) => {
         }
 
         // ── Confirmation email to client ──────────────────────────
-        const bookingUrl = `${process.env.FRONTEND_URL || "https://rudraai.io"}/booking`;
+        const bookingUrl = `${process.env.FRONTEND_URL || "https://rudraai.online"}/booking`;
         const consultantName = process.env.CONSULTANT_NAME || "The RudraAI Team";
         await sendEmail({
           to: email,

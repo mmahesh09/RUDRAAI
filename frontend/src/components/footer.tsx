@@ -3,8 +3,7 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Zap, Mail, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Zap, Mail, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const Globe = dynamic(() => import("@/components/globe"), { ssr: false });
@@ -121,12 +120,6 @@ export default function Footer() {
                   borders, no downtime.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <Button asChild size="default">
-                    <Link href="/booking">
-                      Start Today
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </Button>
                   <Link href="/case-studies" className="outline-button h-11 px-6">
                     See Results
                   </Link>
@@ -192,8 +185,8 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center gap-2.5 text-sm font-body text-[#71717A]">
                   <Mail className="w-4 h-4 text-[#FF6B00] flex-shrink-0" />
-                  <a href="mailto:hello@rudraai.io" className="hover:text-white transition-colors">
-                    hello@rudraai.io
+                  <a href="mailto:hello@rudraai.online" className="hover:text-white transition-colors">
+                    hello@rudraai.online
                   </a>
                 </div>
               </div>

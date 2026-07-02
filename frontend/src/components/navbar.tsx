@@ -95,10 +95,10 @@ export default function Navbar() {
             {/* Right Side */}
             <div className="hidden md:flex items-center gap-3">
               <Link
-                href="/services#contact"
+                href="/feedback"
                 className="text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white transition-colors px-3 py-2"
               >
-                Contact
+                Feedback
               </Link>
               <Button asChild size="sm" className="h-9 px-5 text-sm font-heading font-bold">
                 <Link href="/booking">
@@ -147,10 +147,10 @@ export default function Navbar() {
                 );
               })}
               <Link
-                href="/services#contact"
+                href="/feedback"
                 className="px-4 py-3 rounded-xl text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white hover:bg-white/05 transition-colors"
               >
-                Contact
+                Feedback
               </Link>
               <div className="pt-2 border-t border-white/08 mt-1">
                 <Button asChild className="w-full font-heading font-bold">

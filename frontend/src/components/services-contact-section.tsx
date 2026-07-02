@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import { useState } from "react";
 import { apiPost } from "@/lib/api";
 
 const contactInfo = [
-  { icon: Mail, label: "Email", value: "hello@rudraai.io", href: "mailto:hello@rudraai.io" },
+  { icon: Mail, label: "Email", value: "hello@rudraai.online", href: "mailto:hello@rudraai.online" },
   { icon: Phone, label: "Phone", value: "+91 98765 43210", href: "tel:+919876543210" },
   { icon: MapPin, label: "Location", value: "Hyderabad, India · Remote Worldwide", href: null },
   { icon: MessageSquare, label: "Response Time", value: "Within 4 business hours", href: null },

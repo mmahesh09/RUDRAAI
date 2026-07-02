@@ -1,7 +1,7 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 import { posts } from "@/lib/posts";
 
-const BASE = "https://rudraai.io";
+const BASE = "https://rudraai.online";
 
 const staticRoutes = [
   { url: BASE, priority: 1.0 },

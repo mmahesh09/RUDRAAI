@@ -1,4 +1,4 @@
-import Navbar from "@/components/navbar";
+﻿import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Badge } from "@/components/ui/badge";
 import type { Metadata } from "next";
@@ -9,9 +9,9 @@ export const metadata: Metadata = {
 };
 
 const LAST_UPDATED = "June 15, 2026";
-const CONTACT_EMAIL = "privacy@rudraai.io";
+const CONTACT_EMAIL = "privacy@rudraai.online";
 const COMPANY = "RudraAI";
-const WEBSITE = "https://rudraai.io";
+const WEBSITE = "https://rudraai.online";
 
 export default function PrivacyPage() {
   return (

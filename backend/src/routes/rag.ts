@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+﻿import { Router, Request, Response } from "express";
 import { z } from "zod";
 import logger from "../lib/logger";
 import { qdrant, COLLECTION_NAME } from "../lib/qdrant";
@@ -21,7 +21,7 @@ async function embed(text: string): Promise<number[] | null> {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": process.env.FRONTEND_URL || "https://rudraai.io",
+        "HTTP-Referer": process.env.FRONTEND_URL || "https://rudraai.online",
       },
       body: JSON.stringify({
         model: "text-embedding-3-small",

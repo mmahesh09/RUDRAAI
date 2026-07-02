@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
@@ -135,13 +134,14 @@ export default function HowItWorksSection() {
           transition={{ delay: 0.6 }}
           className="text-center mt-12"
         >
-          <Button asChild size="lg">
-            <Link href="/booking">
-              Book Free call
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
-          <p className="mt-3 text-sm text-[#71717A] font-body">
+          <Link
+            href="/booking"
+            className="inline-flex items-center gap-2 text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white transition-colors"
+          >
+            Start with a free consultation
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          <p className="mt-2 text-sm text-[#71717A] font-body">
             No credit card required. No commitment.
           </p>
         </motion.div>

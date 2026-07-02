@@ -53,8 +53,8 @@ export default async function BlogPostPage({ params }: Props) {
     description: post.excerpt,
     image: post.image,
     datePublished: post.date,
-    author: { "@type": "Organization", name: "RudraAI", url: "https://rudraai.io" },
-    publisher: { "@type": "Organization", name: "RudraAI", logo: { "@type": "ImageObject", url: "https://rudraai.io/logo.png" } },
+    author: { "@type": "Organization", name: "RudraAI", url: "https://rudraai.online" },
+    publisher: { "@type": "Organization", name: "RudraAI", logo: { "@type": "ImageObject", url: "https://rudraai.online/logo.png" } },
   };
 
   return (

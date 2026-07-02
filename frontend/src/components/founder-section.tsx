@@ -97,15 +97,16 @@ export default function FounderSection() {
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button asChild size="lg">
-                <Link href="/booking">
-                  Book a Call with Me
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
               <Button asChild variant="outline" size="lg">
                 <Link href="/about">More About RudraAI</Link>
               </Button>
+              <Link
+                href="/booking"
+                className="inline-flex items-center gap-2 h-11 px-2 text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white transition-colors"
+              >
+                Or book a call
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </motion.div>
         </div>

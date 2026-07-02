@@ -253,8 +253,10 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
           `,
         });
       } catch (emailErr) {
-        logger.warn({ err: (emailErr as Error).message }, "Email send failed — booking still confirmed");
+        logger.error({ err: (emailErr as Error).message }, "Email send failed — booking still confirmed. Check RESEND_API_KEY and EMAIL_FROM domain verification.");
       }
+    } else {
+      logger.warn("emailReady() = false — RESEND_API_KEY is missing, no emails sent");
     } // end emailReady block
 
     const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -67,7 +67,7 @@ export default function ChatWidget() {
           role: "assistant",
           content:
             data.reply ||
-            "Sorry, I had trouble responding. Try emailing hello@rudraai.io.",
+            "Sorry, I had trouble responding. Try emailing hello@rudraai.online.",
         },
       ]);
     } catch {
@@ -76,7 +76,7 @@ export default function ChatWidget() {
         {
           role: "assistant",
           content:
-            "Connection error. Please try again or email hello@rudraai.io.",
+            "Connection error. Please try again or email hello@rudraai.online.",
         },
       ]);
     } finally {

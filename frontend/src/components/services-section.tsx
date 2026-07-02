@@ -9,24 +9,15 @@ import {
   CheckCircle2,
   Zap,
   Shield,
-  GitBranch,
-  Clock,
-  Plug,
   Server,
-  RefreshCw,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 const features = [
-  { icon: Plug, label: "500+ pre-built integrations", desc: "Connect any app in your stack — CRM, email, databases, payments, and more." },
-  { icon: Shield, label: "Error handling & retry logic", desc: "Workflows that self-heal: automatic retries, fallback paths, and failure alerts." },
-  { icon: Server, label: "Self-hosted or cloud deploy", desc: "Full control over your data with self-hosted n8n, or managed cloud — your choice." },
-  { icon: GitBranch, label: "Version control & rollback", desc: "Every workflow change is tracked. Roll back to any previous version instantly." },
-  { icon: Clock, label: "Webhooks, cron & event triggers", desc: "Run automations on a schedule, on demand, or in real-time from any event." },
-  { icon: RefreshCw, label: "Real-time monitoring & alerts", desc: "Live execution logs, failure notifications, and health dashboards built in." },
-  { icon: Zap, label: "Custom code nodes (JS / Python)", desc: "Break free from no-code limits — add any custom logic right inside your workflow." },
-  { icon: CheckCircle2, label: "Multi-environment support", desc: "Separate dev, staging, and production environments for safe, reliable deployments." },
+  { icon: Zap, label: "Live in under a week", desc: "We've built hundreds of workflows. Yours ships in 3–7 days, tested and ready to run." },
+  { icon: Shield, label: "Breaks? We fix it.", desc: "Every workflow ships with monitoring. If something fails, we know before you do." },
+  { icon: Server, label: "Yours to keep", desc: "Full access, full documentation, full ownership. You're never locked into us." },
+  { icon: CheckCircle2, label: "We don't disappear", desc: "Dedicated Slack channel, monthly check-ins, and updates whenever your tools change." },
 ];
 
 const useCases = [
@@ -105,12 +96,13 @@ export default function ServicesSection() {
                 own and understand.
               </p>
 
-              <Button asChild size="lg">
-                <Link href="/booking">
-                  Book a Free Strategy Call
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </Button>
+              <Link
+                href="/booking"
+                className="inline-flex items-center gap-2 text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white transition-colors"
+              >
+                Schedule a free strategy session
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
 
             {/* Right — use cases */}
@@ -145,8 +137,8 @@ export default function ServicesSection() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mb-10"
         >
-          <h3 className="text-xl font-heading font-bold text-white text-center mb-8">What Every Workflow Includes</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <h3 className="text-lg font-heading font-bold text-white text-center mb-6 text-[#A1A1AA]">What you can count on</h3>
+          <div className="grid sm:grid-cols-2 gap-4">
             {features.map((f, i) => {
               const Icon = f.icon;
               return (
@@ -154,14 +146,16 @@ export default function ServicesSection() {
                   key={f.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.4, delay: 0.35 + i * 0.05 }}
-                  className="p-5 rounded-2xl neo-card group hover:border-[#FF6B00]/20 transition-all duration-300"
+                  transition={{ duration: 0.4, delay: 0.35 + i * 0.07 }}
+                  className="flex items-start gap-4 p-5 rounded-2xl neo-card"
                 >
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style={{ background: "#FF6B0015", border: "1px solid #FF6B0025" }}>
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "#FF6B0015", border: "1px solid #FF6B0025" }}>
                     <Icon className="w-4 h-4 text-[#FF6B00]" />
                   </div>
-                  <p className="text-sm font-subheading font-semibold text-white mb-1.5 leading-tight">{f.label}</p>
-                  <p className="text-xs font-body text-[#71717A] leading-relaxed">{f.desc}</p>
+                  <div>
+                    <p className="text-sm font-subheading font-semibold text-white mb-1">{f.label}</p>
+                    <p className="text-xs font-body text-[#71717A] leading-relaxed">{f.desc}</p>
+                  </div>
                 </motion.div>
               );
             })}
@@ -193,21 +187,6 @@ export default function ServicesSection() {
           </div>
         </motion.div>
 
-        {/* Bottom CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.7 }}
-          className="text-center"
-        >
-          <p className="text-[#71717A] font-body text-sm mb-4">Ready to automate your first workflow?</p>
-          <Button asChild size="lg">
-            <Link href="/booking">
-              Get Your Free Automation Strategy Call
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
-        </motion.div>
 
       </div>
     </section>

@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+﻿import { Router, Request, Response } from "express";
 import { z } from "zod";
 import logger from "../lib/logger";
 import { supabase } from "../lib/supabase";
@@ -48,7 +48,7 @@ async function callOpenRouter(
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": process.env.FRONTEND_URL || "https://rudraai.io",
+      "HTTP-Referer": process.env.FRONTEND_URL || "https://rudraai.online",
       "X-Title": "RudraAI Chat",
     },
     body: JSON.stringify({
@@ -155,7 +155,7 @@ chatRouter.post("/", async (req: Request, res: Response) => {
       logger.error({ err: (ollamaErr as Error).message }, "Both AI providers failed");
       return res.json({
         reply:
-          "The AI assistant is temporarily offline. Please email hello@rudraai.io or book a call at /booking.",
+          "The AI assistant is temporarily offline. Please email hello@rudraai.online or book a call at /booking.",
         provider: "none",
       });
     }

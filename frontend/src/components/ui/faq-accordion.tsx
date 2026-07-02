@@ -1,3 +1,8 @@
+"use client";
+
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 
 export interface FaqItem {
@@ -26,6 +31,8 @@ export const Faq5 = ({
   description = "Find out all the essential details about our platform and how it can serve your needs.",
   faqs = defaultFaqs,
 }: Faq5Props) => {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   return (
     <section className="py-32">
       <div className="container">
@@ -35,19 +42,45 @@ export const Faq5 = ({
           <p className="mt-6 font-medium text-muted-foreground">{description}</p>
         </div>
         <div className="mx-auto mt-14 max-w-screen-sm">
-          {faqs.map((faq, index) => (
-            <div key={index} className="mb-8 flex gap-4">
-              <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-secondary font-mono text-xs text-primary">
-                {index + 1}
-              </span>
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-                  <h3 className="font-medium">{faq.question}</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">{faq.answer}</p>
+          {faqs.map((faq, index) => {
+            const isOpen = openIndex === index;
+            return (
+              <div
+                key={index}
+                className="mb-3 rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                  className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-white/[0.03] transition-colors"
+                >
+                  <span className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-secondary font-mono text-xs text-primary">
+                    {index + 1}
+                  </span>
+                  <span className="flex-1 font-medium text-sm">{faq.question}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 text-[#A1A1AA] transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <p className="px-5 pb-4 pl-[3.25rem] text-sm text-muted-foreground leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
