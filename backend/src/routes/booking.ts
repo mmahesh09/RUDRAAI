@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { getEventTypeId, createCalBooking } from "../lib/calcom";
 import { escapeHtml, sendEmail, emailReady } from "../lib/email";
+import { notifySlackBooking } from "../lib/slack";
 import { appendToSheet } from "../lib/sheets";
 import { supabase } from "../lib/supabase";
 import logger from "../lib/logger";
@@ -188,6 +189,9 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
     // ── Log to Notion for onboarding (non-fatal) ──────────────────
     logToNotion({ name, email, company, role, timeSlot, goal, zoomLink }).catch(() => {});
 
+    // ── Slack notification to owner (non-fatal) ───────────────────
+    notifySlackBooking({ name, email, company, role, timeSlot, goal, zoomLink }).catch(() => {});
+
     const safeZoomLink = zoomLink ? escapeHtml(zoomLink) : null;
 
     const zoomSection = safeZoomLink
@@ -200,10 +204,21 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
 
     const consultantName = process.env.CONSULTANT_NAME || "The RudraAI Team";
 
+    // ── EMAIL GATE ────────────────────────────────────────────────────────────
+    console.log("\n╔══════════════════════════════════════════════════════════╗");
+    console.log("║  BOOKING ROUTE: Email gate reached                       ║");
+    console.log("╚══════════════════════════════════════════════════════════╝");
+    console.log("  Booking from :", email, "(", name, ")");
+    console.log("  Time slot    :", timeSlot);
+    console.log("  About to call emailReady() ...");
+
     if (emailReady()) {
+      console.log("\n  ── Gate OPEN: proceeding to send emails ──");
+      console.log("  CONTACT_TO set?", !!process.env.CONTACT_TO, "→", process.env.CONTACT_TO ?? "(not set — owner email skipped)");
       try {
         // ── Notification to owner ─────────────────────────────────
         if (process.env.CONTACT_TO) {
+          console.log("\n  ▶ Sending owner notification to:", process.env.CONTACT_TO);
           await sendEmail({
             to: process.env.CONTACT_TO,
             subject: `New Booking: ${safeName} (${safeCompany}) — ${safeTimeSlot}`,
@@ -222,9 +237,13 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
               <p style="color:#888;font-size:0.85em"><em>Notion onboarding record created automatically.</em></p>
             `,
           });
+          console.log("  ✅ Owner notification: sendEmail() returned without error");
+        } else {
+          console.log("  ⚠️  CONTACT_TO is not set — skipping owner notification");
         }
 
         // ── Confirmation email to client ──────────────────────────
+        console.log("\n  ▶ Sending client confirmation to:", email);
         await sendEmail({
           to: email,
           subject: "Your Automation Audit is Confirmed — RudraAI",
@@ -252,10 +271,26 @@ bookingRouter.post("/", async (req: Request, res: Response) => {
             </div>
           `,
         });
+        console.log("  ✅ Client confirmation: sendEmail() returned without error");
+
       } catch (emailErr) {
-        logger.error({ err: (emailErr as Error).message }, "Email send failed — booking still confirmed. Check RESEND_API_KEY and EMAIL_FROM domain verification.");
+        const err = emailErr as Error;
+        console.error("\n╔══════════════════════════════════════════════════════════╗");
+        console.error("║  BOOKING EMAIL FAILED — booking itself is still saved     ║");
+        console.error("╚══════════════════════════════════════════════════════════╝");
+        console.error("  Error class  :", err.constructor?.name ?? "unknown");
+        console.error("  Error message:", err.message);
+        console.error("  Stack        :", err.stack);
+        console.error("");
+        console.error("  Action       : Fix the issue above, then re-deploy.");
+        console.error("  The booking was saved — only the email failed.");
+        console.error("");
+        logger.error({ err: err.message, stack: err.stack }, "Booking email failed — check console output above for root cause.");
       }
     } else {
+      console.warn("\n  ── Gate CLOSED: emailReady() returned false ──");
+      console.warn("  RESEND_API_KEY is missing or empty — no emails will be sent.");
+      console.warn("  Fix: Add RESEND_API_KEY=re_... to your .env and restart the server.");
       logger.warn("emailReady() = false — RESEND_API_KEY is missing, no emails sent");
     } // end emailReady block
 

@@ -17,6 +17,69 @@ import { requireApiKey } from "./middleware/apiKey";
 
 dotenv.config();
 
+// ── Startup email diagnostics ─────────────────────────────────────────────────
+// Remove this block once emails are confirmed working.
+(function runEmailStartupDiagnostics() {
+  const apiKey  = process.env.RESEND_API_KEY;
+  const from    = process.env.EMAIL_FROM;
+  const to      = process.env.CONTACT_TO;
+  const nodeEnv = process.env.NODE_ENV;
+
+  const mask = (k: string | undefined) =>
+    k ? `${k.slice(0, 8)}...${k.slice(-4)} (len=${k.length})` : "(MISSING)";
+
+  console.log("\n╔══════════════════════════════════════════════════════════╗");
+  console.log("║          EMAIL INFRASTRUCTURE STARTUP DIAGNOSTICS        ║");
+  console.log("╚══════════════════════════════════════════════════════════╝");
+
+  console.log("\n──── STEP 1: dotenv.config() loaded ────────────────────────");
+  console.log("  NODE_ENV        :", nodeEnv ?? "(not set)");
+  console.log("  cwd()           :", process.cwd());
+  console.log("  Result          :", "dotenv.config() just executed above this block");
+
+  console.log("\n──── STEP 2: RESEND_API_KEY ─────────────────────────────────");
+  console.log("  Current         :", mask(apiKey));
+  console.log("  Expected        : starts with 're_', length ≥ 30");
+  if (!apiKey) {
+    console.log("  Result          : ❌ FAIL — key is missing; emails will NOT be sent");
+  } else if (!apiKey.startsWith("re_")) {
+    console.log("  Result          : ❌ FAIL — key does not start with 're_'");
+  } else {
+    console.log("  Result          : ✅ PASS");
+  }
+
+  console.log("\n──── STEP 3: EMAIL_FROM ─────────────────────────────────────");
+  console.log("  Current         :", from ?? "(not set — fallback: onboarding@resend.dev)");
+  const domainMatch = from?.match(/@([^>\s]+)/);
+  const fromDomain  = domainMatch ? domainMatch[1] : null;
+  console.log("  Extracted domain:", fromDomain ?? "(could not extract)");
+  console.log("  Expected        : Name <email@your-verified-domain.com>");
+  if (!from) {
+    console.log("  Result          : ⚠️  WARN — using fallback; only works in Resend test mode");
+  } else if (!fromDomain) {
+    console.log("  Result          : ❌ FAIL — EMAIL_FROM format is invalid");
+  } else {
+    console.log("  Result          : ✅ PASS — verify domain at https://resend.com/domains");
+  }
+
+  console.log("\n──── STEP 4: CONTACT_TO ─────────────────────────────────────");
+  console.log("  Current         :", to ?? "(not set — owner notifications disabled)");
+  if (!to) {
+    console.log("  Result          : ⚠️  WARN — owner won't receive booking notifications");
+  } else {
+    console.log("  Result          : ✅ PASS");
+  }
+
+  console.log("\n──── STEP 5: Account / domain alignment check ───────────────");
+  console.log("  ACTION REQUIRED : Log in to https://resend.com/api-keys");
+  console.log("  Verify that the key", mask(apiKey));
+  console.log("  belongs to the SAME account where domain '" + (fromDomain ?? "?") + "' is verified.");
+  console.log("  'No sent emails yet' in the dashboard = wrong account or key.");
+
+  console.log("\n╚══════════════════════════════════════════════════════════╝\n");
+})();
+// ── End startup diagnostics ───────────────────────────────────────────────────
+
 if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
