@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${post.title} — RudraAI Blog`,
     description: post.excerpt,
+    alternates: { canonical: `/blog/${slug}` },
     openGraph: {
       title: post.title,
       description: post.excerpt,
@@ -53,8 +54,8 @@ export default async function BlogPostPage({ params }: Props) {
     description: post.excerpt,
     image: post.image,
     datePublished: post.date,
-    author: { "@type": "Organization", name: "RudraAI", url: "https://rudraai.online" },
-    publisher: { "@type": "Organization", name: "RudraAI", logo: { "@type": "ImageObject", url: "https://rudraai.online/logo.png" } },
+    author: { "@type": "Organization", name: "RudraAI", url: "https://www.rudraai.online" },
+    publisher: { "@type": "Organization", name: "RudraAI", logo: { "@type": "ImageObject", url: "https://www.rudraai.online/logo.png" } },
   };
 
   return (

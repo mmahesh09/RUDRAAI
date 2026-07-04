@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: "Industries — RudraAI | AI Automation by Vertical",
   description:
     "RudraAI serves SaaS, e-commerce, agencies, healthcare, FinTech, and operations teams with specialized AI automation workflows.",
+  alternates: { canonical: "/industries" },
 };
 
 export default function IndustriesPage() {

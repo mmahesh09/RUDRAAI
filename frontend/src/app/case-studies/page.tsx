@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Case Studies — RudraAI | AI Automation Results",
   description:
     "See real results from RudraAI's AI automation projects — lead qualification, customer support AI, appointment booking, and more.",
+  alternates: { canonical: "/case-studies" },
 };
 
 export default function CaseStudiesPage() {

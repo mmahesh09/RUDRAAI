@@ -12,8 +12,10 @@ const zapIcon = (
 );
 
 export const metadata = {
-  title: "Pricing — RudraAI",
-  description: "Simple, transparent pricing for AI automation that grows with your business.",
+  title: "AI Automation Pricing & Packages",
+  description:
+    "Transparent pricing for n8n workflow automation and AI agent development — from single workflows to full enterprise automation programs.",
+  alternates: { canonical: "/pricing" },
 };
 
 export default function PricingPage() {

@@ -6,6 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service — RudraAI",
   description: "Terms and conditions for using RudraAI's website and services.",
+  alternates: { canonical: "/terms" },
 };
 
 const LAST_UPDATED = "June 15, 2026";

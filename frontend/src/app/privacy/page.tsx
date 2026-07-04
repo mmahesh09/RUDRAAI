@@ -6,12 +6,13 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy — RudraAI",
   description: "How RudraAI collects, uses, and protects your personal data.",
+  alternates: { canonical: "/privacy" },
 };
 
 const LAST_UPDATED = "June 15, 2026";
 const CONTACT_EMAIL = "privacy@rudraai.online";
 const COMPANY = "RudraAI";
-const WEBSITE = "https://rudraai.online";
+const WEBSITE = "https://www.rudraai.online";
 
 export default function PrivacyPage() {
   return (

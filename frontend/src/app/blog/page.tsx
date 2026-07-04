@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: "Blog — RudraAI | Automation Tips & AI Insights",
   description:
     "Practical guides on n8n, AI agents, workflow automation, and business process optimization from the RudraAI team.",
+  alternates: { canonical: "/blog" },
 };
 
 export default function BlogPage() {

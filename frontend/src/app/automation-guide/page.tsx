@@ -9,6 +9,7 @@ export const metadata = {
   title: "The Automation Guide — RudraAI",
   description:
     "A practical guide to automating your business with n8n and AI. Learn what to automate first, which tools to use, and how to measure ROI.",
+  alternates: { canonical: "/automation-guide" },
 };
 
 const sections = [

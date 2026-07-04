@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${study.title} — RudraAI Case Study`,
     description: study.description,
+    alternates: { canonical: `/case-studies/${slug}` },
     openGraph: {
       title: study.title,
       description: study.description,

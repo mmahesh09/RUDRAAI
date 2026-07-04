@@ -13,11 +13,11 @@ const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "RudraAI",
-  url: "https://rudraai.online",
-  logo: "https://rudraai.online/logo.png",
+  url: "https://www.rudraai.online",
+  logo: "https://www.rudraai.online/logo.png",
   description: "AI automation agency building n8n workflows and AI agents for businesses.",
   sameAs: ["https://twitter.com/GowriRudrai"],
-  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://rudraai.online/services#contact" },
+  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://www.rudraai.online/services#contact" },
 };
 
 export default function HomePage() {
