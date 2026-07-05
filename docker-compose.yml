@@ -1,6 +1,19 @@
 version: "3.9"
 
 services:
+  redis:
+    image: redis:7-alpine
+    # Bound memory + LRU eviction so rate-limit keys can never OOM the host.
+    command: ["redis-server", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru", "--save", ""]
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   backend:
     build:
       context: ./backend
@@ -10,6 +23,12 @@ services:
       - "4000:4000"
     env_file:
       - ./backend/.env
+    environment:
+      # Overrides any REDIS_URL in .env so the backend reaches the compose Redis.
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
   frontend:

@@ -4,7 +4,6 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
-import rateLimit from "express-rate-limit";
 import logger from "./lib/logger";
 import { contactRouter } from "./routes/contact";
 import { bookingRouter } from "./routes/booking";
@@ -13,7 +12,16 @@ import { chatRouter } from "./routes/chat";
 import { newsletterRouter } from "./routes/newsletter";
 import { ragRouter } from "./routes/rag";
 import { chatwootRouter } from "./routes/chatwoot";
+import { metricsRouter } from "./routes/metrics";
 import { requireApiKey } from "./middleware/apiKey";
+import {
+  abuseGuard,
+  globalLimiter,
+  formLimiter,
+  chatLimiter,
+  internalLimiter,
+} from "./middleware/rateLimit";
+import { TRUST_PROXY_HOPS } from "./middleware/rateLimit/config";
 
 dotenv.config();
 
@@ -91,6 +99,12 @@ if (process.env.SENTRY_DSN) {
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Behind Vercel/Render/Cloudflare we sit behind N proxies. Configuring the
+// exact hop count makes req.ip trustworthy for per-IP rate limiting and stops
+// clients spoofing X-Forwarded-For to dodge limits. Never use `true` (trust
+// all) — that IS the spoofing hole.
+app.set("trust proxy", TRUST_PROXY_HOPS);
+
 app.use(compression());
 
 // Security middleware
@@ -127,39 +141,16 @@ app.use(
   })
 );
 
-// Global rate limit: 30 requests per 15 minutes per IP
-const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many requests. Please try again later." },
-  skip: (req) => req.path === "/health",
-});
-
-// Stricter limit for form submissions: 5 per hour per IP
-const formLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
-  max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many submissions from this IP. Please try again in an hour." },
-});
-
-// Chat: tighter limit — 20 messages per 15 min per IP
-const chatLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many chat messages. Please wait a moment." },
-});
-
-app.use("/api/", globalLimiter);
+// ── Rate limiting & abuse protection ──────────────────────────────────────────
+// Redis-backed sliding-window limiting (falls back to in-memory when REDIS_URL
+// is unset). abuseGuard runs first so blacklisted / temp-banned clients are
+// rejected before we spend a store round-trip on them. See middleware/rateLimit.
+app.use("/api/", abuseGuard, globalLimiter);
 app.use("/api/contact", formLimiter);
 app.use("/api/booking", formLimiter);
 app.use("/api/newsletter", formLimiter);
 app.use("/api/chat", chatLimiter);
+app.use("/api/rag", internalLimiter);
 
 // Chatwoot webhook must be mounted before express.json() so that its
 // route-level express.raw() middleware can read the raw Buffer for HMAC verification.
@@ -181,6 +172,9 @@ app.use("/api/rag", requireApiKey, ragRouter);
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+// Prometheus scrape endpoint — API-key protected (reveals traffic/offenders)
+app.use("/metrics", requireApiKey, metricsRouter);
 
 // 404 handler
 app.use((_req, res) => {
