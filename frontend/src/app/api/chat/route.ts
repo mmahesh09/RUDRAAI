@@ -1,9 +1,10 @@
-﻿import { Router, Request, Response } from "express";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import logger from "../lib/logger";
-import { supabase } from "../lib/supabase";
+import { getSupabase } from "@/lib/server-utils";
 
-export const chatRouter = Router();
+// Runs on the Vercel Node runtime — the OpenRouter key stays server-side only.
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const chatSchema = z.object({
   message: z.string().min(1).max(1000).trim(),
@@ -34,9 +35,8 @@ Process: Free 60-min audit → custom design → 48-hour deployment → 30-day m
 
 Be helpful, friendly, and concise (2–4 sentences per reply). Guide interested users to book a free audit at /booking. Do not make up information or pricing you are unsure about.`;
 
-// ── OpenRouter (PRIMARY — multi-model fallback routing) ───────────────────────
-// Uses the `models` array so if the first model is rate-limited, OpenRouter
-// automatically tries the next one. All are free-tier models.
+// OpenRouter with multi-model fallback: if the first model is rate-limited or
+// unavailable, OpenRouter automatically tries the next one in the array.
 async function callOpenRouter(
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
@@ -48,7 +48,10 @@ async function callOpenRouter(
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": process.env.FRONTEND_URL || "https://rudraai.online",
+      "HTTP-Referer":
+        process.env.FRONTEND_URL ||
+        process.env.NEXT_PUBLIC_SITE_URL ||
+        "https://rudraai.online",
       "X-Title": "RudraAI Chat",
     },
     body: JSON.stringify({
@@ -73,62 +76,43 @@ async function callOpenRouter(
   };
   const content = data.choices?.[0]?.message?.content?.trim();
   if (!content) throw new Error("OpenRouter returned empty content");
-  return content as string;
+  return content;
 }
 
-// ── Ollama (OPTIONAL local fallback — only if OLLAMA_BASE_URL is set) ─────────
-async function callOllama(
-  messages: Array<{ role: string; content: string }>
-): Promise<string> {
-  const baseUrl = process.env.OLLAMA_BASE_URL;
-  if (!baseUrl) throw new Error("Ollama not configured");
-
-  const model = process.env.OLLAMA_MODEL || "llama3.2:3b";
-
-  const res = await fetch(`${baseUrl}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model, messages, stream: false }),
-    signal: AbortSignal.timeout(8_000), // quick fail — don't block UX
-  });
-
-  if (!res.ok) throw new Error(`Ollama ${res.status}`);
-  const data = (await res.json()) as {
-    message?: { content?: string };
-    response?: string;
-  };
-  const content = (data.message?.content || data.response || "").trim();
-  if (!content) throw new Error("Ollama returned empty content");
-  return content as string;
-}
-
-// Persist a turn to Supabase chat tables (fire-and-forget)
+// Persist a turn to Supabase (fire-and-forget — never blocks the reply).
 async function persistTurn(
   sessionId: string,
   userMessage: string,
   assistantReply: string,
   provider: string
 ): Promise<void> {
+  const supabase = getSupabase();
   if (!supabase) return;
   try {
-    // Upsert session so it exists before inserting messages
     await supabase
       .from("chat_sessions")
-      .upsert({ id: sessionId, updated_at: new Date().toISOString() }, { onConflict: "id" });
-
+      .upsert(
+        { id: sessionId, updated_at: new Date().toISOString() },
+        { onConflict: "id" }
+      );
     await supabase.from("chat_messages").insert([
       { session_id: sessionId, role: "user", content: userMessage },
       { session_id: sessionId, role: "assistant", content: assistantReply, provider },
     ]);
   } catch (err) {
-    logger.warn({ err: (err as Error).message }, "Chat persistence failed");
+    console.error("[chat] persistence failed:", (err as Error).message);
   }
 }
 
-chatRouter.post("/", async (req: Request, res: Response) => {
-  const parsed = chatSchema.safeParse(req.body);
+export async function POST(req: NextRequest) {
+  let parsed;
+  try {
+    parsed = chatSchema.safeParse(await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
   if (!parsed.success) {
-    return res.status(400).json({ error: "Invalid request." });
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
   const { message, session_id, history } = parsed.data;
@@ -139,41 +123,30 @@ chatRouter.post("/", async (req: Request, res: Response) => {
   ];
 
   let reply: string;
-  let provider = "openrouter";
-
-  // 1. Try OpenRouter first (primary)
   try {
     reply = await callOpenRouter(messages);
-  } catch (orErr) {
-    logger.warn({ err: (orErr as Error).message }, "OpenRouter failed, trying Ollama");
-    provider = "ollama";
-
-    // 2. Fallback to local Ollama
-    try {
-      reply = await callOllama(messages);
-    } catch (ollamaErr) {
-      logger.error({ err: (ollamaErr as Error).message }, "Both AI providers failed");
-      return res.json({
-        reply:
-          "The AI assistant is temporarily offline. Please email hello@rudraai.online or book a call at /booking.",
-        provider: "none",
-      });
-    }
+  } catch (err) {
+    console.error("[chat] OpenRouter failed:", (err as Error).message);
+    // Always return 200 with a graceful message so the widget never shows a
+    // raw "connection error" to the visitor.
+    return NextResponse.json({
+      reply:
+        "The AI assistant is briefly unavailable. Please email hello@rudraai.online or book a free audit at /booking — I'll get right back to you.",
+      provider: "none",
+    });
   }
 
-  // Fire-and-forget: persist to Supabase if session_id provided
   if (session_id) {
-    persistTurn(session_id, message, reply, provider).catch(() => {});
+    persistTurn(session_id, message, reply, "openrouter").catch(() => {});
   }
 
-  // Fire-and-forget to n8n (logs chat to Notion if configured)
   if (process.env.N8N_WEBHOOK_CHAT) {
     fetch(process.env.N8N_WEBHOOK_CHAT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message, reply, provider, history, session_id }),
+      body: JSON.stringify({ message, reply, provider: "openrouter", history, session_id }),
     }).catch(() => {});
   }
 
-  return res.json({ reply, provider, session_id });
-});
+  return NextResponse.json({ reply, provider: "openrouter", session_id });
+}
