@@ -1,7 +1,8 @@
-﻿import { Router, Request, Response } from "express";
+import { Router, Request, Response } from "express";
 import { z } from "zod";
 import logger from "../lib/logger";
 import { supabase } from "../lib/supabase";
+import { searchKnowledge } from "../lib/qdrant";
 
 export const chatRouter = Router();
 
@@ -20,23 +21,30 @@ const chatSchema = z.object({
     .default([]),
 });
 
-const SYSTEM_PROMPT = `You are an AI assistant for RudraAI, an n8n automation agency based in Hyderabad, India run by Mahesh. Help visitors understand our services, pricing, and how AI automation saves time and money.
+const BASE_SYSTEM_PROMPT = `You are an AI assistant for RudraAI, an n8n automation agency based in Hyderabad, India. Help visitors understand our services, pricing, and how AI automation saves their business time and money.
 
-Services: n8n workflow automation, AI agent development, lead qualification, CRM integrations, email sequences, client onboarding, proposal generation, SEO content automation.
+Be helpful, friendly, and concise (2–4 sentences per reply). Guide interested users to book a free audit at /booking. Do not make up information or pricing you are unsure about — only use what's provided in the context below.`;
 
-Pricing:
-- Starter: $50 — 1 automation
-- Growth: $100 — 3 automations (most popular)
-- Scale: $200 — 5 automations
-- Enterprise: Contact us — 5+ automations with dedicated support
+function buildSystemPrompt(ragContext: string[]): string {
+  if (ragContext.length === 0) {
+    // Minimal fallback when RAG is unavailable
+    return `${BASE_SYSTEM_PROMPT}
 
-Process: Free 60-min audit → custom design → 48-hour deployment → 30-day monitoring and support.
+Key facts (fallback):
+- Services: n8n workflow automation, AI agent development, CRM integrations, email/marketing automation
+- Pricing: Starter $50 (1 workflow), Growth $100 (3 workflows), Scale $200 (5 workflows), Enterprise custom
+- Process: Free 60-min audit → custom design → 3–7 day deployment → 30-day support
+- Book at /booking | Email: hello@rudraai.online`;
+  }
 
-Be helpful, friendly, and concise (2–4 sentences per reply). Guide interested users to book a free audit at /booking. Do not make up information or pricing you are unsure about.`;
+  return `${BASE_SYSTEM_PROMPT}
 
-// ── OpenRouter (PRIMARY — multi-model fallback routing) ───────────────────────
-// Uses the `models` array so if the first model is rate-limited, OpenRouter
-// automatically tries the next one. All are free-tier models.
+--- KNOWLEDGE BASE (use this to answer questions) ---
+${ragContext.join("\n\n---\n\n")}
+--- END OF KNOWLEDGE BASE ---`;
+}
+
+// ── OpenRouter (PRIMARY) ──────────────────────────────────────────────────────
 async function callOpenRouter(
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
@@ -76,7 +84,7 @@ async function callOpenRouter(
   return content as string;
 }
 
-// ── Ollama (OPTIONAL local fallback — only if OLLAMA_BASE_URL is set) ─────────
+// ── Ollama (LOCAL FALLBACK) ───────────────────────────────────────────────────
 async function callOllama(
   messages: Array<{ role: string; content: string }>
 ): Promise<string> {
@@ -89,7 +97,7 @@ async function callOllama(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ model, messages, stream: false }),
-    signal: AbortSignal.timeout(8_000), // quick fail — don't block UX
+    signal: AbortSignal.timeout(8_000),
   });
 
   if (!res.ok) throw new Error(`Ollama ${res.status}`);
@@ -102,7 +110,7 @@ async function callOllama(
   return content as string;
 }
 
-// Persist a turn to Supabase chat tables (fire-and-forget)
+// Persist a turn to Supabase (fire-and-forget)
 async function persistTurn(
   sessionId: string,
   userMessage: string,
@@ -111,7 +119,6 @@ async function persistTurn(
 ): Promise<void> {
   if (!supabase) return;
   try {
-    // Upsert session so it exists before inserting messages
     await supabase
       .from("chat_sessions")
       .upsert({ id: sessionId, updated_at: new Date().toISOString() }, { onConflict: "id" });
@@ -132,8 +139,18 @@ chatRouter.post("/", async (req: Request, res: Response) => {
   }
 
   const { message, session_id, history } = parsed.data;
+
+  // 1. Retrieve relevant knowledge from Qdrant (non-blocking — fallback gracefully)
+  const ragContext = await searchKnowledge(message, 4);
+  if (ragContext.length > 0) {
+    logger.debug({ chunks: ragContext.length }, "RAG context retrieved");
+  } else {
+    logger.debug("RAG unavailable — using fallback system prompt");
+  }
+
+  const systemPrompt = buildSystemPrompt(ragContext);
   const messages = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: systemPrompt },
     ...history,
     { role: "user", content: message },
   ];
@@ -141,14 +158,14 @@ chatRouter.post("/", async (req: Request, res: Response) => {
   let reply: string;
   let provider = "openrouter";
 
-  // 1. Try OpenRouter first (primary)
+  // 2. Try OpenRouter first
   try {
     reply = await callOpenRouter(messages);
   } catch (orErr) {
     logger.warn({ err: (orErr as Error).message }, "OpenRouter failed, trying Ollama");
     provider = "ollama";
 
-    // 2. Fallback to local Ollama
+    // 3. Fallback to local Ollama
     try {
       reply = await callOllama(messages);
     } catch (ollamaErr) {
@@ -161,12 +178,12 @@ chatRouter.post("/", async (req: Request, res: Response) => {
     }
   }
 
-  // Fire-and-forget: persist to Supabase if session_id provided
+  // Fire-and-forget: persist to Supabase
   if (session_id) {
     persistTurn(session_id, message, reply, provider).catch(() => {});
   }
 
-  // Fire-and-forget to n8n (logs chat to Notion if configured)
+  // Fire-and-forget: log to n8n/Notion
   if (process.env.N8N_WEBHOOK_CHAT) {
     fetch(process.env.N8N_WEBHOOK_CHAT, {
       method: "POST",
