@@ -27,7 +27,7 @@ export default function ChatWidget() {
     {
       role: "assistant",
       content:
-        "Hi! I'm RudraAI's assistant. I can answer questions about our automation services, pricing, and process. What would you like to know?",
+        "Hi! I'm RudraAI's assistant. I can answer questions about our automation services, past builds, and process. What would you like to know?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -197,7 +197,7 @@ export default function ChatWidget() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKey}
-                  placeholder="Ask about services, pricing…"
+                  placeholder="Ask about services, past builds…"
                   maxLength={500}
                   className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm font-body text-white placeholder-[#71717A] focus:outline-none focus:border-[rgba(255,107,0,0.5)] transition-colors"
                   disabled={loading}

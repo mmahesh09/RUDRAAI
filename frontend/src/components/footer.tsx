@@ -12,6 +12,7 @@ const footerLinks = {
   "Quick Links": [
     { label: "Home", href: "/" },
     { label: "Services", href: "/services" },
+    { label: "Showcase", href: "/showcase" },
     { label: "Case Studies", href: "/case-studies" },
     { label: "About", href: "/about" },
     { label: "Blog", href: "/blog" },
@@ -21,7 +22,6 @@ const footerLinks = {
     { label: "Contact Us", href: "/services#contact" },
     { label: "Feedback", href: "/feedback" },
     { label: "Automation Guide", href: "/automation-guide" },
-    { label: "Pricing", href: "/pricing" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "/privacy" },

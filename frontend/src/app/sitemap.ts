@@ -11,7 +11,7 @@ const staticRoutes = [
   { url: `${BASE}/booking`, priority: 0.9 },
   { url: `${BASE}/blog`, priority: 0.8 },
   { url: `${BASE}/about`, priority: 0.7 },
-  { url: `${BASE}/pricing`, priority: 0.7 },
+  { url: `${BASE}/showcase`, priority: 0.7 },
   { url: `${BASE}/industries`, priority: 0.6 },
   { url: `${BASE}/case-studies`, priority: 0.6 },
   { url: `${BASE}/automation-guide`, priority: 0.6 },

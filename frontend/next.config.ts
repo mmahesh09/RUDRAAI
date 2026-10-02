@@ -56,6 +56,11 @@ const nextConfig: NextConfig = {
     ];
   },
 
+  // Pricing page was replaced by Showcase — keep old links and search results working
+  async redirects() {
+    return [{ source: "/pricing", destination: "/showcase", permanent: true }];
+  },
+
   // Proxy /api/* to the Express backend — browser always talks to same origin,
   // which eliminates CORS entirely and keeps the backend URL out of client JS.
   async rewrites() {

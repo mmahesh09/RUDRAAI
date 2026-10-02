@@ -32,7 +32,7 @@ backend/    Express.js API server
 
 - `/` — Home (hero, services, features, how it works, testimonials, founder, FAQ, CTA)
 - `/services` — Service offerings with process roadmap
-- `/pricing` — 4 pricing tiers
+- `/showcase` — Gallery of built n8n workflows / AI agents (replaced `/pricing`, which 308-redirects here)
 - `/about` — Founder story
 - `/blog` + `/blog/[slug]` — 6 static blog posts
 - `/booking` — Free consultation booking (Sat/Sun only, 15 min slots)
