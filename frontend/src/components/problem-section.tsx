@@ -32,9 +32,9 @@ export default function ProblemSection() {
                   <p role="cell" className="md:col-span-4 font-heading text-xl font-semibold tracking-[-0.02em] text-[#F5F5F7]">
                     {r.task}
                   </p>
-                  <p role="cell" className="md:col-span-4 text-[15px] leading-relaxed text-[#8A8A93] line-through decoration-white/20">
+                  <p role="cell" className="md:col-span-4 text-[15px] leading-relaxed text-[#8A8A93]">
                     <span className="sr-only">Today: </span>
-                    {r.today}
+                    <del className="strike no-underline [text-decoration:none]">{r.today}</del>
                   </p>
                   <p role="cell" className="md:col-span-4 text-[15px] leading-relaxed text-[#F5F5F7]">
                     <span className="sr-only">After: </span>

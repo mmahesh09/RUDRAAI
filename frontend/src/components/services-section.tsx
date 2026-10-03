@@ -18,12 +18,17 @@ export default function ServicesSection({ index = "02" }: { index?: string } = {
         <ol className="mt-16 lg:mt-24 border-b border-white/[0.08]">
           {SERVICES.map((s, i) => (
             <Reveal as="li" key={s.slug} delay={i * 0.06} className="border-t border-white/[0.08]">
-              <div className="grid gap-y-5 py-10 lg:grid-cols-12 lg:gap-x-8 lg:py-14">
-                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93] lg:col-span-1 lg:pt-3">
+              <div className="group/row relative isolate grid gap-y-5 py-10 lg:grid-cols-12 lg:gap-x-8 lg:py-14">
+                {/* Hover: a faint panel wipes up behind the row and the name slides in */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-x-[-1.25rem] inset-y-0 -z-10 origin-bottom scale-y-0 bg-white/[0.025] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover/row:scale-y-100"
+                />
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93] transition-colors duration-300 group-hover/row:text-[#BF5AF2] lg:col-span-1 lg:pt-3">
                   {String(i + 1).padStart(2, "0")}
                 </p>
                 <div className="lg:col-span-5">
-                  <h3 className="font-heading text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-none tracking-[-0.035em] text-[#F5F5F7]">
+                  <h3 className="font-heading text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-none tracking-[-0.035em] text-[#F5F5F7] transition-transform duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover/row:translate-x-3">
                     {s.name}
                   </h3>
                   <p className="mt-4 max-w-[34ch] text-lg leading-snug text-[#F5F5F7]/90">{s.line}</p>

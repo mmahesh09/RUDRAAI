@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import HeroTornado from "@/components/hero-tornado";
 import HeroRunTicker from "@/components/hero-run-ticker";
+import Magnetic from "@/components/site/magnetic";
 
 // The three services, each revealed from behind a mask — then the promise underneath
 const SERVICES = ["Websites.", "AI agents.", "Automations."];
@@ -56,18 +57,22 @@ export default function Hero() {
             </div>
 
             <h1 className="mt-6 lg:mt-7 font-heading font-bold tracking-[-0.035em] leading-[0.98]">
-              <span className="block text-[clamp(2.25rem,11vw,4.25rem)] lg:text-[clamp(3rem,min(5.2vw,10.5svh),5.5rem)]">
+              <span className="sr-only">{SERVICES.join(" ")} Built to work for your business.</span>
+              {/* Each line rises out of its mask one character at a time */}
+              <span aria-hidden="true" className="block text-[clamp(2.25rem,11vw,4.25rem)] lg:text-[clamp(3rem,min(5.2vw,10.5svh),5.5rem)]">
                 {SERVICES.map((text, i) => (
-                  <span key={text} className="block overflow-hidden pb-[0.06em]">
-                    <span style={delay(0.25 + i * 0.09)} className="hero-rise inline-block text-white">
-                      {text}
-                    </span>{" "}
+                  <span key={text} className="block overflow-hidden pb-[0.06em] text-white">
+                    {text.split("").map((ch, j) => (
+                      <span key={j} style={delay(0.25 + i * 0.12 + j * 0.028)} className="hero-rise hero-char">
+                        {ch === " " ? " " : ch}
+                      </span>
+                    ))}
                   </span>
                 ))}
               </span>
-              <span className="mt-3 block overflow-hidden pb-[0.08em] font-subheading font-medium tracking-[-0.01em] text-[clamp(1.25rem,4.6vw,1.75rem)] lg:text-[clamp(1.35rem,min(2vw,4.2svh),2rem)]">
-                <span style={delay(0.25 + SERVICES.length * 0.09)} className="hero-rise inline-block text-[#BF5AF2]">
-                  Built to work for your business.
+              <span aria-hidden="true" className="mt-3 block overflow-hidden pb-[0.08em] font-subheading font-medium tracking-[-0.01em] text-[clamp(1.25rem,4.6vw,1.75rem)] lg:text-[clamp(1.35rem,min(2vw,4.2svh),2rem)]">
+                <span style={delay(0.25 + SERVICES.length * 0.12 + 0.15)} className="hero-rise inline-block">
+                  <span className="text-shine">Built to work for your business.</span>
                 </span>
               </span>
             </h1>
@@ -81,6 +86,7 @@ export default function Hero() {
             </p>
 
             <div style={delay(0.9)} className="hero-fade mt-8 flex flex-col min-[420px]:flex-row min-[420px]:items-center gap-x-8 gap-y-4">
+              <Magnetic strength={0.25}>
               <Link
                 href="/booking"
                 className="group inline-flex h-12 items-center justify-between gap-4 rounded-full bg-[#8944AB] pl-6 pr-1.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#7A3A9A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#BF5AF2]"
@@ -91,6 +97,7 @@ export default function Hero() {
                   <ArrowRight className="h-3.5 w-3.5 text-[#BF5AF2] transition-transform duration-300 group-hover:translate-x-0.5" />
                 </span>
               </Link>
+              </Magnetic>
               <Link
                 href="/services"
                 className="group relative inline-flex w-fit items-center gap-2 py-1 text-[15px] font-medium text-white"

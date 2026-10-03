@@ -7,6 +7,7 @@ import { Providers } from "@/components/providers";
 import ChatWidget from "@/components/chat-widget";
 import GaScript from "@/components/ga-script";
 import ChatwootWidget from "@/components/chatwoot-widget";
+import SiteEffects from "@/components/site/site-effects";
 
 // Display + subheads: Inter Tight (neo-grotesque, tight metrics for large sizes).
 // Body: Google Sans (linked below — not yet in next/font). JetBrains Mono: labels, data, run logs.
@@ -91,6 +92,7 @@ export default function RootLayout({
         <SmoothScrollProvider>
           <Providers>{children}</Providers>
         </SmoothScrollProvider>
+        <SiteEffects />
         <CookieConsent />
         <ChatWidget />
         <GaScript />

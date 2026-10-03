@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { splitWords } from "@/lib/split-words";
 
 type RevealProps = {
   as?: "div" | "span" | "li" | "section" | "p";
-  /** "fade" lifts a block in; "line" slides its content up from behind a mask */
-  variant?: "fade" | "line";
+  /** "fade" lifts a block in; "line" slides its content up from behind a mask;
+   *  "words" masks each word and staggers them up one after another */
+  variant?: "fade" | "line" | "words";
   /** Start delay in seconds */
   delay?: number;
   className?: string;
@@ -38,10 +40,10 @@ export default function Reveal({ as = "div", variant = "fade", delay = 0, classN
     return () => io.disconnect();
   }, []);
 
-  const base = variant === "line" ? "reveal-line" : "reveal";
+  const base = variant === "line" ? "reveal-line" : variant === "words" ? "reveal-words" : "reveal";
   return (
     <Tag ref={ref} className={`${base} ${className}`} style={{ ...style, "--d": `${delay}s` } as CSSProperties}>
-      {variant === "line" ? <span>{children}</span> : children}
+      {variant === "line" ? <span>{children}</span> : variant === "words" ? splitWords(children) : children}
     </Tag>
   );
 }

@@ -7,6 +7,8 @@ import HowItWorksSection from "@/components/how-it-works-section";
 import FaqSection from "@/components/faq-section";
 import CTASection from "@/components/cta-section";
 import Footer from "@/components/footer";
+import ScrollStatement from "@/components/site/scroll-statement";
+import VelocityMarquee from "@/components/site/velocity-marquee";
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -30,9 +32,11 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <Navbar />
       <Hero />
-      {/* The page reads as one run: problem → services → a live workflow → process → questions → close */}
+      {/* The page reads as one run: statement → problem → services → ticker → a live workflow → process → questions → close */}
+      <ScrollStatement />
       <ProblemSection />
       <ServicesSection />
+      <VelocityMarquee />
       <FeaturesSection />
       <HowItWorksSection />
       <FaqSection />

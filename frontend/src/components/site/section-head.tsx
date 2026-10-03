@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Reveal from "@/components/site/reveal";
+import ScrambleText from "@/components/site/scramble-text";
 
 type SectionHeadProps = {
   /** Index shown before the label, e.g. "02" */
@@ -13,16 +14,16 @@ type SectionHeadProps = {
 };
 
 /**
- * Section opener used across the site: mono index + label on a hairline,
- * a left-aligned display heading, optional intro set in a narrow measure.
+ * Section opener used across the site: a hairline that draws itself in, a mono label that
+ * decodes from glyphs, and a display heading whose words rise out of a mask one by one.
  */
 export default function SectionHead({ index, label, title, intro, as: H = "h2", className = "" }: SectionHeadProps) {
   return (
     <div className={`grid gap-y-6 lg:grid-cols-12 lg:gap-x-8 ${className}`}>
-      <Reveal className="lg:col-span-12 border-t border-white/[0.08] pt-5">
+      <Reveal className="rule-draw lg:col-span-12 pt-5">
         <p className="eyebrow">
           {index && <span className="text-[#BF5AF2]">{index}&nbsp;&nbsp;</span>}
-          {label}
+          <ScrambleText text={label} />
         </p>
       </Reveal>
       <H
@@ -30,7 +31,7 @@ export default function SectionHead({ index, label, title, intro, as: H = "h2", 
           H === "h1" ? "text-[clamp(2.5rem,6vw,5rem)]" : "text-[clamp(2rem,4.6vw,3.75rem)]"
         }`}
       >
-        <Reveal as="span" variant="line" delay={0.05}>
+        <Reveal as="span" variant="words" delay={0.05} className="block">
           {title}
         </Reveal>
       </H>
