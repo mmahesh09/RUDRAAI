@@ -7,8 +7,8 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { showcaseProjects, type ShowcaseProject } from "@/lib/showcase";
 
-// The screenshot stops before the page's footer whitespace (~74% of its height)
-const SCROLL_END = "-74%";
+// Frame is 16:10 over a 1:4 screenshot, so the last frame sits at 1 - 0.625/4 of its height
+const SCROLL_END = "-84.375%";
 
 /** A browser window whose page scrolls as you scroll ours — the site, shown as it really is. */
 function BrowserFrame({ project, pinned }: { project: ShowcaseProject; pinned: boolean }) {
@@ -51,7 +51,7 @@ function BrowserFrame({ project, pinned }: { project: ShowcaseProject; pinned: b
 
   return (
     <div ref={trackRef} className="relative h-[260vh]">
-      <div className="sticky top-0 flex h-screen items-center">{frame}</div>
+      <div className="sticky top-0 flex h-screen items-start pt-28">{frame}</div>
     </div>
   );
 }
@@ -85,7 +85,7 @@ function Project({ project, index }: { project: ShowcaseProject; index: number }
             <p className="eyebrow">
               <span className="text-[#BF5AF2]">Case {String(index + 1).padStart(2, "0")}&nbsp;&nbsp;</span>Live website
             </p>
-            <h2 className="mt-6 font-heading text-[clamp(2.5rem,5vw,4.25rem)] font-semibold leading-[0.95] tracking-[-0.045em] text-[#F5F5F7] [overflow-wrap:anywhere]">
+            <h2 className="mt-6 font-heading text-[clamp(2.25rem,9vw,3.5rem)] lg:text-[clamp(2.25rem,3.3vw,3.25rem)] font-semibold leading-[0.95] tracking-[-0.045em] text-[#F5F5F7] break-words">
               {project.client}
             </h2>
             <p className="mt-5 max-w-[34ch] text-lg leading-snug text-[#F5F5F7]/90">{project.line}</p>
@@ -135,7 +135,7 @@ export default function ShowcaseSection() {
       ))}
 
       {/* The open slot — the page closes on the next case, not a generic banner */}
-      <div className="container-wide mt-32 lg:mt-44">
+      <div className="container-wide mt-24 lg:mt-32">
         <Link
           href="/booking"
           className="group grid gap-6 border-y border-white/[0.08] py-12 transition-colors hover:border-[#BF5AF2]/50 md:grid-cols-12 md:items-end md:gap-x-8 md:py-16"
