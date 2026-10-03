@@ -1,10 +1,37 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
+import { Particles } from "@/components/ui/particles";
 
 /**
- * Site-wide craft layer: a hairline scroll-progress rule, a static film-grain overlay,
+ * Site-wide particle field. Fixed behind everything (negative z-index), so it shows
+ * through the transparent page sections and is covered by cards and panels.
+ * Skipped for reduced motion; fewer particles on small screens.
+ */
+function ParticleField() {
+  const [quantity, setQuantity] = useState(0);
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setQuantity(window.innerWidth < 768 ? 45 : 110);
+  }, []);
+
+  if (!quantity) return null;
+  return (
+    <Particles
+      className="pointer-events-none fixed inset-0 -z-10"
+      quantity={quantity}
+      staticity={60}
+      ease={70}
+      size={0.5}
+      color="#F5F5F7"
+    />
+  );
+}
+
+/**
+ * Site-wide craft layer: a particle field behind the page, a hairline scroll-progress rule, a static film-grain overlay,
  * and (fine pointers only, motion allowed) a trailing cursor ring that swells over links.
  */
 export default function SiteEffects() {
@@ -62,6 +89,7 @@ export default function SiteEffects() {
 
   return (
     <div aria-hidden="true">
+      <ParticleField />
       <motion.div
         style={{ scaleX: progress }}
         className="fixed inset-x-0 top-0 z-[70] h-px origin-left bg-[#BF5AF2]"
