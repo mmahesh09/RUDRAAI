@@ -60,7 +60,7 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Pricing page was replaced by Showcase, and the first six blog posts were retired —
+  // Pricing page was replaced by Showcase, case studies and the first six blog posts were retired —
   // keep old links and search results working
   async redirects() {
     const retiredPosts = [
@@ -73,6 +73,9 @@ const nextConfig: NextConfig = {
     ];
     return [
       { source: "/pricing", destination: "/showcase", permanent: true },
+      // Case studies were retired; Showcase is where the real work lives now
+      { source: "/case-studies", destination: "/showcase", permanent: true },
+      { source: "/case-studies/:path*", destination: "/showcase", permanent: true },
       ...retiredPosts.map((slug) => ({ source: `/blog/${slug}`, destination: "/blog", permanent: true })),
     ];
   },
