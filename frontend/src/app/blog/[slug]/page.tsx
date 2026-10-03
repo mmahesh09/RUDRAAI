@@ -83,7 +83,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="container-wide mt-12 md:mt-16">
           <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl bg-[#0B0B0C]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={post.image} alt="" className="aspect-[16/8] w-full object-cover" />
+            <img src={post.image} alt="" className="aspect-[40/21] w-full object-cover" />
           </div>
         </div>
 

@@ -244,6 +244,16 @@
     margin-bottom: 1.4rem;
     font-size: 0.9rem;
   }
+  /* Phones: wide comparison tables scroll inside their own box instead of widening the page */
+  @media (max-width: 767px) {
+    .prose-blog table {
+      display: block;
+      overflow-x: auto;
+    }
+    .prose-blog th, .prose-blog td {
+      min-width: 9rem;
+    }
+  }
   .prose-blog th {
     background: rgba(255,255,255,0.06);
     color: #ffffff;

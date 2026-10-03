@@ -60,9 +60,21 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Pricing page was replaced by Showcase — keep old links and search results working
+  // Pricing page was replaced by Showcase, and the first six blog posts were retired —
+  // keep old links and search results working
   async redirects() {
-    return [{ source: "/pricing", destination: "/showcase", permanent: true }];
+    const retiredPosts = [
+      "n8n-vs-zapier-make-2025",
+      "build-lead-qualification-ai-agent",
+      "ai-agents-vs-traditional-automation",
+      "automate-customer-support-gpt4",
+      "n8n-self-hosted-guide",
+      "roi-calculation-automation",
+    ];
+    return [
+      { source: "/pricing", destination: "/showcase", permanent: true },
+      ...retiredPosts.map((slug) => ({ source: `/blog/${slug}`, destination: "/blog", permanent: true })),
+    ];
   },
 
   // Proxy /api/* to the Express backend — browser always talks to same origin,

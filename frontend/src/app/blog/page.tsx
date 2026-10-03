@@ -8,9 +8,9 @@ import type { Metadata } from "next";
 import { posts } from "@/lib/posts";
 
 export const metadata: Metadata = {
-  title: "Blog — Practical Notes on AI Agents & Automation",
+  title: "Blog — Practical Guides to RAG, LLMs & MCP",
   description:
-    "Plain-English guides on n8n, AI agents, websites and workflow automation — what works, what it costs, and how to start — from the RudraAI studio.",
+    "Plain-English, hands-on guides to RAG architecture, choosing and evaluating LLMs, and building MCP servers — what works and how to ship it — from the RudraAI studio.",
   alternates: { canonical: "/blog" },
 };
 
@@ -32,7 +32,7 @@ export default function BlogPage() {
           {/* Featured — image-led, full width */}
           {featured && (
             <Link href={`/blog/${featured.slug}`} className="group grid gap-8 border-t border-white/[0.08] pt-10 lg:grid-cols-12 lg:gap-x-8">
-              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#0B0B0C] lg:col-span-7">
+              <div className="relative aspect-[40/21] overflow-hidden rounded-2xl bg-[#0B0B0C] lg:col-span-7">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={featured.image}

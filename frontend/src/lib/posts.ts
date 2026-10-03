@@ -13,478 +13,645 @@ export interface BlogPost {
 
 export const posts: BlogPost[] = [
   {
-    slug: "n8n-vs-zapier-make-2025",
-    category: "Comparison",
-    title: "n8n vs Zapier vs Make in 2025: Which Automation Platform Wins?",
+    slug: "rag-architecture-explained",
+    category: "Architecture",
+    title: "RAG Architecture, Explained: How to Build Retrieval-Augmented Generation That Actually Works",
     excerpt:
-      "A deep technical comparison of the three leading automation platforms — breaking down real-world performance, pricing, integration depth, and who should use each.",
-    readTime: "8 min read",
-    date: "Jan 15, 2025",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80",
+      "What RAG is, the two pipelines inside every RAG system, the design choices that decide answer quality — chunking, embeddings, hybrid search, reranking — and how to evaluate and run it in production.",
+    readTime: "11 min read",
+    date: "Oct 4, 2026",
+    image: "/blog/rag-architecture-explained.png",
     featured: true,
     color: "#BF5AF2",
     content: `
-<p>Choosing the right automation platform is one of the highest-leverage decisions an operations team can make. The wrong choice locks you into vendor pricing, limits your integration depth, and creates technical debt that costs months to unwind. In this guide, we'll break down <strong>n8n, Zapier, and Make (formerly Integromat)</strong> on the dimensions that actually matter in 2025.</p>
+<p>A large language model only knows what was in its training data. It has never seen your product catalogue, your refund policy, last week's pricing change or the PDF your operations team wrote in March. Ask it about any of those and it will either say it doesn't know or, worse, confidently make something up.</p>
 
-<h2>TL;DR Decision Matrix</h2>
+<p><strong>Retrieval-Augmented Generation (RAG)</strong> fixes this without retraining the model. At question time, the system <em>retrieves</em> the few passages from your own data that are most relevant to the question, <em>augments</em> the prompt with them, and lets the model <em>generate</em> an answer grounded in that text — ideally with citations back to the source.</p>
+
+<p>That one-sentence description hides a lot of engineering. Most RAG systems that disappoint in production don't fail because of the model; they fail because the wrong passages were retrieved. This guide walks through the full architecture, the decisions at each step, and how to know whether it's working.</p>
+
+<h2>RAG vs fine-tuning vs a giant prompt</h2>
+<p>There are three common ways to give a model knowledge it doesn't have. They solve different problems:</p>
 <table>
-  <thead><tr><th>Criterion</th><th>n8n</th><th>Zapier</th><th>Make</th></tr></thead>
+  <thead><tr><th></th><th>RAG</th><th>Fine-tuning</th><th>Long-context prompt</th></tr></thead>
   <tbody>
-    <tr><td>Pricing model</td><td>Self-hosted free / Cloud from $24/mo</td><td>From $29.99/mo (2k tasks)</td><td>From $9/mo (10k ops)</td></tr>
-    <tr><td>Technical barrier</td><td>Medium–High</td><td>Low</td><td>Low–Medium</td></tr>
-    <tr><td>Custom code</td><td>Full Node.js / Python</td><td>Basic JS only</td><td>Basic JS only</td></tr>
-    <tr><td>AI agent support</td><td>Native LLM nodes</td><td>Via Zapier AI (limited)</td><td>Via HTTP (manual)</td></tr>
-    <tr><td>Self-host option</td><td>Yes (Docker)</td><td>No</td><td>No</td></tr>
-    <tr><td>Integrations</td><td>400+ + any HTTP API</td><td>6,000+</td><td>1,700+</td></tr>
+    <tr><td>What it changes</td><td>What the model reads at answer time</td><td>The model's weights</td><td>What the model reads at answer time</td></tr>
+    <tr><td>Best for</td><td>Facts, documents, data that changes</td><td>Style, format, a narrow skill</td><td>A small, fixed set of documents</td></tr>
+    <tr><td>Freshness</td><td>Update the index in seconds</td><td>Retrain to update</td><td>Edit the prompt</td></tr>
+    <tr><td>Citations</td><td>Natural — you know which chunks were used</td><td>Not possible</td><td>Possible but vague</td></tr>
+    <tr><td>Cost per question</td><td>Low (only relevant chunks are sent)</td><td>Low</td><td>High (everything is sent, every time)</td></tr>
+    <tr><td>Scales to</td><td>Millions of documents</td><td>—</td><td>What fits in the context window</td></tr>
+  </tbody>
+</table>
+<p>The short version: <strong>use RAG for knowledge, fine-tuning for behaviour</strong>. If your whole knowledge base is a few pages, skip RAG and put it in the prompt. Once it's larger than that, or changes often, or needs per-user permissions, you want retrieval.</p>
+
+<h2>The two pipelines inside every RAG system</h2>
+<p>Every RAG system is really two pipelines that share a vector index. One runs ahead of time (or continuously) to prepare your data. The other runs on every question.</p>
+
+<pre><code>INGESTION  (offline / on every data change)
+
+  Sources ──► Load &amp; clean ──► Chunk ──► Embed ──► Store
+  (docs, DB,     (text +        (split    (text →   (vector index
+   tickets,       metadata)      into      vectors)   + metadata)
+   web pages)                    passages)
+
+QUERY  (on every question)
+
+  Question ──► Rewrite ──► Retrieve ──► Rerank ──► Prompt ──► Generate ──► Answer
+               (optional)  (vector +    (keep the  (question   (LLM)       + citations
+                            keyword)     best 5–8)  + chunks)</code></pre>
+
+<p>Let's go through each stage.</p>
+
+<h2>1. Loading and cleaning</h2>
+<p>Garbage in, garbage retrieved. Before anything is embedded, turn every source into clean text plus metadata:</p>
+<ul>
+  <li><strong>Extract text properly.</strong> PDFs, slides and scanned documents need real parsing (and OCR for scans). Tables are the usual casualty — convert them to Markdown or one row per line so they survive.</li>
+  <li><strong>Strip the noise.</strong> Navigation menus, cookie banners, repeated headers and footers all pollute embeddings.</li>
+  <li><strong>Keep metadata.</strong> Source URL, title, section heading, author, last-updated date, product, language and — critically — <em>who is allowed to see it</em>. You'll filter on these later.</li>
+</ul>
+
+<h2>2. Chunking</h2>
+<p>You can't embed a 60-page manual as one vector — the meaning gets averaged into mush, and you couldn't fit it all in the prompt anyway. So documents are split into chunks. Chunking is the single most underrated decision in RAG.</p>
+<ul>
+  <li><strong>Fixed-size with overlap.</strong> Split every ~300–800 tokens with 10–20% overlap so sentences on a boundary aren't lost. Simple, and a fine baseline.</li>
+  <li><strong>Structure-aware.</strong> Split on headings, sections, list items or FAQ entries so each chunk is one coherent idea. Almost always better than fixed-size for documentation.</li>
+  <li><strong>Semantic chunking.</strong> Start a new chunk where the topic shifts, detected by embedding similarity between sentences. Useful for long, unstructured prose.</li>
+  <li><strong>Parent–child (small-to-big).</strong> Embed small chunks for precise matching, but send the larger parent section to the model so it has the surrounding context.</li>
+  <li><strong>Contextual chunk headers.</strong> Prepend the document title and section path to each chunk before embedding (e.g. "Returns policy › International orders › …"). A chunk that just says "this must be done within 14 days" is useless on its own; with a header it becomes findable.</li>
+</ul>
+<p><strong>Rule of thumb:</strong> a chunk should make sense if a person read it with no other context. If it doesn't, it won't make sense to the retriever either.</p>
+
+<h2>3. Embeddings</h2>
+<p>An embedding model turns text into a vector — a list of a few hundred to a few thousand numbers — such that texts with similar meaning end up close together. "How do I get my money back?" lands near "Refund policy" even though they share no words.</p>
+<ul>
+  <li><strong>Use the same model for documents and questions.</strong> Vectors from different models aren't comparable.</li>
+  <li><strong>Pick for your language and domain.</strong> Check retrieval benchmarks (the MTEB leaderboard is the usual reference), then test on your own data — see the evaluation section below.</li>
+  <li><strong>Changing models means re-embedding everything.</strong> Store the model name alongside each vector so migrations are deliberate.</li>
+  <li><strong>Mind the dimensions.</strong> Bigger vectors can be slightly more accurate but cost more storage and search time. Many models let you truncate dimensions with little loss.</li>
+</ul>
+
+<h2>4. The vector store</h2>
+<p>The vector store holds your chunks, their vectors and their metadata, and answers "which vectors are closest to this one?" quickly using an approximate nearest-neighbour index (HNSW is the most common).</p>
+<p>Options range from dedicated vector databases (Qdrant, Pinecone, Weaviate, Milvus, Chroma) to adding vectors to the database you already run. If you're on PostgreSQL, <strong>pgvector</strong> keeps everything — data, metadata, permissions and vectors — in one place, which removes a whole class of sync bugs:</p>
+
+<pre><code>create extension if not exists vector;
+
+create table chunks (
+  id          bigserial primary key,
+  document_id text not null,
+  content     text not null,
+  metadata    jsonb not null default '{}',
+  embedding   vector(1536) not null
+);
+
+create index on chunks using hnsw (embedding vector_cosine_ops);
+
+-- top 20 chunks for a question, limited to one product
+select id, content, 1 - (embedding &lt;=&gt; $1) as similarity
+from chunks
+where metadata-&gt;&gt;'product' = 'billing'
+order by embedding &lt;=&gt; $1
+limit 20;</code></pre>
+<p>A dedicated vector database earns its place at very large scale, when you need advanced filtering and quantisation, or when search load would compete with your transactional database.</p>
+
+<h2>5. Retrieval: dense, sparse and hybrid</h2>
+<p>Pure vector (dense) search is great at meaning but surprisingly bad at exact terms: product codes, error numbers, names, acronyms. Keyword (sparse) search such as BM25 is the opposite. So production systems usually run both and merge the results — <strong>hybrid search</strong>.</p>
+<p>The standard way to merge is <strong>Reciprocal Rank Fusion (RRF)</strong>: each result scores <code>1 / (60 + rank)</code> in each list, and the scores are summed. It needs no tuning and works well.</p>
+<p>Two other retrieval levers matter as much as the algorithm:</p>
+<ul>
+  <li><strong>Metadata filters.</strong> Restrict the search to the right product, language, date range — and to documents the current user is permitted to see. Permission filtering must happen <em>in the retrieval query</em>, never by asking the model to ignore things.</li>
+  <li><strong>How many to fetch.</strong> Retrieve generously at this stage (20–50 candidates) and let the reranker narrow it down.</li>
+</ul>
+
+<h2>6. Reranking</h2>
+<p>Embedding search compares a question vector with chunk vectors that were computed independently, which is fast but approximate. A <strong>reranker</strong> (a cross-encoder) reads the question and each candidate chunk <em>together</em> and scores how well the chunk actually answers it. It's slower, so you only run it on the shortlist.</p>
+<p>Retrieve 30–50, rerank, keep the top 5–8. In our experience this is the single cheapest large improvement you can make to a RAG system that "sort of works".</p>
+
+<h2>7. Building the prompt and generating</h2>
+<p>Finally, the chosen chunks go into the prompt with clear instructions. A solid starting template:</p>
+
+<pre><code>You answer questions using ONLY the sources below.
+
+Rules:
+- If the sources don't contain the answer, say you don't know.
+- Cite the sources you used like [1], [2].
+- Quote numbers, dates and prices exactly as written.
+
+Sources:
+[1] Returns policy › International orders
+Items shipped outside the UK can be returned within 30 days ...
+
+[2] Help centre › Refund timelines
+Refunds are issued to the original payment method within 5–10 business days ...
+
+Question: How long do I have to return an order shipped to Germany?</code></pre>
+<p>Put the most relevant chunks first, keep instructions short and explicit, and always give the model permission to say "I don't know". A RAG system that admits ignorance is far more trustworthy than one that improvises.</p>
+
+<h2>Advanced patterns worth knowing</h2>
+<ul>
+  <li><strong>Query rewriting.</strong> Users ask vague, conversational questions ("what about the other one?"). Have a fast model rewrite the question into a standalone search query using the chat history before retrieving.</li>
+  <li><strong>Multi-query and HyDE.</strong> Generate several phrasings of the question — or a hypothetical answer — and search with each, then fuse the results. Helps when users and documents use different vocabulary.</li>
+  <li><strong>Agentic RAG.</strong> Give the model retrieval as a <em>tool</em> instead of retrieving once up front. It can search, read, decide it needs more, and search again — essential for multi-step questions like "compare our 2025 and 2026 pricing for annual plans".</li>
+  <li><strong>GraphRAG.</strong> Extract entities and relationships into a knowledge graph, so questions about connections ("which suppliers affect product X?") or whole-corpus themes can be answered, not just look-ups.</li>
+  <li><strong>Multi-tenant RAG.</strong> When several customers or products share one system, every chunk carries a tenant ID and every query is filtered by it — or each tenant gets its own collection. Isolation is enforced by the retriever, never by the prompt.</li>
+</ul>
+
+<h2>Keeping the index fresh</h2>
+<p>A RAG system is only as current as its index. Treat ingestion as a sync service, not a one-off script:</p>
+<ul>
+  <li><strong>Detect changes</strong> with webhooks, database change-data-capture, or polling an <code>updated_at</code> column.</li>
+  <li><strong>Hash each chunk's content</strong> and only re-embed chunks whose hash changed — re-embedding everything on every change gets expensive fast.</li>
+  <li><strong>Handle deletes.</strong> When a document is removed or unpublished, its chunks must go too, or the assistant will keep quoting it.</li>
+  <li><strong>Upsert by stable IDs</strong> (document ID + chunk position) so updates replace rather than duplicate.</li>
+</ul>
+
+<h2>How to evaluate a RAG system</h2>
+<p>"It looks good when I try it" is not an evaluation. Build a <strong>golden set</strong> of 50–200 real questions, each with the correct answer and the document(s) that contain it. Then measure the two halves separately:</p>
+<table>
+  <thead><tr><th>Stage</th><th>Metric</th><th>Question it answers</th></tr></thead>
+  <tbody>
+    <tr><td>Retrieval</td><td>Recall@k / hit rate</td><td>Was the right chunk in the top k at all?</td></tr>
+    <tr><td>Retrieval</td><td>MRR</td><td>How high up was it ranked?</td></tr>
+    <tr><td>Retrieval</td><td>Context precision</td><td>How much of what we sent was actually relevant?</td></tr>
+    <tr><td>Generation</td><td>Faithfulness</td><td>Is every claim in the answer supported by the retrieved text?</td></tr>
+    <tr><td>Generation</td><td>Answer relevance</td><td>Does the answer address the question that was asked?</td></tr>
+    <tr><td>End to end</td><td>Correctness</td><td>Does it match the reference answer?</td></tr>
+  </tbody>
+</table>
+<p>Libraries such as Ragas and DeepEval compute the generation metrics using an LLM as the judge. Run the golden set on every change to chunking, embeddings, prompts or models, and you'll know immediately whether a change helped. We cover evals in depth in <a href="/blog/llm-models-benchmarks-evals">our guide to LLM benchmarks and evals</a>.</p>
+
+<h2>Common failure modes, and what usually fixes them</h2>
+<table>
+  <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Can't find answers that are definitely in the docs</td><td>Poor chunking or parsing; exact terms missed</td><td>Structure-aware chunks, contextual headers, hybrid search</td></tr>
+    <tr><td>Finds the right document, wrong part of it</td><td>Chunks too large or no reranker</td><td>Smaller chunks + parent–child, add a reranker</td></tr>
+    <tr><td>Answers with outdated information</td><td>Stale index, deletes not synced</td><td>Change detection, content hashing, delete handling</td></tr>
+    <tr><td>Confident answers not in the sources</td><td>Prompt allows guessing</td><td>Explicit "only from sources" rule, require citations, check faithfulness</td></tr>
+    <tr><td>Fails on follow-up questions</td><td>Retrieval uses the raw follow-up text</td><td>Rewrite the query using chat history</td></tr>
+    <tr><td>Shows one customer another's data</td><td>Permissions applied after retrieval (or not at all)</td><td>Filter by tenant/permissions inside the retrieval query</td></tr>
   </tbody>
 </table>
 
-<h2>Zapier: The No-Code King</h2>
-<p>Zapier remains the easiest entry point for non-technical teams. Its 6,000+ pre-built integrations mean most tools you use today have a native connector. Setup takes minutes, and the linear "trigger → action" model is intuitive for business users.</p>
-<p><strong>Where it breaks down:</strong> Complex branching logic, loops, and data transformations are painful. Pricing scales steeply — a team running 50k+ tasks/month will pay $599+/mo. There's no self-hosting option, so your data touches Zapier's servers.</p>
-<p><strong>Best for:</strong> Marketing teams, small businesses, non-technical founders who need simple two-app bridges fast.</p>
-
-<h2>Make: The Visual Power User's Tool</h2>
-<p>Make's scenario builder is genuinely impressive — drag-and-drop with real branching, iterators, aggregators, and a router pattern that handles complex logic visually. The pricing is significantly cheaper than Zapier (operations-based, not task-based), making it attractive for high-volume workflows.</p>
-<p><strong>Where it breaks down:</strong> The visual canvas gets overwhelming for large workflows (50+ modules). No self-hosting means data sovereignty concerns for regulated industries. AI/LLM support is weaker — you're building raw HTTP requests to OpenAI rather than using native AI nodes.</p>
-<p><strong>Best for:</strong> Teams that need complex multi-step workflows but aren't ready to write code. E-commerce and marketing automation are strong sweet spots.</p>
-
-<h2>n8n: The Engineering Team's Platform</h2>
-<p>n8n is what you reach for when Zapier and Make hit their ceiling. Self-hosting on Docker means your data never leaves your infrastructure — critical for healthcare, fintech, and enterprise clients. The Code node supports full Node.js and Python, which means you can implement any business logic without workarounds.</p>
-<p>In 2025, n8n's native AI agent framework is a standout: LLM nodes, vector store integrations, memory nodes, and agent orchestration are all first-class. Building a RAG pipeline that pulls from a PostgreSQL database, embeds results, and calls Claude 3.5 Sonnet takes about 20 nodes — no Python backend needed.</p>
-<p><strong>Where it breaks down:</strong> The learning curve is real. If your team doesn't have a technical person, initial setup and maintenance will be friction. The native integration library (400+) is smaller than Zapier's — though the HTTP Request node covers anything with a REST API.</p>
-<p><strong>Best for:</strong> Engineering-adjacent teams, SaaS companies, any business that handles sensitive data, and anyone building AI agents.</p>
-
-<h2>Our Recommendation</h2>
-<p>After deploying automations across 40+ clients, our default recommendation is:</p>
+<h2>A production checklist</h2>
 <ul>
-  <li><strong>Start with Make</strong> if your team is non-technical and you need complex workflows at a reasonable price.</li>
-  <li><strong>Move to n8n</strong> when you need AI agents, self-hosting, or hit Make's complexity ceiling.</li>
-  <li><strong>Use Zapier</strong> only for simple two-app triggers where setup speed matters more than cost.</li>
+  <li>Clean parsing, with tables and headings preserved</li>
+  <li>Structure-aware chunks with contextual headers</li>
+  <li>Hybrid search plus a reranker</li>
+  <li>Permission and tenant filters inside the retrieval query</li>
+  <li>An incremental sync pipeline that handles updates and deletes</li>
+  <li>Citations in every answer, and permission to say "I don't know"</li>
+  <li>A golden set run on every change, and logging of real questions to grow it</li>
+  <li>Latency and cost tracked per stage, not just end to end</li>
 </ul>
-<p>The biggest mistake we see: teams staying on Zapier long after they've outgrown it, paying 10× what n8n would cost at their volume.</p>
 
-<p>Want us to audit your current automation stack and recommend the right platform? <a href="/booking">Book a free 60-minute session</a> — we'll tell you exactly where you are and where you should be.</p>
+<p>RAG is less about any one clever technique and more about getting a dozen ordinary decisions right. Get retrieval right and almost any modern model will give good answers; get it wrong and no model can save you.</p>
+
+<p>Want a RAG assistant over your own documents, help centre or database? <a href="/booking">Book a free 15-minute call</a> and we'll tell you what it would take.</p>
     `.trim(),
   },
   {
-    slug: "build-lead-qualification-ai-agent",
-    category: "Tutorial",
-    title: "Build a Lead Qualification AI Agent in n8n (Step-by-Step)",
+    slug: "llm-models-benchmarks-evals",
+    category: "Models",
+    title: "LLM Models, Benchmarks and Evals: How to Choose a Model on Evidence, Not Leaderboards",
     excerpt:
-      "Complete walkthrough of building an autonomous AI agent that scores leads, enriches data from 3 APIs, and routes to the right sales rep — with zero manual intervention.",
-    readTime: "12 min read",
-    date: "Jan 8, 2025",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
-    featured: false,
-    color: "#A1A1A6",
-    content: `
-<p>Lead qualification is the highest-ROI automation you can build for a B2B sales team. A well-built agent replaces 2–4 hours of daily SDR work, improves lead scoring accuracy, and routes high-intent prospects to senior reps before they go cold. Here's the exact architecture we deployed for a SaaS client last quarter.</p>
-
-<h2>What the Agent Does</h2>
-<ul>
-  <li>Triggers on new CRM lead (HubSpot webhook)</li>
-  <li>Enriches the lead with company data (Clearbit), LinkedIn data (Proxycurl), and tech stack info (BuiltWith)</li>
-  <li>Scores the lead 0–100 using GPT-4o with your ICP criteria as the system prompt</li>
-  <li>Routes score ≥ 70 to senior AE (Slack DM + CRM task), score 40–69 to SDR sequence, score &lt; 40 to nurture email</li>
-  <li>Logs everything to Google Sheets for pipeline reporting</li>
-</ul>
-
-<h2>Prerequisites</h2>
-<p>You'll need:</p>
-<ul>
-  <li>n8n (self-hosted or cloud)</li>
-  <li>HubSpot with webhook access</li>
-  <li>Clearbit API key (or Apollo.io as an alternative)</li>
-  <li>OpenAI API key</li>
-  <li>Slack bot token with DM permissions</li>
-</ul>
-
-<h2>Step 1: Webhook Trigger</h2>
-<p>In n8n, create a new workflow and add a <strong>Webhook node</strong>. Set the method to POST and copy the webhook URL. In HubSpot, go to Settings → Integrations → Webhooks and create a new subscription for <code>contact.creation</code>. Paste the n8n URL as the target.</p>
-<p>Test by creating a dummy contact — n8n's webhook will capture the payload so you can inspect the structure.</p>
-
-<h2>Step 2: Data Enrichment (3 Parallel HTTP Calls)</h2>
-<p>Add a <strong>Split In Batches</strong> node, then three <strong>HTTP Request nodes</strong> running in parallel:</p>
-<ol>
-  <li><strong>Clearbit Enrichment:</strong> <code>GET https://person.clearbit.com/v2/combined/find?email={{email}}</code> — returns company size, industry, funding, LinkedIn URL, location</li>
-  <li><strong>Proxycurl LinkedIn:</strong> <code>GET https://nubela.co/proxycurl/api/v2/linkedin?linkedin_profile_url={{linkedin_url}}</code> — returns title, seniority, connections</li>
-  <li><strong>BuiltWith API:</strong> <code>GET https://api.builtwith.com/free1/api.json?KEY={{key}}&LOOKUP={{domain}}</code> — returns tech stack tags (Salesforce, Stripe, AWS, etc.)</li>
-</ol>
-<p>Merge the results using a <strong>Merge node</strong> (mode: Merge By Index) so all enrichment data lands on the same item.</p>
-
-<h2>Step 3: AI Scoring with GPT-4o</h2>
-<p>Add an <strong>OpenAI node</strong> set to Chat Completion. Use this system prompt structure:</p>
-<pre><code>You are a B2B lead qualification expert. Score this lead from 0-100 based on our ICP:
-- Ideal company size: 50-500 employees
-- Ideal industries: SaaS, FinTech, Healthcare
-- Must be decision-maker: VP level or above
-- Strong signal: uses Salesforce or HubSpot
-- Strong signal: Series A or B funded
-
-Return ONLY a JSON object: {"score": number, "reasoning": "string", "priority": "high|medium|low"}
-
-Lead data: {{JSON.stringify($json)}}</code></pre>
-<p>Parse the JSON response with a <strong>Code node</strong> using <code>JSON.parse($input.first().json.choices[0].message.content)</code>.</p>
-
-<h2>Step 4: Routing Logic</h2>
-<p>Add an <strong>IF node</strong> checking <code>score >= 70</code>. For the true branch (high priority):</p>
-<ul>
-  <li><strong>Slack node:</strong> DM the senior AE with lead summary and score reasoning</li>
-  <li><strong>HubSpot node:</strong> Create a task assigned to that AE, set lead stage to "SQL"</li>
-</ul>
-<p>For score 40–69, trigger an email sequence. For under 40, add to a nurture list.</p>
-
-<h2>Step 5: Logging</h2>
-<p>Add a <strong>Google Sheets node</strong> at the end of all branches to append a row: timestamp, lead email, company, score, reasoning, routing decision. This becomes your qualification audit trail.</p>
-
-<h2>Results from Our Client Deployment</h2>
-<p>After 90 days running this agent for a Series B SaaS company:</p>
-<ul>
-  <li>SDR time on manual qualification: reduced from 3.5 hrs/day → 15 min/day (review only)</li>
-  <li>Lead response time: 4 hours → 8 minutes for high-score leads</li>
-  <li>Qualification accuracy: 73% match vs. human judgment (up from 61% pre-agent)</li>
-  <li>Pipeline impact: 22% increase in SQL-to-opportunity conversion</li>
-</ul>
-
-<p>Want this built for your sales team? <a href="/booking">Book an automation audit</a> and we'll scope it out in 60 minutes.</p>
-    `.trim(),
-  },
-  {
-    slug: "ai-agents-vs-traditional-automation",
-    category: "Strategy",
-    title: "AI Agents vs Traditional Automation: When to Use Each",
-    excerpt:
-      "Know exactly when to reach for a simple n8n workflow vs building a full AI agent. This decision framework has saved our clients thousands in over-engineered solutions.",
-    readTime: "6 min read",
-    date: "Dec 28, 2024",
-    image: "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1200&q=80",
+      "How large language models differ, what the popular benchmarks really measure — and where they mislead — and how to build your own evals so you pick and change models with confidence.",
+    readTime: "9 min read",
+    date: "Oct 4, 2026",
+    image: "/blog/llm-models-benchmarks-evals.png",
     featured: false,
     color: "#10B981",
     content: `
-<p>One of the most expensive mistakes we see is companies spending $15,000 on an AI agent system to solve a problem that a $200 n8n workflow would have handled perfectly. On the other side, we see teams using rigid if/then workflows for tasks that require judgment — and then hiring a person to handle all the edge cases the workflow can't.</p>
-<p>Here's the decision framework we use during every automation audit.</p>
+<p>New models ship almost every month, each with a chart showing it beating the last one. If you're building anything on top of LLMs, you need a way to cut through that: which model is actually best <em>for your task</em>, at a price and speed you can live with — and how will you know if switching models breaks something?</p>
 
-<h2>Use Traditional Automation (n8n / Zapier / Make) When:</h2>
+<p>This guide covers three things: how LLMs differ, what public benchmarks measure (and don't), and how to build your own <strong>evals</strong> — the tests that turn model choice from guesswork into engineering.</p>
+
+<h2>What an LLM is, in four ideas</h2>
 <ul>
-  <li><strong>The logic is deterministic.</strong> If the rules are clear and enumerable ("if status = approved AND amount &gt; $1000, send to finance"), a workflow is faster, cheaper, and more reliable than an LLM.</li>
-  <li><strong>The data is structured.</strong> Working with JSON APIs, database tables, and form submissions? A workflow engine handles this natively without the cost and latency of an LLM call.</li>
-  <li><strong>Volume is high and consistency is critical.</strong> Processing 10,000 invoices per day requires deterministic, auditable logic. You don't want an LLM making slightly different decisions on batch 2,000 vs batch 8,000.</li>
-  <li><strong>You need guaranteed output format.</strong> Workflows enforce schema. LLMs can be prompted to return JSON, but they occasionally deviate — which breaks downstream systems unless you add robust parsing and fallback logic.</li>
+  <li><strong>Tokens.</strong> Models read and write text as tokens — word pieces of roughly three-quarters of a word in English. Pricing, speed and limits are all measured in tokens.</li>
+  <li><strong>Next-token prediction.</strong> A transformer network predicts the most likely next token, over and over. Everything else — answering, coding, reasoning — emerges from doing this extremely well.</li>
+  <li><strong>Parameters.</strong> The learned weights of the network. More parameters generally means more capability and more cost, though training data and techniques matter as much as size.</li>
+  <li><strong>Context window.</strong> How many tokens the model can consider at once — your instructions, documents, conversation and its own answer. Large windows are useful, but models don't use every part of a huge context equally well.</li>
+</ul>
+<p>Modern models are built in stages: <strong>pre-training</strong> on vast amounts of text, <strong>instruction tuning</strong> to follow requests, <strong>preference training</strong> (such as RLHF) to be helpful and safe, and increasingly <strong>reasoning training</strong> so the model can work through a problem step by step before answering.</p>
+
+<h2>The model landscape</h2>
+<p>Specific versions change constantly, so it's more useful to think in categories:</p>
+<table>
+  <thead><tr><th>Category</th><th>Examples (families)</th><th>Strengths</th><th>Trade-offs</th></tr></thead>
+  <tbody>
+    <tr><td>Frontier, closed</td><td>Anthropic Claude, OpenAI GPT, Google Gemini</td><td>Highest capability, strong tool use, managed APIs</td><td>Per-token cost, data leaves your infrastructure</td></tr>
+    <tr><td>Open-weight</td><td>Meta Llama, Mistral, Qwen, DeepSeek, Google Gemma</td><td>Self-hostable, fine-tunable, data stays with you</td><td>You run the infrastructure; usually a step behind the frontier</td></tr>
+    <tr><td>Reasoning / thinking modes</td><td>Extended-thinking variants of most frontier families</td><td>Maths, code, multi-step planning, hard analysis</td><td>Slower and more output tokens per answer</td></tr>
+    <tr><td>Small and fast</td><td>The "mini", "flash" or "haiku" tier of each family</td><td>Low latency and cost; great for classification, extraction, routing</td><td>Weaker on complex reasoning</td></tr>
+    <tr><td>Specialist</td><td>Embedding, reranking, speech, vision and code models</td><td>Best at one job (e.g. embeddings for RAG)</td><td>Not general-purpose</td></tr>
+  </tbody>
+</table>
+<p>Always check the provider's documentation for the current model names, context limits and prices — anything written in a blog post (including this one) will date quickly.</p>
+
+<h2>What actually differs between models</h2>
+<ul>
+  <li><strong>Quality on your task</strong> — the only quality measure that matters, and the one no leaderboard can give you.</li>
+  <li><strong>Latency</strong> — time to first token (how fast it starts) and tokens per second (how fast it finishes). Critical for chat and voice.</li>
+  <li><strong>Cost</strong> — priced per million input and output tokens; output is usually several times more expensive. Prompt caching and batch APIs can cut costs substantially.</li>
+  <li><strong>Context window</strong> — and how well the model actually uses information buried in the middle of a long input.</li>
+  <li><strong>Tool use and structured output</strong> — how reliably it calls functions with correct arguments and returns valid JSON. Make-or-break for agents.</li>
+  <li><strong>Multimodality</strong> — images, PDFs, audio, video in; images or speech out.</li>
+  <li><strong>Deployment and data</strong> — available regions, data-retention terms, self-hosting options and licence.</li>
 </ul>
 
-<h2>Use AI Agents When:</h2>
+<h2>Benchmarks: what they measure</h2>
+<p>A benchmark is a fixed public test set with a scoring method. These are the ones you'll see most often on model launch charts:</p>
+<table>
+  <thead><tr><th>Benchmark</th><th>What it measures</th><th>Watch out for</th></tr></thead>
+  <tbody>
+    <tr><td>MMLU / MMLU-Pro</td><td>Broad knowledge across ~57 subjects, multiple choice (Pro: harder, 10 options)</td><td>Original MMLU is saturated — top models all score similarly</td></tr>
+    <tr><td>GPQA Diamond</td><td>Graduate-level science questions designed to be "Google-proof"</td><td>Small set (~200 questions), so scores are noisy</td></tr>
+    <tr><td>Humanity's Last Exam</td><td>Very hard expert questions across many fields</td><td>Measures the frontier, says little about everyday tasks</td></tr>
+    <tr><td>AIME, MATH</td><td>Competition and school-level mathematics</td><td>Tests reasoning in maths specifically</td></tr>
+    <tr><td>HumanEval</td><td>Writing short Python functions from a docstring</td><td>Saturated and widely leaked into training data</td></tr>
+    <tr><td>SWE-bench Verified</td><td>Fixing real GitHub issues in real repositories</td><td>Scores depend heavily on the agent scaffold around the model</td></tr>
+    <tr><td>LiveCodeBench</td><td>Fresh coding problems collected after model training cut-offs</td><td>Designed to resist contamination — a good sign</td></tr>
+    <tr><td>τ-bench, BFCL</td><td>Tool and function calling; multi-turn agent tasks with simulated users</td><td>Closest public proxy for agent reliability</td></tr>
+    <tr><td>ARC-AGI</td><td>Abstract pattern puzzles that are easy for people, hard for models</td><td>Measures novel reasoning, not knowledge</td></tr>
+    <tr><td>LMArena (Chatbot Arena)</td><td>Human preference in blind side-by-side chats, ranked by Elo</td><td>Rewards style and length as well as correctness</td></tr>
+    <tr><td>RULER, needle-in-a-haystack</td><td>Finding and using information in long contexts</td><td>Simple "needle" tests overstate real long-document ability</td></tr>
+  </tbody>
+</table>
+
+<h2>How to read a leaderboard without being misled</h2>
 <ul>
-  <li><strong>The task requires judgment from unstructured input.</strong> Parsing email intent, classifying support tickets by sentiment, extracting key clauses from contracts — these require language understanding, not rule matching.</li>
-  <li><strong>The number of edge cases is too large to enumerate.</strong> If writing the if/then rules would take longer than the ROI of the automation, you need an agent.</li>
-  <li><strong>The workflow needs to decide what action to take.</strong> Agents can choose tools, call APIs, and chain steps dynamically based on context. Workflows execute a predefined path.</li>
-  <li><strong>Human-quality writing is required.</strong> Drafting personalized emails, generating proposal summaries, writing first drafts of reports — LLMs outperform template-based workflows here.</li>
+  <li><strong>Contamination.</strong> If test questions leaked into training data, the model is remembering, not reasoning. Prefer benchmarks with fresh or private questions.</li>
+  <li><strong>Saturation.</strong> When every top model scores 90%+, the differences are noise.</li>
+  <li><strong>Different harnesses.</strong> Prompts, number of attempts, "thinking" budgets and agent scaffolds vary between reports. A vendor's number and an independent lab's number for the same model often differ.</li>
+  <li><strong>pass@1 vs pass@k.</strong> "Solved in one try" and "solved in any of five tries" are very different claims.</li>
+  <li><strong>Missing columns.</strong> Leaderboards rarely show cost and latency — and a model that is 2% better but 5× the price is often the wrong choice.</li>
+  <li><strong>Goodhart's law.</strong> Once a benchmark becomes a target, models get optimised for it, and it stops measuring what it was designed to measure.</li>
+</ul>
+<p>Use benchmarks to build a <strong>shortlist</strong>. Use your own evals to make the <strong>decision</strong>.</p>
+
+<h2>Evals: your own benchmark</h2>
+<p>An eval is a repeatable test of your system on your task: a set of inputs, the expected behaviour, and a way of scoring the output automatically. Benchmarks tell you how a model does on someone else's exam; evals tell you how your product does on yours.</p>
+
+<h3>Step 1 — Define what "good" means</h3>
+<p>Write it down in checkable terms. "Helpful answers" isn't checkable. "Answers the question, cites a source, under 120 words, never invents an order number, escalates refund requests over £500" is.</p>
+
+<h3>Step 2 — Build a golden dataset</h3>
+<p>Collect 50–200 realistic examples: real user messages (anonymised) are best. Include the easy common cases, the awkward edge cases, the ambiguous ones, and a few adversarial ones (prompt injection, off-topic requests, missing information). Each example gets an expected answer or a description of what a good answer must contain.</p>
+
+<h3>Step 3 — Choose graders</h3>
+<table>
+  <thead><tr><th>Grader</th><th>Use it for</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td>Code-based</td><td>Anything objectively checkable — fast, cheap, deterministic</td><td>Valid JSON, matches schema, contains the order ID, under N words, correct label</td></tr>
+    <tr><td>LLM-as-judge</td><td>Qualities that need judgement</td><td>"Is every claim supported by the sources?" "Is the tone appropriate?"</td></tr>
+    <tr><td>Human review</td><td>Calibrating the judge, high-stakes outputs, spot checks</td><td>A weekly review of 30 sampled conversations</td></tr>
+  </tbody>
+</table>
+<p>LLM judges are powerful but biased: they favour longer answers, the first option in a pair, and sometimes their own model family. Mitigate this by giving the judge a specific rubric, asking for a short justification before a pass/fail verdict, swapping answer order in pairwise comparisons, and checking the judge's verdicts against human labels on a sample before trusting it.</p>
+
+<h3>Step 4 — Run, compare, decide</h3>
+<p>Run every candidate model (or prompt, or retrieval setting) over the same dataset and record quality, cost and latency side by side. Here is the core of an eval harness — wire <code>complete()</code> to whichever provider SDK you use:</p>
+
+<pre><code>import json, time
+
+def complete(model: str, prompt: str) -&gt; str:
+    """Call your LLM provider here and return the text response."""
+    raise NotImplementedError
+
+JUDGE_PROMPT = """You are grading a customer-support answer.
+Question: {question}
+Reference answer: {reference}
+Candidate answer: {answer}
+
+Does the candidate answer agree with the reference on every fact,
+without adding unsupported claims? Explain in one sentence, then
+finish with exactly PASS or FAIL on its own line."""
+
+def run_eval(model: str, dataset_path: str, judge_model: str) -&gt; dict:
+    # one JSON object per line: {"question": ..., "reference": ..., "must_include": ...}
+    cases = [json.loads(line) for line in open(dataset_path)]
+    passed, latencies = 0, []
+    for case in cases:
+        start = time.perf_counter()
+        answer = complete(model, case["question"])
+        latencies.append(time.perf_counter() - start)
+
+        # cheap deterministic checks first
+        if case.get("must_include") and case["must_include"] not in answer:
+            continue
+        verdict = complete(judge_model, JUDGE_PROMPT.format(
+            question=case["question"], reference=case["reference"], answer=answer))
+        if verdict.strip().splitlines()[-1].strip() == "PASS":
+            passed += 1
+    latencies.sort()
+    return {
+        "model": model,
+        "pass_rate": passed / len(cases),
+        "p50_latency_s": latencies[len(latencies) // 2],
+    }</code></pre>
+
+<h3>Step 5 — Make it a regression test</h3>
+<p>Run the eval in CI whenever a prompt, model, retrieval setting or tool definition changes, and fail the build if the pass rate drops below your bar. This is what lets you upgrade to next month's model in an afternoon instead of hoping for the best.</p>
+
+<h3>Step 6 — Keep evaluating in production</h3>
+<p>Offline evals catch regressions; production tells you what you didn't think to test. Log inputs and outputs (respecting privacy), sample a slice for automatic and human grading, collect thumbs-up/down feedback, and add every real failure to the golden dataset. The dataset should grow every week.</p>
+
+<h2>Evals for RAG and agents</h2>
+<ul>
+  <li><strong>RAG systems:</strong> evaluate retrieval (did we fetch the right chunks? recall@k, MRR) separately from generation (faithfulness, answer relevance). See <a href="/blog/rag-architecture-explained">our RAG architecture guide</a>.</li>
+  <li><strong>Agents:</strong> score task completion, whether the right tools were chosen with the right arguments, number of steps, recovery from tool errors, and cost per completed task. Check the final state (was the ticket actually created?) rather than just the final message.</li>
+  <li><strong>Safety:</strong> test prompt injection hidden in documents or emails, attempts to extract other users' data, and requests the system should refuse.</li>
 </ul>
 
-<h2>The Hybrid Sweet Spot</h2>
-<p>The best systems we've built combine both: a <strong>workflow handles the deterministic scaffolding</strong> (trigger, data fetch, routing, logging), while <strong>AI handles the judgment steps</strong> in the middle. This gives you reliability, cost control, and auditability from the workflow layer, plus intelligent decision-making from the AI layer.</p>
-<p>Example: An invoice processing system uses n8n to fetch emails, extract attachments, and call an OCR API (deterministic). The AI then classifies the invoice type, extracts line items from ambiguous formats, and flags anomalies (judgment). The workflow then routes to the correct accounting queue (deterministic again).</p>
+<h2>Tools that help</h2>
+<p>You can start with a script like the one above and a spreadsheet. When you outgrow that, open-source and hosted tools such as <strong>promptfoo</strong>, <strong>DeepEval</strong>, <strong>Ragas</strong>, <strong>OpenAI Evals</strong>, <strong>Langfuse</strong>, <strong>LangSmith</strong>, <strong>Braintrust</strong> and <strong>Arize Phoenix</strong> add dataset management, judges, tracing and dashboards. The tool matters far less than having a golden set and running it consistently.</p>
 
-<h2>Cost Reality Check</h2>
-<p>A GPT-4o API call costs ~$0.01–0.03 per call depending on token count. At 1,000 items/day, that's $10–30/day in API costs alone — $3,600–10,950/year. If a simple workflow could handle 80% of those cases, pre-filtering with rule logic and only calling the LLM for the uncertain 20% drops your cost by 80% immediately.</p>
-<p>Always ask: <em>"Could a junior employee follow written rules to do this task 95% of the time?"</em> If yes, start with rules. Add AI only for the remaining 5%.</p>
+<h2>A practical model-selection recipe</h2>
+<ol>
+  <li><strong>Shortlist</strong> three models from benchmarks relevant to your task — say, one frontier, one fast/cheap, one open-weight.</li>
+  <li><strong>Run your eval</strong> on all three with the same prompt.</li>
+  <li><strong>Pick the cheapest, fastest model that clears your quality bar</strong> — not the one at the top of the leaderboard.</li>
+  <li><strong>Route where it pays.</strong> Send simple requests to a small model and escalate hard ones to a larger or reasoning model. Many teams cut costs dramatically this way with no loss in quality.</li>
+  <li><strong>Re-run quarterly</strong>, or whenever a new model ships. With evals in place, switching is an afternoon's work.</li>
+</ol>
 
-<p>Not sure which approach fits your use case? <a href="/booking">Book a free audit</a> — we'll tell you exactly what to build and what it'll cost.</p>
+<p>Leaderboards tell you who is good at exams. Evals tell you who is good at your job. Only one of those is worth paying for.</p>
+
+<p>Building an AI assistant or agent and not sure which model to trust with it? <a href="/booking">Book a free 15-minute call</a> — we'll help you set up the evals that answer that question.</p>
     `.trim(),
   },
   {
-    slug: "automate-customer-support-gpt4",
-    category: "Tutorial",
-    title: "How We Built a Customer Support Bot That Handles 80% of Tickets",
+    slug: "mcp-vs-api-build-deploy-mcp-server",
+    category: "Protocols",
+    title: "MCP vs API: What the Model Context Protocol Is, Its Types, and How to Build and Deploy an MCP Server",
     excerpt:
-      "Full technical breakdown of our e-commerce client's support automation — architecture, prompt engineering, escalation logic, and the 3 mistakes we made along the way.",
-    readTime: "15 min read",
-    date: "Dec 20, 2024",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
+      "MCP is the standard way for AI apps to use tools and data. How it differs from a normal API, its building blocks and server types, and a step-by-step guide to building an MCP server in Python and deploying it.",
+    readTime: "11 min read",
+    date: "Oct 4, 2026",
+    image: "/blog/mcp-vs-api-build-deploy-mcp-server.png",
     featured: false,
     color: "#A78BFA",
     content: `
-<p>Our client — a mid-sized DTC e-commerce brand doing $8M ARR — was drowning in support tickets. Their team of 4 agents was spending 70% of their time on questions that had the same 12 answers. Average first response time: 6.5 hours. Cart abandonment from frustrated customers waiting for support answers: measurable in revenue.</p>
-<p>Eight weeks later, the bot handles 80% of tickets autonomously, average first response is 47 seconds, and the team of 4 now handles only complex escalations — freeing them for proactive customer success work that's driving retention up 14%.</p>
-<p>Here's exactly how we built it.</p>
+<p>An AI assistant becomes genuinely useful when it can <em>do</em> things — look up an order, query a database, create a ticket, read a file. For a long time, every AI app wired up every tool in its own custom way. Ten AI apps and fifty tools meant hundreds of one-off integrations, each built and maintained separately.</p>
 
-<h2>Architecture Overview</h2>
-<p>The system has four layers:</p>
-<ol>
-  <li><strong>Intake:</strong> Zendesk webhook → n8n → ticket classification</li>
-  <li><strong>Knowledge retrieval:</strong> Pinecone vector store with embedded FAQ, policy docs, and product catalog</li>
-  <li><strong>Response generation:</strong> GPT-4o with a strict system prompt and retrieved context</li>
-  <li><strong>Quality gate:</strong> Confidence scoring + escalation logic before the response is posted</li>
-</ol>
+<p>The <strong>Model Context Protocol (MCP)</strong> fixes that. Introduced by Anthropic as an open standard in November 2024, it defines one common way for AI applications to discover and use tools and data. Build an MCP server for your system once, and any MCP-compatible app — Claude, Cursor, VS Code, and a growing list of others — can use it. It's often described as "USB-C for AI": one standard plug instead of a drawer full of adapters.</p>
 
-<h2>Step 1: Building the Knowledge Base</h2>
-<p>We exported three sources of ground truth:</p>
+<h2>MCP vs API: what's actually different?</h2>
+<p>The first thing to understand is that <strong>MCP doesn't replace APIs</strong>. Most MCP servers are thin layers on top of existing APIs. The difference is who the interface is designed for.</p>
+<p>A REST API is designed for <em>developers</em>: someone reads the documentation, writes code to call specific endpoints, and ships it. MCP is designed for <em>AI models</em>: the AI app connects to a server, asks it what it can do, gets back a list of tools with plain-language descriptions and input schemas, and the model decides at runtime which to call.</p>
+<table>
+  <thead><tr><th></th><th>Traditional API (REST / GraphQL)</th><th>MCP</th></tr></thead>
+  <tbody>
+    <tr><td>Designed for</td><td>Developers writing integration code</td><td>AI models choosing tools at runtime</td></tr>
+    <tr><td>Discovery</td><td>Humans read docs</td><td>The client asks the server (<code>tools/list</code>) and gets names, descriptions and JSON schemas</td></tr>
+    <tr><td>Interface</td><td>Different for every vendor — endpoints, auth, pagination, errors</td><td>The same small set of JSON-RPC methods for every server</td></tr>
+    <tr><td>Integration cost</td><td>Custom code per app × per API</td><td>Build a server once; it works in any MCP host</td></tr>
+    <tr><td>Connection</td><td>Usually stateless request/response</td><td>A session that starts with capability negotiation</td></tr>
+    <tr><td>Direction</td><td>Client calls server</td><td>Two-way: servers can request model completions, ask the user for input and send notifications</td></tr>
+    <tr><td>Context</td><td>Returns raw data</td><td>Also exposes readable resources and reusable prompt templates for the model</td></tr>
+  </tbody>
+</table>
+<p><strong>When to use which:</strong> if you're writing ordinary software where the developer decides exactly which call to make, use the API directly — it's simpler and faster. If you want an AI model to be able to use your system, especially across several AI apps, wrap the API in an MCP server.</p>
+
+<h2>How MCP works</h2>
+<p>MCP has three roles:</p>
 <ul>
-  <li>Zendesk macros (their existing canned responses) — 47 of them</li>
-  <li>Shopify store policies (returns, shipping, exchanges)</li>
-  <li>Product FAQ document (size guides, materials, care instructions)</li>
-</ul>
-<p>We chunked each document into 400-token segments with 50-token overlap, embedded them using <code>text-embedding-3-small</code> (fast, cheap, good for retrieval), and loaded them into Pinecone with metadata tags (source, category, product_ids).</p>
-
-<h2>Step 2: Classification First</h2>
-<p>Before calling GPT-4o for a response, we classify the ticket into one of 8 categories using a cheap GPT-4o-mini call:</p>
-<ul>
-  <li>Order status inquiry</li>
-  <li>Return/refund request</li>
-  <li>Shipping issue</li>
-  <li>Product question</li>
-  <li>Discount/promotion inquiry</li>
-  <li>Account/password issue</li>
-  <li>Complaint (negative sentiment)</li>
-  <li>Other / unclear</li>
-</ul>
-<p>This classification drives two things: the retrieval query (more targeted than using the raw ticket text), and the escalation decision (complaints always go to a human, regardless of confidence).</p>
-
-<h2>Step 3: RAG Retrieval</h2>
-<p>Using the classification + key entities from the ticket, we construct a retrieval query and fetch the top-5 most similar chunks from Pinecone. For an order status question, the query might be: "order status tracking WISMO delayed shipping update".</p>
-<p>We also pull live order data via a Shopify API call (order ID extracted from the ticket via regex) so the response can include real tracking information, not just generic instructions.</p>
-
-<h2>Step 4: Response Generation</h2>
-<p>The GPT-4o system prompt is the most important part. Key elements:</p>
-<pre><code>You are a helpful customer support agent for [Brand].
-Respond in a warm but concise tone. Maximum 3 sentences unless the customer needs step-by-step instructions.
-NEVER make up information not in the provided context.
-If you're uncertain, say "Let me get our team to look into this for you" — do not guess.
-Always end with a specific next step or question.
-Context: {retrieved_chunks}
-Order data: {shopify_order_json}</code></pre>
-<p>The "never make up information" instruction and the explicit uncertain-state behavior were critical. Without them, the model hallucinated shipping ETAs and return windows that didn't match actual policy.</p>
-
-<h2>Step 5: The Quality Gate</h2>
-<p>We don't post every response automatically. After generation, a second LLM call scores the response 0–10 on:</p>
-<ul>
-  <li>Accuracy (does it match the retrieved context?)</li>
-  <li>Helpfulness (does it answer the question?)</li>
-  <li>Tone (is it on-brand?)</li>
-</ul>
-<p>Score ≥ 8: post as solved. Score 6–7: post as draft for agent review. Score &lt; 6 or complaint category: escalate immediately.</p>
-<p>This gate is why we're comfortable at 80% auto-resolution rather than lower — we're not posting responses we're not confident in.</p>
-
-<h2>The 3 Mistakes We Made</h2>
-<ol>
-  <li><strong>Skipping classification and going straight to generation.</strong> Response quality was inconsistent, and retrieval was too broad. Adding the classification step improved auto-resolution rate from 62% → 80%.</li>
-  <li><strong>Not including live order data.</strong> The bot gave accurate policy answers but couldn't answer "where is MY order" — the most common question. Adding the Shopify API call was the single highest-impact change.</li>
-  <li><strong>Trusting LLM confidence scores instead of building our own quality gate.</strong> GPT-4o's own uncertainty estimates were poorly calibrated. The separate scoring call was more reliable.</li>
-</ol>
-
-<p>Interested in deploying something similar for your support team? <a href="/booking">Book a free audit</a> and we'll scope out your specific use case.</p>
-    `.trim(),
-  },
-  {
-    slug: "n8n-self-hosted-guide",
-    category: "DevOps",
-    title: "Complete Guide to Self-Hosting n8n in 2025",
-    excerpt:
-      "Step-by-step tutorial for deploying n8n on a VPS, configuring SSL, setting up PostgreSQL, enabling queue mode, and monitoring with Grafana.",
-    readTime: "10 min read",
-    date: "Dec 12, 2024",
-    image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1200&q=80",
-    featured: false,
-    color: "#F59E0B",
-    content: `
-<p>Self-hosting n8n gives you complete data sovereignty, no per-execution pricing, and the ability to run unlimited workflows. The tradeoff is infrastructure responsibility — but with Docker and a modern VPS, the setup takes under 2 hours and maintenance is minimal. This is the exact stack we use for client deployments that handle sensitive data.</p>
-
-<h2>What You'll Need</h2>
-<ul>
-  <li>A VPS with at least 2 vCPU / 4GB RAM (we recommend Hetzner CX22 at €5.77/mo, or DigitalOcean Droplet 4GB)</li>
-  <li>A domain name pointed at your server's IP</li>
-  <li>Ubuntu 22.04 LTS</li>
-  <li>Basic Linux CLI familiarity</li>
+  <li><strong>Host</strong> — the AI application the user interacts with (Claude Desktop, Claude Code, an IDE, your own agent).</li>
+  <li><strong>Client</strong> — a connector inside the host. The host creates one client per server it connects to.</li>
+  <li><strong>Server</strong> — a program that exposes tools, resources and prompts for one system (your CRM, your database, GitHub, the file system).</li>
 </ul>
 
-<h2>Step 1: Server Setup</h2>
-<pre><code># SSH into your server
-ssh root@your-server-ip
+<pre><code>Host (e.g. Claude Desktop)
+│
+├── LLM
+├── MCP client A ──►  MCP server: Orders ──►  Orders API
+├── MCP client B ──►  MCP server: CRM    ──►  CRM API
+└── MCP client C ──►  MCP server: Files  ──►  Local disk</code></pre>
 
-# Update packages
-apt update && apt upgrade -y
+<p>Messages are <strong>JSON-RPC 2.0</strong>. A session goes through a simple lifecycle: the client sends <code>initialize</code>, both sides declare which capabilities they support, and then the client can list and call what the server offers. When the model decides to use a tool, the client sends a request like this:</p>
 
-# Install Docker
-curl -fsSL https://get.docker.com | sh
-systemctl enable docker
-
-# Install Nginx + Certbot
-apt install nginx certbot python3-certbot-nginx -y</code></pre>
-
-<h2>Step 2: PostgreSQL Database</h2>
-<p>n8n uses SQLite by default, which is fine for personal use but breaks under concurrent load. For production, use PostgreSQL.</p>
-<pre><code># docker-compose.yml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:16
-    restart: always
-    environment:
-      POSTGRES_DB: n8n
-      POSTGRES_USER: n8n
-      POSTGRES_PASSWORD: \${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  n8n:
-    image: n8nio/n8n:latest
-    restart: always
-    ports:
-      - "5678:5678"
-    environment:
-      - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgres
-      - DB_POSTGRESDB_DATABASE=n8n
-      - DB_POSTGRESDB_USER=n8n
-      - DB_POSTGRESDB_PASSWORD=\${POSTGRES_PASSWORD}
-      - N8N_BASIC_AUTH_ACTIVE=true
-      - N8N_BASIC_AUTH_USER=\${N8N_USER}
-      - N8N_BASIC_AUTH_PASSWORD=\${N8N_PASSWORD}
-      - WEBHOOK_URL=https://n8n.yourdomain.com
-      - N8N_PROTOCOL=https
-      - N8N_HOST=n8n.yourdomain.com
-      - EXECUTIONS_PROCESS=main
-      - N8N_ENCRYPTION_KEY=\${N8N_ENCRYPTION_KEY}
-    volumes:
-      - n8n_data:/home/node/.n8n
-    depends_on:
-      - postgres
-
-volumes:
-  postgres_data:
-  n8n_data:</code></pre>
-
-<h2>Step 3: SSL with Nginx</h2>
-<pre><code># /etc/nginx/sites-available/n8n
-server {
-    listen 80;
-    server_name n8n.yourdomain.com;
-
-    location / {
-        proxy_pass http://localhost:5678;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_cache_bypass $http_upgrade;
-        # Required for n8n websockets
-        proxy_read_timeout 88400;
-        send_timeout 88400;
-    }
+<pre><code>{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "method": "tools/call",
+  "params": {
+    "name": "get_order_status",
+    "arguments": { "order_id": "A1001" }
+  }
 }</code></pre>
-<pre><code>ln -s /etc/nginx/sites-available/n8n /etc/nginx/sites-enabled/
-certbot --nginx -d n8n.yourdomain.com
-systemctl reload nginx</code></pre>
+<p>…and the server replies with content the model can read:</p>
+<pre><code>{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "result": {
+    "content": [
+      { "type": "text", "text": "Order A1001: shipped, estimated delivery 2026-10-08." }
+    ],
+    "isError": false
+  }
+}</code></pre>
 
-<h2>Step 4: Queue Mode for High-Volume Workflows</h2>
-<p>Queue mode uses Redis to distribute workflow execution across multiple worker processes — essential if you're running more than ~20 concurrent workflows or have long-running jobs.</p>
-<pre><code># Add to docker-compose.yml
-  redis:
-    image: redis:7
-    restart: always
+<h2>The building blocks</h2>
+<p>Servers can offer three kinds of things, each controlled by a different party:</p>
+<table>
+  <thead><tr><th>Primitive</th><th>Controlled by</th><th>What it is</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Tools</strong></td><td>The model</td><td>Functions the model can call to take actions or fetch live data</td><td><code>create_ticket</code>, <code>search_orders</code>, <code>run_query</code></td></tr>
+    <tr><td><strong>Resources</strong></td><td>The application</td><td>Read-only data identified by a URI, which the app can attach as context</td><td><code>policy://returns</code>, a file, a database schema</td></tr>
+    <tr><td><strong>Prompts</strong></td><td>The user</td><td>Reusable templates the user can pick, often surfaced as slash commands</td><td>"Draft a reply to this customer", "Summarise this PR"</td></tr>
+  </tbody>
+</table>
+<p>Clients can also offer capabilities back to servers: <strong>sampling</strong> (the server asks the host's model to generate text, so the server doesn't need its own LLM key), <strong>roots</strong> (which folders or locations the server may work in) and <strong>elicitation</strong> (the server asks the user for missing information mid-task).</p>
 
-  n8n-worker:
-    image: n8nio/n8n:latest
-    command: worker
-    environment:
-      # Same env vars as n8n, plus:
-      - EXECUTIONS_PROCESS=worker
-      - QUEUE_BULL_REDIS_HOST=redis
-    depends_on:
-      - redis
-      - postgres</code></pre>
-<p>Set <code>EXECUTIONS_PROCESS=queue</code> on the main n8n instance and <code>worker</code> on worker instances. Scale worker replicas with <code>docker-compose up --scale n8n-worker=3</code>.</p>
+<h2>Types of MCP servers</h2>
+<p>"Types of MCP" usually means one of four ways of classifying servers:</p>
 
-<h2>Step 5: Monitoring with Grafana</h2>
-<p>n8n exposes Prometheus metrics at <code>/metrics</code> (enable with <code>N8N_METRICS=true</code>). Key metrics to watch:</p>
+<h3>1. By transport — how client and server talk</h3>
 <ul>
-  <li><code>n8n_executions_total</code> — total executions by workflow and status</li>
-  <li><code>n8n_executions_duration_seconds</code> — p50/p95 execution time</li>
-  <li><code>n8n_failed_executions_total</code> — alert on spikes</li>
-  <li><code>nodejs_heap_space_size_used_bytes</code> — memory usage</li>
+  <li><strong>stdio (local).</strong> The host launches the server as a child process on the same machine and talks over standard input/output. Zero network setup, ideal for personal and developer tools — file system, local databases, Git.</li>
+  <li><strong>Streamable HTTP (remote).</strong> The server runs as a web service at a URL (usually ending in <code>/mcp</code>). Clients send JSON-RPC over HTTP POST and the server can stream responses. This is what you deploy for teams and customers.</li>
+  <li><strong>HTTP + SSE (legacy).</strong> The original remote transport, replaced by Streamable HTTP in the March 2025 spec revision. You'll still meet it in older servers; don't build new ones on it.</li>
 </ul>
-<p>Add a Prometheus scrape target for your n8n instance and import the community n8n Grafana dashboard (ID: 17556).</p>
 
-<h2>Backup Strategy</h2>
-<p>Daily PostgreSQL dumps to S3-compatible storage:</p>
-<pre><code># /etc/cron.daily/n8n-backup
-#!/bin/bash
-docker exec postgres pg_dump -U n8n n8n | gzip | \
-  aws s3 cp - s3://your-bucket/n8n/backup-$(date +%Y%m%d).sql.gz</code></pre>
-<p>Also back up the <code>n8n_data</code> volume which contains credentials and workflow files.</p>
+<h3>2. By where it runs</h3>
+<ul>
+  <li><strong>Local servers</strong> on the user's machine, with access to local files and apps.</li>
+  <li><strong>Self-hosted remote servers</strong> that you deploy for your team or customers — for example, an MCP server in front of your internal order system.</li>
+  <li><strong>Vendor-hosted servers</strong> that SaaS companies run for their own products, such as the official GitHub MCP server. You connect with a URL and sign in.</li>
+</ul>
 
-<p>Need help deploying n8n for your team? <a href="/booking">Book a free audit</a> — we set up and manage n8n infrastructure as part of our automation packages.</p>
-    `.trim(),
-  },
+<h3>3. By what it exposes</h3>
+<ul>
+  <li><strong>Action servers</strong> — mostly tools that change things (create, update, send).</li>
+  <li><strong>Data/context servers</strong> — mostly resources and read-only tools (search docs, query analytics).</li>
+  <li><strong>Workflow servers</strong> — mostly prompts that package a repeatable process.</li>
+  <li>In practice, most useful servers mix all three.</li>
+</ul>
+
+<h3>4. By access level</h3>
+<ul>
+  <li><strong>Read-only</strong> servers are safe to connect broadly.</li>
+  <li><strong>Read-write</strong> servers need tighter permissions, confirmation before destructive actions, and careful auditing.</li>
+</ul>
+
+<h2>How to build an MCP server (Python)</h2>
+<p>We'll build a small "orders" server with one tool, one resource and one prompt, using the official Python SDK and its <strong>FastMCP</strong> interface. You'll need Python 3.10+ and <a href="https://docs.astral.sh/uv/">uv</a>.</p>
+
+<h3>Step 1 — Set up the project</h3>
+<pre><code>uv init orders-mcp
+cd orders-mcp
+uv add "mcp[cli]"</code></pre>
+
+<h3>Step 2 — Write the server</h3>
+<p>Create <code>server.py</code>. In a real server, the dictionary would be a call to your database or API:</p>
+<pre><code>import os
+from mcp.server.fastmcp import FastMCP
+
+mcp = FastMCP(
+    "orders",
+    host=os.environ.get("HOST", "127.0.0.1"),
+    port=int(os.environ.get("PORT", "8000")),
+    stateless_http=True,  # lets you run several replicas behind a load balancer
+)
+
+# Stand-in for your real order system
+ORDERS = {
+    "A1001": {"status": "shipped", "eta": "2026-10-08"},
+    "A1002": {"status": "processing", "eta": "2026-10-11"},
+}
+
+
+@mcp.tool()
+def get_order_status(order_id: str) -&gt; str:
+    """Look up the shipping status and estimated delivery date of an order.
+
+    Args:
+        order_id: The order reference, e.g. "A1001".
+    """
+    order = ORDERS.get(order_id.strip().upper())
+    if order is None:
+        return f"No order found with ID {order_id}. Ask the customer to check the reference."
+    return f"Order {order_id}: {order['status']}, estimated delivery {order['eta']}."
+
+
+@mcp.resource("policy://returns")
+def returns_policy() -&gt; str:
+    """The store's returns policy."""
+    return "Items can be returned within 30 days of delivery in original condition. Refunds take 5-10 business days."
+
+
+@mcp.prompt()
+def customer_reply(order_id: str) -&gt; str:
+    """Draft a reply to a customer asking about their order."""
+    return (
+        f"Use get_order_status to check order {order_id}, then write a short, "
+        "friendly reply to the customer. Mention the returns policy only if relevant."
+    )
+
+
+if __name__ == "__main__":
+    # stdio for local use; "streamable-http" when deployed
+    mcp.run(transport=os.environ.get("MCP_TRANSPORT", "stdio"))</code></pre>
+<p>Notice what FastMCP does for you: the function name becomes the tool name, the docstring becomes the description the model reads, and the type hints become the JSON input schema. <strong>That docstring is effectively a prompt</strong> — it's how the model decides when to use the tool, so write it for the model.</p>
+
+<h3>Step 3 — Test it with the MCP Inspector</h3>
+<pre><code>uv run mcp dev server.py</code></pre>
+<p>This opens the <strong>MCP Inspector</strong> in your browser, where you can list the tools, resources and prompts, call them with test inputs and see the raw responses — before any AI is involved.</p>
+
+<h3>Step 4 — Connect it to an AI app</h3>
+<p>For <strong>Claude Desktop</strong>, add the server to <code>claude_desktop_config.json</code> (Settings → Developer → Edit Config) and restart the app:</p>
+<pre><code>{
+  "mcpServers": {
+    "orders": {
+      "command": "uv",
+      "args": ["--directory", "/absolute/path/to/orders-mcp", "run", "server.py"]
+    }
+  }
+}</code></pre>
+<p>For <strong>Claude Code</strong>, one command does it:</p>
+<pre><code>claude mcp add orders -- uv --directory /absolute/path/to/orders-mcp run server.py</code></pre>
+<p>Now ask "Where is order A1001?" and watch the model call your tool.</p>
+
+<h3>The same server in TypeScript</h3>
+<p>If your stack is Node.js, the official TypeScript SDK follows the same shape:</p>
+<pre><code>import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+const server = new McpServer({ name: "orders", version: "1.0.0" });
+
+server.registerTool(
+  "get_order_status",
   {
-    slug: "roi-calculation-automation",
-    category: "Strategy",
-    title: "How to Calculate ROI Before You Automate (With Real Examples)",
-    excerpt:
-      "The exact framework we use during automation audits to calculate payback period, hourly cost of manual work, and total annual value — with 4 real client examples.",
-    readTime: "7 min read",
-    date: "Dec 5, 2024",
-    image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&q=80",
-    featured: false,
-    color: "#EC4899",
-    content: `
-<p>The number one reason automation projects fail isn't technical — it's that nobody calculated whether the automation was worth building before they started. We've seen companies spend $20,000 automating a process that saves 30 minutes a week. We've also seen a $500 n8n workflow eliminate a $180,000/year manual process.</p>
-<p>Here's the exact framework we use during every automation audit to decide what to build and in what order.</p>
+    title: "Get order status",
+    description: "Look up the shipping status of an order by its ID, e.g. A1001.",
+    inputSchema: { orderId: z.string() },
+  },
+  async ({ orderId }) =&gt; ({
+    content: [{ type: "text", text: "Order " + orderId + ": shipped." }],
+  })
+);
 
-<h2>The RudraAI ROI Formula</h2>
-<p>Annual Value = (Hours saved per week × 52 × Hourly cost of employee) + (Error rate reduction × Cost per error) + (Speed improvement value)</p>
-<p>Payback Period (months) = Automation cost ÷ (Annual value ÷ 12)</p>
+await server.connect(new StdioServerTransport());</code></pre>
 
-<h2>Step 1: Calculate Hourly Cost</h2>
-<p>Most people underestimate the true cost of employee time. Total cost = salary + benefits + overhead (office space, equipment, management time). A safe multiplier is <strong>1.3–1.5× base salary</strong>.</p>
-<p>If your Operations Analyst earns $60,000/year: true cost ≈ $78,000/year → $37.50/hour.</p>
-
-<h2>Step 2: Map the Hours</h2>
-<p>For each candidate process, time-study it for one week. Count:</p>
+<h2>Designing tools that models use well</h2>
 <ul>
-  <li>Active time (doing the work)</li>
-  <li>Wait time (waiting for approvals, data, etc.)</li>
-  <li>Error correction time (re-doing work, fixing mistakes)</li>
-  <li>Reporting/documentation time</li>
+  <li><strong>Few, focused tools.</strong> Ten clear tools beat fifty overlapping ones. Model accuracy drops as the tool list grows and descriptions blur together.</li>
+  <li><strong>Name and describe for the model.</strong> Say what the tool does, when to use it, and what the inputs look like, with an example.</li>
+  <li><strong>Design around tasks, not endpoints.</strong> One <code>find_customer</code> tool that searches by email, phone or name is better than mirroring three API endpoints.</li>
+  <li><strong>Return concise, readable results.</strong> Trim huge API payloads to the fields that matter; paginate long lists.</li>
+  <li><strong>Return errors as helpful text</strong> ("No order found — ask the customer to check the reference") so the model can recover, rather than crashing the call.</li>
+  <li><strong>Validate every input</strong> on the server. The model is not a trusted caller.</li>
 </ul>
-<p>Automation typically eliminates active + error correction time. Wait time often compresses significantly but may not disappear entirely.</p>
 
-<h2>4 Real Client Examples</h2>
+<h2>How to deploy an MCP server</h2>
+<p>Local stdio servers are great for one person. To share a server with a team or customers, deploy it as a remote <strong>Streamable HTTP</strong> server.</p>
 
-<h3>Example 1: E-commerce Order Processing</h3>
-<p><strong>Process:</strong> Manually copying orders from Shopify into a 3PL system, then emailing tracking info back to customers.<br>
-<strong>Time:</strong> 2 hours/day × 5 days × $25/hr = $1,300/month manual cost.<br>
-<strong>Errors:</strong> 3 wrong addresses per week × $45 average cost = $540/month in reshipping costs.<br>
-<strong>Total annual cost:</strong> $22,080.<br>
-<strong>Automation cost:</strong> $400 (2 n8n workflows, 1 week setup).<br>
-<strong>Annual savings:</strong> $21,680. <strong>Payback: 7 days.</strong></p>
+<h3>Step 1 — Containerise it</h3>
+<pre><code>FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
-<h3>Example 2: HR Onboarding Workflow</h3>
-<p><strong>Process:</strong> HR manually creating accounts across 8 systems (Slack, Notion, GitHub, Jira, GSuite, Zendesk, 1Password, HubSpot) for each new hire.<br>
-<strong>Time:</strong> 3 hours per new hire × 4 hires/month × $40/hr = $480/month.<br>
-<strong>Errors:</strong> Wrong permission levels, accounts created late — hard to quantify but real productivity cost.<br>
-<strong>Automation cost:</strong> $700 (n8n + BambooHR webhook + 8 API integrations).<br>
-<strong>Annual savings:</strong> $5,760. <strong>Payback: 6 weeks.</strong></p>
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
+COPY server.py .
 
-<h3>Example 3: Financial Reporting</h3>
-<p><strong>Process:</strong> Finance analyst spending 12 hours/month pulling data from 4 sources (Stripe, QuickBooks, Google Ads, Salesforce) and assembling a revenue report in Google Sheets.<br>
-<strong>Time:</strong> 12 hours × $55/hr = $660/month.<br>
-<strong>Speed value:</strong> Report was delivered on day 8 of each month. Automation delivers it on day 1 — earlier decisions across the leadership team is worth conservatively $1,000/month.<br>
-<strong>Automation cost:</strong> $900 (n8n + 4 API connectors + Google Sheets template).<br>
-<strong>Annual savings:</strong> $19,920. <strong>Payback: 17 days.</strong></p>
+ENV MCP_TRANSPORT=streamable-http HOST=0.0.0.0 PORT=8000
+EXPOSE 8000
+CMD ["uv", "run", "server.py"]</code></pre>
+<p>Run it locally with <code>docker build -t orders-mcp . &amp;&amp; docker run -p 8000:8000 orders-mcp</code>; the MCP endpoint is now at <code>http://localhost:8000/mcp</code>.</p>
 
-<h3>Example 4: Customer Churn Detection</h3>
-<p><strong>Process:</strong> CSM team manually reviewing product usage metrics weekly to identify at-risk accounts.<br>
-<strong>Time:</strong> 6 hours/week × $45/hr = $1,170/month.<br>
-<strong>Churn savings:</strong> Early detection historically saves 2 accounts/month. Average contract value $1,200 → $2,400/month in retained revenue.<br>
-<strong>Automation cost:</strong> $1,200 (n8n + Mixpanel API + AI scoring + Slack alerts).<br>
-<strong>Annual savings (total):</strong> $42,840. <strong>Payback: 10 days.</strong></p>
+<h3>Step 2 — Host it</h3>
+<p>Any platform that runs a container behind HTTPS works: Google Cloud Run, AWS (App Runner or ECS), Azure Container Apps, Render, Railway or Fly.io. Cloudflare Workers is another option, with its own tooling for remote MCP servers. Because we set <code>stateless_http=True</code>, you can scale to several instances behind a load balancer without sticky sessions.</p>
 
-<h2>Build vs. Buy Decision</h2>
-<p>Once you have the ROI, the build vs. buy question is simple: if a SaaS tool solves the problem for $100/mo and the automation would cost $2,000 to build, you need the tool to stay relevant for 20+ months. For a growing business, that's usually a reasonable bet. If the problem is bespoke to your operations, build.</p>
+<h3>Step 3 — Add authentication</h3>
+<p>A remote MCP server is an API on the public internet that can take actions in your systems — treat it accordingly:</p>
+<ul>
+  <li><strong>Internal or team use:</strong> put it behind your API gateway, VPN or identity-aware proxy, or require a bearer token checked on every request.</li>
+  <li><strong>Public, multi-user servers:</strong> the MCP specification defines an <strong>OAuth 2.1</strong>-based authorisation flow, so each user signs in and the server acts with <em>their</em> permissions. The official SDKs include support for it.</li>
+</ul>
 
-<p>Want us to run this analysis on your top 5 manual processes? <a href="/booking">Book a free audit</a> — you'll leave with a prioritized automation roadmap and ROI estimates for each item.</p>
+<h3>Step 4 — Connect clients to the URL</h3>
+<pre><code>claude mcp add --transport http orders https://orders-mcp.example.com/mcp --header "Authorization: Bearer $ORDERS_MCP_TOKEN"</code></pre>
+<p>Most MCP hosts now accept a remote server URL directly in their settings.</p>
+
+<h2>Security checklist</h2>
+<ul>
+  <li><strong>HTTPS only</strong> for remote servers, and validate the <code>Origin</code> header (the spec requires this to prevent DNS-rebinding attacks).</li>
+  <li><strong>Bind local servers to 127.0.0.1</strong>, never 0.0.0.0, unless they're inside a container behind a proxy.</li>
+  <li><strong>Least privilege.</strong> Give the server credentials that can do only what its tools need — a read-only database user for a read-only server.</li>
+  <li><strong>Confirm destructive actions.</strong> Deleting, paying, emailing customers: require human approval in the host or a confirmation step.</li>
+  <li><strong>Assume prompt injection.</strong> Text returned by tools (emails, web pages, tickets) can contain instructions aimed at the model. Never let tool output alone authorise sensitive actions.</li>
+  <li><strong>Vet third-party servers.</strong> A malicious server can hide instructions in its tool descriptions. Install servers only from sources you trust, and pin their versions.</li>
+  <li><strong>Log every tool call</strong> with the user, arguments and result, and rate-limit per user.</li>
+</ul>
+
+<h2>The bottom line</h2>
+<p>APIs connect software to software. MCP connects AI to software, by putting a standard, self-describing layer on top of the APIs you already have. If you want AI assistants — yours or your customers' — to work with your systems, an MCP server is now the most reusable way to do it: build it once, and it works everywhere MCP does.</p>
+
+<p>Want an MCP server for your product, CRM or internal tools? <a href="/booking">Book a free 15-minute call</a> and we'll scope it with you.</p>
     `.trim(),
   },
 ];
@@ -494,8 +661,7 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
 }
 
 export const categoryColors: Record<string, string> = {
-  Comparison: "#BF5AF2",
-  Tutorial: "#A1A1A6",
-  Strategy: "#10B981",
-  DevOps: "#F59E0B",
+  Architecture: "#BF5AF2",
+  Models: "#10B981",
+  Protocols: "#A78BFA",
 };
