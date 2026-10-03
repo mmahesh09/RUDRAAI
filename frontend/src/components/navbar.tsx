@@ -10,7 +10,6 @@ import { SITE } from "@/lib/site";
 const navLinks = [
   { label: "Services", href: "/services" },
   { label: "Showcase", href: "/showcase" },
-  { label: "Case studies", href: "/case-studies" },
   { label: "About", href: "/about" },
   { label: "Blog", href: "/blog" },
 ];
@@ -40,6 +39,8 @@ export default function Navbar() {
   }, [isMobileOpen]);
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  // The blog is for reading — no booking prompts there
+  const showBooking = !isActive("/blog");
 
   return (
     <header
@@ -77,12 +78,14 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/booking"
-            className="hidden sm:inline-flex h-8 items-center rounded-full bg-[#8944AB] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#7A3A9A]"
-          >
-            Book a call
-          </Link>
+          {showBooking && (
+            <Link
+              href="/booking"
+              className="hidden sm:inline-flex h-8 items-center rounded-full bg-[#8944AB] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#7A3A9A]"
+            >
+              Book a call
+            </Link>
+          )}
           <button
             type="button"
             onClick={() => setIsMobileOpen((o) => !o)}
@@ -115,14 +118,16 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
-          <div className="container-wide pb-6">
-            <Link
-              href="/booking"
-              className="flex h-12 w-full items-center justify-center rounded-full bg-[#8944AB] text-[15px] font-semibold text-white"
-            >
-              Book a free call · {SITE.call.short}
-            </Link>
-          </div>
+          {showBooking && (
+            <div className="container-wide pb-6">
+              <Link
+                href="/booking"
+                className="flex h-12 w-full items-center justify-center rounded-full bg-[#8944AB] text-[15px] font-semibold text-white"
+              >
+                Book a free call · {SITE.call.short}
+              </Link>
+            </div>
+          )}
         </nav>
       )}
     </header>

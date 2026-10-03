@@ -1,6 +1,5 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import CTASection from "@/components/cta-section";
 import PageHero from "@/components/site/page-hero";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
@@ -8,7 +7,7 @@ import type { Metadata } from "next";
 import { posts } from "@/lib/posts";
 
 export const metadata: Metadata = {
-  title: "Blog — Practical Guides to RAG, LLMs & MCP",
+  title: "AI Engineering Blog: RAG, LLM Evals & MCP Guides",
   description:
     "Plain-English, hands-on guides to RAG architecture, choosing and evaluating LLMs, and building MCP servers — what works and how to ship it — from the RudraAI studio.",
   alternates: { canonical: "/blog" },
@@ -18,13 +17,31 @@ export default function BlogPage() {
   const featured = posts.find((p) => p.featured) ?? posts[0];
   const rest = posts.filter((p) => p.slug !== featured?.slug);
 
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "RudraAI Blog",
+    url: "https://www.rudraai.online/blog",
+    description: metadata.description,
+    publisher: { "@type": "Organization", name: "RudraAI", url: "https://www.rudraai.online" },
+    blogPost: posts.map((p) => ({
+      "@type": "BlogPosting",
+      headline: p.title,
+      url: `https://www.rudraai.online/blog/${p.slug}`,
+      datePublished: p.datePublished,
+      dateModified: p.dateModified,
+      image: `https://www.rudraai.online${p.image}`,
+    })),
+  };
+
   return (
     <main className="bg-black">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSchema) }} />
       <Navbar />
       <PageHero
         label="Blog"
         title="Notes from the workbench."
-        intro="Practical writing on AI agents, automation and the web — what we've learned building them, without the hype."
+        intro="In-depth, practical guides to building with AI — RAG architecture, choosing and evaluating LLMs, and connecting models to real systems with MCP. Written from what we've learned shipping them, without the hype."
       />
 
       <section className="pb-24 md:pb-32">
@@ -36,7 +53,9 @@ export default function BlogPage() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={featured.image}
-                  alt=""
+                  alt={featured.imageAlt}
+                  width={1200}
+                  height={630}
                   className="h-full w-full object-cover opacity-80 transition-[opacity,transform] duration-700 group-hover:scale-[1.02] group-hover:opacity-100"
                 />
               </div>
@@ -80,7 +99,6 @@ export default function BlogPage() {
         </div>
       </section>
 
-      <CTASection />
       <Footer />
     </main>
   );

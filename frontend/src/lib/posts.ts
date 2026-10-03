@@ -8,6 +8,19 @@ export interface BlogPost {
   image: string;
   featured: boolean;
   color: string;
+  /** <title> text, under ~50 chars — the layout template appends " | RudraAI" */
+  seoTitle: string;
+  /** 150–160 characters, shown in search results */
+  metaDescription: string;
+  /** ISO dates for structured data and the sitemap */
+  datePublished: string;
+  dateModified: string;
+  keywords: string[];
+  imageAlt: string;
+  /** Short "key takeaways" shown above the article */
+  takeaways: string[];
+  /** Rendered as a visible FAQ and as FAQPage structured data */
+  faqs: { q: string; a: string }[];
   content: string; // HTML body
 }
 
@@ -18,17 +31,42 @@ export const posts: BlogPost[] = [
     title: "RAG Architecture, Explained: How to Build Retrieval-Augmented Generation That Actually Works",
     excerpt:
       "What RAG is, the two pipelines inside every RAG system, the design choices that decide answer quality — chunking, embeddings, hybrid search, reranking — and how to evaluate and run it in production.",
-    readTime: "11 min read",
+    readTime: "14 min read",
     date: "Oct 4, 2026",
     image: "/blog/rag-architecture-explained.png",
     featured: true,
     color: "#BF5AF2",
+    seoTitle: "RAG Architecture Explained: A Practical Guide",
+    metaDescription:
+      "Learn how RAG architecture works: chunking, embeddings, vector databases, hybrid search, reranking, evaluation and production tips for accurate AI answers.",
+    datePublished: "2026-10-04",
+    dateModified: "2026-10-04",
+    keywords: ["RAG architecture", "retrieval-augmented generation", "vector database", "embeddings", "hybrid search", "reranking", "RAG evaluation"],
+    imageAlt: "RAG architecture diagram: chunks flow into retrieve, rerank and a cited answer",
+    takeaways: [
+      "RAG retrieves your own documents at question time and grounds the model's answer in them — no retraining needed.",
+      "Most RAG failures are retrieval failures: fix chunking, use hybrid search and add a reranker before blaming the model.",
+      "Enforce permissions and tenant isolation inside the retrieval query, never in the prompt.",
+      "Measure retrieval and generation separately with a golden set of 50–200 real questions.",
+    ],
+    faqs: [
+      { q: "What is RAG in simple terms?", a: "RAG (Retrieval-Augmented Generation) is a way of giving an AI model access to your own information. When a question comes in, the system searches your documents for the most relevant passages, adds them to the prompt, and the model writes an answer based on that text, usually with citations." },
+      { q: "Is RAG better than fine-tuning?", a: "They solve different problems. RAG is best for knowledge — facts and documents that change and need citations. Fine-tuning is best for behaviour — tone, format or a narrow skill. Many production systems use RAG for knowledge and, optionally, light fine-tuning for style." },
+      { q: "Which vector database should I use for RAG?", a: "If you already run PostgreSQL, start with pgvector: it keeps data, permissions and vectors together. Choose a dedicated vector database such as Qdrant, Pinecone, Weaviate or Milvus when you need very large scale, advanced filtering or isolation from your main database." },
+      { q: "What chunk size is best for RAG?", a: "There is no universal number, but 300–800 tokens with 10–20% overlap is a solid baseline. Structure-aware chunks that follow headings and sections usually beat fixed sizes. Test a few settings against your golden question set and keep the one with the best recall." },
+      { q: "How do I stop a RAG chatbot from hallucinating?", a: "Retrieve better context (hybrid search plus a reranker), instruct the model to answer only from the provided sources, require citations, allow it to say it doesn't know, and measure faithfulness on a golden set so regressions are caught before release." },
+      { q: "How do I keep a RAG index up to date?", a: "Run ingestion as a sync service: detect changes with webhooks, change-data-capture or an updated_at column, re-embed only chunks whose content hash changed, upsert by stable IDs and delete chunks when their source document is removed." },
+    ],
     content: `
 <p>A large language model only knows what was in its training data. It has never seen your product catalogue, your refund policy, last week's pricing change or the PDF your operations team wrote in March. Ask it about any of those and it will either say it doesn't know or, worse, confidently make something up.</p>
 
 <p><strong>Retrieval-Augmented Generation (RAG)</strong> fixes this without retraining the model. At question time, the system <em>retrieves</em> the few passages from your own data that are most relevant to the question, <em>augments</em> the prompt with them, and lets the model <em>generate</em> an answer grounded in that text — ideally with citations back to the source.</p>
 
 <p>That one-sentence description hides a lot of engineering. Most RAG systems that disappoint in production don't fail because of the model; they fail because the wrong passages were retrieved. This guide walks through the full architecture, the decisions at each step, and how to know whether it's working.</p>
+
+<h2>What is RAG? A one-paragraph definition</h2>
+<p><strong>Retrieval-Augmented Generation is an AI architecture that answers questions by first searching a knowledge base for relevant passages and then passing those passages to a large language model as context.</strong> The model's answer is grounded in your data rather than in what it memorised during training, which makes answers more accurate, current and verifiable. The knowledge base is usually a vector database of document chunks, and the search usually combines semantic (vector) and keyword matching.</p>
+<p>Typical RAG use cases include customer-support assistants over a help centre, internal knowledge assistants over policies and wikis, sales assistants over product documentation, and research tools over contracts, reports or papers.</p>
 
 <h2>RAG vs fine-tuning vs a giant prompt</h2>
 <p>There are three common ways to give a model knowledge it doesn't have. They solve different problems:</p>
@@ -115,6 +153,19 @@ order by embedding &lt;=&gt; $1
 limit 20;</code></pre>
 <p>A dedicated vector database earns its place at very large scale, when you need advanced filtering and quantisation, or when search load would compete with your transactional database.</p>
 
+<h3>Choosing a vector database</h3>
+<table>
+  <thead><tr><th>Option</th><th>Good fit when</th><th>Things to consider</th></tr></thead>
+  <tbody>
+    <tr><td>pgvector (PostgreSQL)</td><td>You already run Postgres; you want data, permissions and vectors in one place</td><td>Tune HNSW settings and memory as the index grows</td></tr>
+    <tr><td>Qdrant</td><td>You want a fast open-source engine with strong payload filtering, self-hosted or managed</td><td>A second datastore to keep in sync</td></tr>
+    <tr><td>Pinecone</td><td>You want a fully managed, serverless service with minimal operations</td><td>Hosted only; costs scale with usage</td></tr>
+    <tr><td>Weaviate / Milvus</td><td>You need very large collections, built-in hybrid search or many tenants</td><td>More moving parts to operate if self-hosted</td></tr>
+    <tr><td>Chroma</td><td>Prototypes, notebooks and local development</td><td>Plan your production store early</td></tr>
+  </tbody>
+</table>
+<p>In practice, the quality of your chunks and retrieval strategy matters far more than which of these you pick.</p>
+
 <h2>5. Retrieval: dense, sparse and hybrid</h2>
 <p>Pure vector (dense) search is great at meaning but surprisingly bad at exact terms: product codes, error numbers, names, acronyms. Keyword (sparse) search such as BM25 is the opposite. So production systems usually run both and merge the results — <strong>hybrid search</strong>.</p>
 <p>The standard way to merge is <strong>Reciprocal Rank Fusion (RRF)</strong>: each result scores <code>1 / (60 + rank)</code> in each list, and the scores are summed. It needs no tuning and works well.</p>
@@ -166,6 +217,31 @@ Question: How long do I have to return an order shipped to Germany?</code></pre>
   <li><strong>Upsert by stable IDs</strong> (document ID + chunk position) so updates replace rather than duplicate.</li>
 </ul>
 
+<h2>RAG over structured data: when to use SQL instead</h2>
+<p>RAG is built for unstructured text. If the question is "how many orders shipped late last month?", embedding database rows and searching them is the wrong tool — the answer needs counting and filtering, not similarity. For structured data, let the model write a query instead (<strong>text-to-SQL</strong>) against a read-only database user and a documented schema, or expose specific, safe query tools. Many real assistants combine both: RAG for policies and documentation, SQL tools for numbers and records.</p>
+
+<h2>A latency and cost budget</h2>
+<p>Every stage adds time and money. Typical ranges (they vary by provider and scale):</p>
+<table>
+  <thead><tr><th>Stage</th><th>Typical latency</th><th>How to keep it down</th></tr></thead>
+  <tbody>
+    <tr><td>Query rewriting</td><td>200–500 ms</td><td>Use a small, fast model; skip it for first messages</td></tr>
+    <tr><td>Embedding the question</td><td>50–150 ms</td><td>Cache embeddings for repeated questions</td></tr>
+    <tr><td>Vector + keyword search</td><td>10–100 ms</td><td>Proper indexes, metadata filters, sensible top-k</td></tr>
+    <tr><td>Reranking</td><td>100–400 ms</td><td>Rerank 30–50 candidates, not hundreds</td></tr>
+    <tr><td>Generation</td><td>1–5 s</td><td>Stream the answer; send fewer, better chunks</td></tr>
+  </tbody>
+</table>
+<p>Streaming the response hides most of this: users see the first words almost immediately. On cost, the biggest lever is sending fewer tokens of context — which is exactly what good retrieval and reranking give you.</p>
+
+<h2>Security and privacy in RAG</h2>
+<ul>
+  <li><strong>Permission-aware retrieval.</strong> Store access rules as metadata and filter on them in every query, so a user can only ever retrieve what they could open themselves.</li>
+  <li><strong>Prompt injection in documents.</strong> Retrieved text can contain instructions ("ignore previous rules…"). Treat it as data, keep system instructions separate, and never let retrieved text alone trigger actions.</li>
+  <li><strong>Sensitive data.</strong> Decide what should never be indexed — passwords, personal data you don't need, secrets in old documents — and filter it at ingestion.</li>
+  <li><strong>Data residency.</strong> Check where your embedding model, vector store and LLM process data if you have regulatory obligations.</li>
+</ul>
+
 <h2>How to evaluate a RAG system</h2>
 <p>"It looks good when I try it" is not an evaluation. Build a <strong>golden set</strong> of 50–200 real questions, each with the correct answer and the document(s) that contain it. Then measure the two halves separately:</p>
 <table>
@@ -206,9 +282,21 @@ Question: How long do I have to return an order shipped to Germany?</code></pre>
   <li>Latency and cost tracked per stage, not just end to end</li>
 </ul>
 
+<h2>RAG glossary</h2>
+<ul>
+  <li><strong>Chunk</strong> — a passage of a document, embedded and retrieved as one unit.</li>
+  <li><strong>Embedding</strong> — a vector of numbers representing the meaning of a piece of text.</li>
+  <li><strong>Vector database</strong> — a store that finds the vectors most similar to a query vector.</li>
+  <li><strong>HNSW</strong> — the most common approximate nearest-neighbour index for fast vector search.</li>
+  <li><strong>BM25</strong> — a classic keyword-ranking algorithm used for sparse search.</li>
+  <li><strong>Hybrid search</strong> — combining vector and keyword search, typically with Reciprocal Rank Fusion.</li>
+  <li><strong>Reranker</strong> — a cross-encoder model that rescores candidate chunks against the question.</li>
+  <li><strong>Faithfulness</strong> — whether every claim in an answer is supported by the retrieved context.</li>
+</ul>
+
 <p>RAG is less about any one clever technique and more about getting a dozen ordinary decisions right. Get retrieval right and almost any modern model will give good answers; get it wrong and no model can save you.</p>
 
-<p>Want a RAG assistant over your own documents, help centre or database? <a href="/booking">Book a free 15-minute call</a> and we'll tell you what it would take.</p>
+<p><strong>Keep reading:</strong> learn how to choose and test the model behind your RAG system in <a href="/blog/llm-models-benchmarks-evals">LLM Models, Benchmarks and Evals</a>, and how to expose your knowledge base to any AI app in <a href="/blog/mcp-vs-api-build-deploy-mcp-server">MCP vs API: build and deploy an MCP server</a>.</p>
     `.trim(),
   },
   {
@@ -217,15 +305,39 @@ Question: How long do I have to return an order shipped to Germany?</code></pre>
     title: "LLM Models, Benchmarks and Evals: How to Choose a Model on Evidence, Not Leaderboards",
     excerpt:
       "How large language models differ, what the popular benchmarks really measure — and where they mislead — and how to build your own evals so you pick and change models with confidence.",
-    readTime: "9 min read",
+    readTime: "12 min read",
     date: "Oct 4, 2026",
     image: "/blog/llm-models-benchmarks-evals.png",
     featured: false,
     color: "#10B981",
+    seoTitle: "LLM Benchmarks & Evals: How to Choose a Model",
+    metaDescription:
+      "A practical guide to LLM benchmarks and evals: what MMLU, GPQA and SWE-bench measure, where leaderboards mislead, and how to build evals for your own task.",
+    datePublished: "2026-10-04",
+    dateModified: "2026-10-04",
+    keywords: ["LLM benchmarks", "LLM evals", "LLM evaluation", "choosing an LLM", "LLM-as-a-judge", "MMLU", "SWE-bench"],
+    imageAlt: "Bar chart of illustrative eval pass rates for four models against a quality bar",
+    takeaways: [
+      "Benchmarks are useful for a shortlist; your own evals should make the final decision.",
+      "Watch for contamination, saturation and different test harnesses when comparing leaderboard scores.",
+      "A good eval set is 50–200 real examples with code-based checks first and an LLM judge for the rest.",
+      "Pick the cheapest, fastest model that clears your quality bar — then route harder requests to bigger models.",
+    ],
+    faqs: [
+      { q: "What is the difference between an LLM benchmark and an eval?", a: "A benchmark is a public, fixed test used to compare models on general skills such as knowledge, maths or coding. An eval is your own repeatable test of your system on your task, with your data and your definition of a good answer. Benchmarks shortlist models; evals choose between them." },
+      { q: "Which LLM benchmark matters most?", a: "The one closest to your task. For agents, look at tool-use benchmarks such as τ-bench and BFCL; for coding, SWE-bench Verified and LiveCodeBench; for hard reasoning, GPQA Diamond and Humanity's Last Exam. No single benchmark predicts performance on your specific product." },
+      { q: "What is LLM-as-a-judge?", a: "LLM-as-a-judge means using a language model to grade another model's output against a rubric, for qualities that simple code can't check, such as faithfulness or tone. It is fast and scalable but biased, so calibrate it against human labels before trusting it." },
+      { q: "How many examples do I need for an LLM eval?", a: "Start with 50–200 realistic examples drawn from real usage, including edge cases and a few adversarial inputs. That is enough to catch most regressions. Grow the set every week by adding real failures from production." },
+      { q: "How often should I re-evaluate my model choice?", a: "Re-run your evals whenever a prompt, model, tool or retrieval setting changes, and at least quarterly. New models ship frequently, and with an eval suite in place, testing a new one takes hours instead of weeks." },
+      { q: "Are open-weight models good enough for production?", a: "Often, yes — especially for focused tasks such as classification, extraction or RAG over your own documents. They let you self-host and keep data in your infrastructure. Run the same eval against an open-weight and a frontier model and let the results decide." },
+    ],
     content: `
 <p>New models ship almost every month, each with a chart showing it beating the last one. If you're building anything on top of LLMs, you need a way to cut through that: which model is actually best <em>for your task</em>, at a price and speed you can live with — and how will you know if switching models breaks something?</p>
 
 <p>This guide covers three things: how LLMs differ, what public benchmarks measure (and don't), and how to build your own <strong>evals</strong> — the tests that turn model choice from guesswork into engineering.</p>
+
+<h2>Benchmarks vs evals: the short answer</h2>
+<p><strong>An LLM benchmark is a standard public test used to compare models on general abilities; an LLM eval is your own repeatable test that measures how well your specific application performs on your specific task.</strong> Benchmarks answer "which models are strong in general?" Evals answer "which model, prompt and setup work best for us?" You need both: benchmarks to shortlist, evals to decide.</p>
 
 <h2>What an LLM is, in four ideas</h2>
 <ul>
@@ -260,6 +372,19 @@ Question: How long do I have to return an order shipped to Germany?</code></pre>
   <li><strong>Multimodality</strong> — images, PDFs, audio, video in; images or speech out.</li>
   <li><strong>Deployment and data</strong> — available regions, data-retention terms, self-hosting options and licence.</li>
 </ul>
+
+<h2>Estimating cost: a worked example</h2>
+<p>Model prices are quoted per million tokens, with input and output priced separately. Here's how to estimate a monthly bill, using <em>illustrative</em> prices of $3 per million input tokens and $15 per million output tokens:</p>
+<table>
+  <thead><tr><th>Item</th><th>Calculation</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>Conversations per month</td><td>—</td><td>10,000</td></tr>
+    <tr><td>Input tokens</td><td>10,000 × 2,000 tokens (instructions, context, history)</td><td>20M → $60</td></tr>
+    <tr><td>Output tokens</td><td>10,000 × 300 tokens</td><td>3M → $45</td></tr>
+    <tr><td><strong>Total</strong></td><td></td><td><strong>≈ $105 / month</strong></td></tr>
+  </tbody>
+</table>
+<p>Two things usually dominate: how much context you send on every call (trim it, cache it) and whether you use a large model for requests a small one could handle (route them). Reasoning modes also generate many extra "thinking" tokens, so measure their real cost per task before turning them on everywhere.</p>
 
 <h2>Benchmarks: what they measure</h2>
 <p>A benchmark is a fixed public test set with a scoring method. These are the ones you'll see most often on model launch charts:</p>
@@ -358,6 +483,15 @@ def run_eval(model: str, dataset_path: str, judge_model: str) -&gt; dict:
 <h3>Step 6 — Keep evaluating in production</h3>
 <p>Offline evals catch regressions; production tells you what you didn't think to test. Log inputs and outputs (respecting privacy), sample a slice for automatic and human grading, collect thumbs-up/down feedback, and add every real failure to the golden dataset. The dataset should grow every week.</p>
 
+<h2>Measuring hallucinations</h2>
+<p>A hallucination is a confident statement that isn't supported by the facts. You can't eliminate them entirely, but you can measure and reduce them:</p>
+<ul>
+  <li><strong>Grounded tasks</strong> (RAG, summarisation): score <em>faithfulness</em> — the share of claims in the answer supported by the provided sources — with an LLM judge, and spot-check by hand.</li>
+  <li><strong>Factual tasks</strong>: compare against reference answers and track the rate of unsupported or wrong facts.</li>
+  <li><strong>Refusal behaviour</strong>: include questions that <em>can't</em> be answered from the data and check the system says so instead of inventing an answer.</li>
+  <li><strong>Reduce it</strong> with better context, explicit "only from sources" instructions, citations, lower temperature for factual tasks, and structured outputs that leave less room for improvisation.</li>
+</ul>
+
 <h2>Evals for RAG and agents</h2>
 <ul>
   <li><strong>RAG systems:</strong> evaluate retrieval (did we fetch the right chunks? recall@k, MRR) separately from generation (faithfulness, answer relevance). See <a href="/blog/rag-architecture-explained">our RAG architecture guide</a>.</li>
@@ -368,6 +502,19 @@ def run_eval(model: str, dataset_path: str, judge_model: str) -&gt; dict:
 <h2>Tools that help</h2>
 <p>You can start with a script like the one above and a spreadsheet. When you outgrow that, open-source and hosted tools such as <strong>promptfoo</strong>, <strong>DeepEval</strong>, <strong>Ragas</strong>, <strong>OpenAI Evals</strong>, <strong>Langfuse</strong>, <strong>LangSmith</strong>, <strong>Braintrust</strong> and <strong>Arize Phoenix</strong> add dataset management, judges, tracing and dashboards. The tool matters far less than having a golden set and running it consistently.</p>
 
+<h2>Prompting, RAG or fine-tuning?</h2>
+<p>Before switching models, check whether the problem is the model at all:</p>
+<table>
+  <thead><tr><th>Problem</th><th>Try first</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Wrong format, tone or structure</td><td>Better prompt, examples, structured output</td><td>Cheapest and fastest to iterate</td></tr>
+    <tr><td>Doesn't know your facts or documents</td><td>RAG</td><td>Adds knowledge without retraining; supports citations</td></tr>
+    <tr><td>Can't use your systems</td><td>Tools / MCP</td><td>Gives the model live data and actions</td></tr>
+    <tr><td>Consistent narrow skill at high volume</td><td>Fine-tuning a smaller model</td><td>Can match a larger model on one task at lower cost</td></tr>
+    <tr><td>Genuinely hard reasoning</td><td>A stronger or reasoning model</td><td>Some tasks need more capability</td></tr>
+  </tbody>
+</table>
+
 <h2>A practical model-selection recipe</h2>
 <ol>
   <li><strong>Shortlist</strong> three models from benchmarks relevant to your task — say, one frontier, one fast/cheap, one open-weight.</li>
@@ -377,9 +524,21 @@ def run_eval(model: str, dataset_path: str, judge_model: str) -&gt; dict:
   <li><strong>Re-run quarterly</strong>, or whenever a new model ships. With evals in place, switching is an afternoon's work.</li>
 </ol>
 
+<h2>LLM glossary</h2>
+<ul>
+  <li><strong>Token</strong> — the unit models read and write; roughly ¾ of an English word.</li>
+  <li><strong>Context window</strong> — the maximum tokens a model can consider in one request.</li>
+  <li><strong>Temperature</strong> — how random the output is; lower for factual tasks, higher for creative ones.</li>
+  <li><strong>System prompt</strong> — standing instructions that shape the model's behaviour for a conversation.</li>
+  <li><strong>Time to first token (TTFT)</strong> — how long before the response starts streaming.</li>
+  <li><strong>pass@k</strong> — the share of problems solved in at least one of k attempts.</li>
+  <li><strong>Contamination</strong> — test data leaking into training data, inflating benchmark scores.</li>
+  <li><strong>Golden dataset</strong> — your curated set of inputs and expected outputs used for evals.</li>
+</ul>
+
 <p>Leaderboards tell you who is good at exams. Evals tell you who is good at your job. Only one of those is worth paying for.</p>
 
-<p>Building an AI assistant or agent and not sure which model to trust with it? <a href="/booking">Book a free 15-minute call</a> — we'll help you set up the evals that answer that question.</p>
+<p><strong>Keep reading:</strong> see how evals fit into a retrieval system in <a href="/blog/rag-architecture-explained">RAG Architecture, Explained</a>, and how to give your model safe access to tools in <a href="/blog/mcp-vs-api-build-deploy-mcp-server">MCP vs API: build and deploy an MCP server</a>.</p>
     `.trim(),
   },
   {
@@ -388,11 +547,32 @@ def run_eval(model: str, dataset_path: str, judge_model: str) -&gt; dict:
     title: "MCP vs API: What the Model Context Protocol Is, Its Types, and How to Build and Deploy an MCP Server",
     excerpt:
       "MCP is the standard way for AI apps to use tools and data. How it differs from a normal API, its building blocks and server types, and a step-by-step guide to building an MCP server in Python and deploying it.",
-    readTime: "11 min read",
+    readTime: "14 min read",
     date: "Oct 4, 2026",
     image: "/blog/mcp-vs-api-build-deploy-mcp-server.png",
     featured: false,
     color: "#A78BFA",
+    seoTitle: "MCP vs API: Build & Deploy an MCP Server",
+    metaDescription:
+      "What is MCP (Model Context Protocol) and how is it different from an API? Learn the MCP server types, then build and deploy an MCP server in Python.",
+    datePublished: "2026-10-04",
+    dateModified: "2026-10-04",
+    keywords: ["MCP vs API", "Model Context Protocol", "MCP server", "build an MCP server", "deploy MCP server", "FastMCP", "Streamable HTTP"],
+    imageAlt: "Diagram of an AI host app connected to three MCP servers: Orders, CRM and Files",
+    takeaways: [
+      "MCP is an open standard that lets any AI app discover and use your tools and data — build a server once, use it everywhere.",
+      "MCP doesn't replace APIs: most MCP servers are a thin, model-friendly layer on top of an existing API.",
+      "Use stdio for local servers and Streamable HTTP for remote, shared servers.",
+      "Treat a remote MCP server like any public API: HTTPS, authentication, least privilege and logging.",
+    ],
+    faqs: [
+      { q: "What is MCP in simple terms?", a: "MCP (Model Context Protocol) is an open standard that defines how AI applications connect to tools and data. An MCP server describes what it can do — tools, resources and prompts — and any MCP-compatible AI app can discover and use them without custom integration code." },
+      { q: "Is MCP a replacement for REST APIs?", a: "No. MCP sits on top of APIs. A REST API is designed for developers writing code; an MCP server wraps that API in a self-describing interface designed for AI models, so the model can decide at runtime which action to take." },
+      { q: "What is the difference between MCP and function calling?", a: "Function calling is a feature of a model API: you send tool definitions with each request. MCP standardises where those tools come from — servers that any host can connect to and discover. Under the hood, hosts usually present MCP tools to the model through function calling." },
+      { q: "Which language should I use to build an MCP server?", a: "Use the language of the system you're wrapping. Official SDKs exist for Python and TypeScript, among others. Python's FastMCP is the quickest way to start: decorators turn ordinary functions into tools, resources and prompts." },
+      { q: "Where can I deploy a remote MCP server?", a: "Anywhere that runs a container behind HTTPS — Google Cloud Run, AWS App Runner or ECS, Azure Container Apps, Render, Railway or Fly.io — or Cloudflare Workers. Use the Streamable HTTP transport and add authentication before exposing it." },
+      { q: "Is MCP secure?", a: "MCP is as secure as the server you build. Use HTTPS, authenticate every request (OAuth 2.1 for public multi-user servers), grant least-privilege credentials, require confirmation for destructive actions, validate inputs and treat tool output as untrusted because of prompt injection." },
+    ],
     content: `
 <p>An AI assistant becomes genuinely useful when it can <em>do</em> things — look up an order, query a database, create a ticket, read a file. For a long time, every AI app wired up every tool in its own custom way. Ten AI apps and fifty tools meant hundreds of one-off integrations, each built and maintained separately.</p>
 
@@ -414,6 +594,25 @@ def run_eval(model: str, dataset_path: str, judge_model: str) -&gt; dict:
   </tbody>
 </table>
 <p><strong>When to use which:</strong> if you're writing ordinary software where the developer decides exactly which call to make, use the API directly — it's simpler and faster. If you want an AI model to be able to use your system, especially across several AI apps, wrap the API in an MCP server.</p>
+
+<h3>MCP vs function calling vs custom plugins</h3>
+<table>
+  <thead><tr><th></th><th>Function calling</th><th>Custom plugin / integration</th><th>MCP</th></tr></thead>
+  <tbody>
+    <tr><td>What it is</td><td>A model API feature: you pass tool definitions with each request</td><td>Code written for one specific AI app</td><td>An open protocol for serving tools and data to any AI app</td></tr>
+    <tr><td>Where tools live</td><td>In your application code</td><td>Inside one product's ecosystem</td><td>In separate, reusable servers</td></tr>
+    <tr><td>Reuse across apps</td><td>No — rebuilt per app</td><td>No</td><td>Yes — any MCP host</td></tr>
+    <tr><td>Best for</td><td>One app calling a few of its own functions</td><td>Deep integration with a single platform</td><td>Tools you want available across many AI apps and agents</td></tr>
+  </tbody>
+</table>
+<p>They aren't rivals: an MCP host typically takes the tools it discovers from MCP servers and presents them to the model <em>through</em> function calling.</p>
+
+<h3>When not to use MCP</h3>
+<ul>
+  <li>A fixed, deterministic pipeline with no model decisions — call the API directly.</li>
+  <li>A single app with two or three internal functions — plain function calling is simpler.</li>
+  <li>Hard real-time or very high-throughput paths where an extra protocol hop matters.</li>
+</ul>
 
 <h2>How MCP works</h2>
 <p>MCP has three roles:</p>
@@ -452,6 +651,18 @@ def run_eval(model: str, dataset_path: str, judge_model: str) -&gt; dict:
     "isError": false
   }
 }</code></pre>
+
+<h2>MCP specification versions</h2>
+<p>The protocol is versioned by date, and client and server agree on a version during initialisation. The key milestones so far:</p>
+<table>
+  <thead><tr><th>Revision</th><th>Notable changes</th></tr></thead>
+  <tbody>
+    <tr><td>2024-11-05</td><td>Initial public release: tools, resources, prompts, sampling; stdio and HTTP+SSE transports</td></tr>
+    <tr><td>2025-03-26</td><td>Streamable HTTP transport replaces HTTP+SSE; OAuth 2.1-based authorisation; tool annotations</td></tr>
+    <tr><td>2025-06-18</td><td>Structured tool output, elicitation, resource links in tool results, stricter authorisation guidance</td></tr>
+  </tbody>
+</table>
+<p>Check <a href="https://modelcontextprotocol.io">modelcontextprotocol.io</a> for the current revision before you build — the official SDKs track it for you.</p>
 
 <h2>The building blocks</h2>
 <p>Servers can offer three kinds of things, each controlled by a different party:</p>
@@ -637,6 +848,27 @@ CMD ["uv", "run", "server.py"]</code></pre>
 <pre><code>claude mcp add --transport http orders https://orders-mcp.example.com/mcp --header "Authorization: Bearer $ORDERS_MCP_TOKEN"</code></pre>
 <p>Most MCP hosts now accept a remote server URL directly in their settings.</p>
 
+<h2>Monitoring an MCP server in production</h2>
+<ul>
+  <li><strong>Log each tool call</strong> — tool name, arguments (with secrets redacted), user, duration and whether it returned an error.</li>
+  <li><strong>Track error and timeout rates per tool.</strong> A tool that often errors usually needs a clearer description or better input validation.</li>
+  <li><strong>Watch which tools are never called.</strong> They may be badly described, or unnecessary — remove them to keep the tool list focused.</li>
+  <li><strong>Version your tool descriptions</strong> like code. A wording change can change model behaviour, so test it with an eval before shipping.</li>
+</ul>
+
+<h2>Troubleshooting common MCP problems</h2>
+<table>
+  <thead><tr><th>Symptom</th><th>Likely cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Server doesn't appear in the host</td><td>Invalid JSON in the config, a relative path, or the host wasn't restarted</td><td>Validate the JSON, use absolute paths, fully restart the host and check its MCP logs</td></tr>
+    <tr><td>stdio server connects then breaks</td><td>Something prints to stdout, corrupting the JSON-RPC stream</td><td>Log to stderr only — never print() to stdout in a stdio server</td></tr>
+    <tr><td>The model never calls the tool</td><td>Vague name or description; too many similar tools</td><td>Describe when to use the tool, with an example; trim overlapping tools</td></tr>
+    <tr><td>Wrong or missing arguments</td><td>Loose input schema</td><td>Use precise types, enums and examples; validate and return helpful errors</td></tr>
+    <tr><td>401 / 403 from a remote server</td><td>Missing or expired token, wrong audience</td><td>Check the Authorization header and token scopes; re-run the OAuth flow</td></tr>
+    <tr><td>Calls time out</td><td>Slow upstream API or large payloads</td><td>Add timeouts and pagination; return summaries instead of full records</td></tr>
+  </tbody>
+</table>
+
 <h2>Security checklist</h2>
 <ul>
   <li><strong>HTTPS only</strong> for remote servers, and validate the <code>Origin</code> header (the spec requires this to prevent DNS-rebinding attacks).</li>
@@ -648,10 +880,19 @@ CMD ["uv", "run", "server.py"]</code></pre>
   <li><strong>Log every tool call</strong> with the user, arguments and result, and rate-limit per user.</li>
 </ul>
 
+<h2>Real-world MCP use cases</h2>
+<ul>
+  <li><strong>Customer support:</strong> look up orders, subscriptions and tickets, and draft replies with live account data.</li>
+  <li><strong>Sales and CRM:</strong> find contacts, log calls and update deal stages from a chat or an agent.</li>
+  <li><strong>Internal knowledge:</strong> search wikis, policies and documents — often as a RAG system exposed through MCP.</li>
+  <li><strong>Engineering:</strong> read repositories, issues and logs; query staging databases with read-only credentials.</li>
+  <li><strong>Operations:</strong> check inventory, schedules and dashboards, and trigger approved workflows.</li>
+</ul>
+
 <h2>The bottom line</h2>
 <p>APIs connect software to software. MCP connects AI to software, by putting a standard, self-describing layer on top of the APIs you already have. If you want AI assistants — yours or your customers' — to work with your systems, an MCP server is now the most reusable way to do it: build it once, and it works everywhere MCP does.</p>
 
-<p>Want an MCP server for your product, CRM or internal tools? <a href="/booking">Book a free 15-minute call</a> and we'll scope it with you.</p>
+<p><strong>Keep reading:</strong> pair an MCP server with a knowledge base using <a href="/blog/rag-architecture-explained">RAG Architecture, Explained</a>, and test the agents that use your tools with <a href="/blog/llm-models-benchmarks-evals">LLM Models, Benchmarks and Evals</a>.</p>
     `.trim(),
   },
 ];

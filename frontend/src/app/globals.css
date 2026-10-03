@@ -177,6 +177,7 @@
     line-height: 1.85;
   }
   .prose-blog h2 {
+    scroll-margin-top: 7rem; /* table-of-contents jumps clear the fixed navbar */
     color: #F5F5F7;
     font-family: var(--font-display), system-ui, sans-serif;
     font-size: 1.625rem;
@@ -323,6 +324,10 @@
   .js .reveal:not(.is-in), .js .reveal-line:not(.is-in) > span { opacity: 1; transform: none; }
   .reveal, .reveal-line > span { transition: none; }
 }
+
+/* Page-level black fills step aside so the fixed particle field (behind everything,
+   see <SiteEffects>) shows through; body stays black. Cards and panels keep their fills. */
+:is(main, section).bg-black { background-color: transparent; }
 
 /* ── Text animation: word-by-word mask rise (Reveal variant="words") ── */
 .reveal-words .sw {
