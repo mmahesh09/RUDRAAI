@@ -1,74 +1,73 @@
-"use client";
+import { Plus } from "lucide-react";
+import SectionHead from "@/components/site/section-head";
+import Reveal from "@/components/site/reveal";
+import { SITE } from "@/lib/site";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { Faq5 } from "@/components/ui/faq-accordion";
-
-const faqs = [
+const FAQS = [
   {
-    question: "How quickly can you deploy an automation for my business?",
-    answer:
-      "Our standard deployment time is 3–7 business days from the moment we agree on the workflow scope. For more complex multi-system automations involving AI agents, it can take up to 2 weeks. Either way, you'll have a live, tested automation faster than any in-house team could deliver.",
+    q: "How long does a project take?",
+    a: "A single automation is usually live in 3–7 days. An AI agent takes 1–3 weeks, a website 2–4 weeks. You get a firm timeline in the written plan before anything starts.",
   },
   {
-    question: "Do I need any technical knowledge to use or manage the automations?",
-    answer:
-      "None at all. We build every workflow visually in n8n and document everything so your team can understand what's happening. We also provide a short walkthrough call after launch. If something ever breaks or needs changing, we handle it — that's what the ongoing support is for.",
+    q: "How much does it cost?",
+    a: "Every project is quoted at a fixed price after the first call, based on what's actually being built. No hourly billing, no surprise invoices.",
   },
   {
-    question: "What tools and platforms do you integrate with?",
-    answer:
-      "We integrate with 400+ tools via n8n including HubSpot, Salesforce, Slack, Gmail, Notion, Airtable, Google Sheets, Stripe, Shopify, WhatsApp, and any platform with a REST API or webhook. If your tool has an API, we can automate it.",
+    q: "Do I need to be technical?",
+    a: "No. We handle the build and explain it in plain English. You get documentation and a short walkthrough, and we're a message away if something needs changing.",
   },
   {
-    question: "How is the free automation audit different from a sales call?",
-    answer:
-      "The audit is a working session, not a pitch deck. We spend 60 minutes mapping your actual workflows, identifying bottlenecks, and estimating ROI. You walk away with a documented roadmap you can act on — even if you never hire us. Most clients say it's the most useful hour they've spent on operations.",
+    q: "Which tools can you connect?",
+    a: "Most of them. n8n works with 400+ apps — Google Workspace, HubSpot, Slack, Notion, Airtable, Stripe, Shopify, WhatsApp and more — and anything else with an API or webhook.",
   },
   {
-    question: "What happens if an automation breaks after you deploy it?",
-    answer:
-      "All plans include post-launch monitoring. We set up alerting so we know before you do when something fails. For Growth and Enterprise clients, we have a 4-hour SLA response time. Bugs and breaking changes from third-party APIs are fixed at no extra cost during your support period.",
+    q: "What happens if something breaks?",
+    a: `Automations are set up to alert us when a step fails. For the first ${SITE.supportDays} days after launch, fixes are free. After that, ongoing support is optional.`,
   },
   {
-    question: "Can you build AI agents, not just workflow automations?",
-    answer:
-      "Yes — AI agent development is one of our core services. We build agentic systems using GPT-4o, Claude, and open-source LLMs that can reason, make decisions, use tools, and complete multi-step tasks autonomously. Think AI SDRs, support agents, data analysts, and internal copilots.",
+    q: "Where does my data live?",
+    a: "In your accounts. Workflows run on your own n8n instance or a cloud environment set up in your name, and you hold the logins. We're happy to sign an NDA before we start.",
   },
   {
-    question: "Do you work with startups or only enterprise companies?",
-    answer:
-      "Both. Our Starter package is designed for 5–50 person teams tackling their first major automation. Enterprise plans suit 200+ person orgs with complex, multi-department needs. We've worked with pre-revenue startups and publicly listed companies — the common thread is that they want to operate smarter, not just bigger.",
-  },
-  {
-    question: "Is our data safe? Where do the automations run?",
-    answer:
-      "We take data security seriously. All workflows run on your own self-hosted n8n instance or a dedicated cloud environment — your data never passes through our servers. We sign NDAs before any engagement and follow SOC 2-aligned practices for credential management and access control.",
+    q: "What is the free call, exactly?",
+    a: `${SITE.call.minutes} minutes on a ${SITE.call.days.replace(" & ", " or ")}. You describe the work that's slowing you down; we tell you what we'd build and roughly what it would take. No slides, no pressure.`,
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+};
+
+/** §06 — FAQ as a ruled list of native disclosures (keyboard + screen-reader friendly, works without JS). */
 export default function FaqSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-
   return (
-    <section ref={ref} className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-[#09090B]" />
-      <div className="absolute inset-0 grid-bg opacity-20" />
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6 }}
-        className="relative z-10"
-      >
-        <Faq5
-          badge="FAQ"
-          heading="Everything You Want to Know"
-          description="Straight answers to the questions every smart operator asks before hiring an automation agency."
-          faqs={faqs}
-        />
-      </motion.div>
+    <section id="faq" className="section-padding relative bg-black">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <div className="container-wide grid gap-12 lg:grid-cols-12 lg:gap-x-8">
+        <div className="lg:col-span-12">
+          <SectionHead index="06" label="Questions" title="Straight answers." />
+        </div>
+        <div className="lg:col-span-8 lg:col-start-5">
+          <div className="ledger border-y border-white/[0.08]">
+            {FAQS.map((f, i) => (
+              <Reveal key={f.q} delay={i * 0.03}>
+                <details className="group py-1">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 [&::-webkit-details-marker]:hidden">
+                    <span className="font-heading text-lg font-semibold tracking-[-0.02em] text-[#F5F5F7] sm:text-xl">{f.q}</span>
+                    <Plus
+                      className="h-5 w-5 flex-shrink-0 text-[#A1A1AA] transition-transform duration-300 group-open:rotate-45 group-open:text-[#2997FF]"
+                      aria-hidden="true"
+                    />
+                  </summary>
+                  <p className="max-w-[62ch] pb-6 text-[15px] leading-[1.75] text-[#A1A1AA]">{f.a}</p>
+                </details>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

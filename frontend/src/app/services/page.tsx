@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import ServicesView from "./services-view";
 
 export const metadata: Metadata = {
-  title: "AI Automation Services — n8n & AI Agent Development",
+  title: "Services — Websites, AI Agents & Automations",
   description:
-    "Custom n8n workflow automation, AI agent development, and CRM/WhatsApp/Slack integrations, live in 3–7 days. See RudraAI's full service breakdown.",
+    "Fast Next.js websites, AI agents trained on your data, and n8n automations between your tools. Fixed-price, documented, and owned by you. Automations live in 3–7 days.",
   alternates: { canonical: "/services" },
 };
 

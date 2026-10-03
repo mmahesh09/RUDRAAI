@@ -33,7 +33,7 @@ export default async function AdminClients() {
           <p className="text-[#A1A1AA] mt-1 text-sm">{projects?.length ?? 0} active projects</p>
         </div>
         <Link href="/admin/clients/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] text-white text-sm font-medium shadow-[0_4px_20px_rgba(255,107,0,0.3)]">
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2997FF] to-[#5CB0FF] text-white text-sm font-medium shadow-[0_4px_20px_rgba(41,151,255,0.3)]">
           <Plus className="w-4 h-4" /> New Project
         </Link>
       </div>
@@ -68,7 +68,7 @@ export default async function AdminClients() {
                     {p.timeline_end ? new Date(p.timeline_end).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                   </td>
                   <td className="px-6 py-4">
-                    <Link href={`/admin/clients/${p.id}`} className="flex items-center gap-1 text-[#FF6B00] text-sm hover:underline">
+                    <Link href={`/admin/clients/${p.id}`} className="flex items-center gap-1 text-[#2997FF] text-sm hover:underline">
                       Manage <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </td>

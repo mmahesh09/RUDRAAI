@@ -3,28 +3,28 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+// Apple-style pills: one solid primary (white on #0071E3 = 4.7:1), quiet secondaries.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-heading font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[15px] font-heading font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2997FF] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default:
-          "bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] text-white shadow-[0_4px_20px_rgba(255,107,0,0.4)] hover:shadow-[0_6px_30px_rgba(255,107,0,0.6)] hover:-translate-y-0.5 active:translate-y-0",
+        default: "bg-[#0071E3] text-white hover:bg-[#0077ED]",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
-          "border border-white/15 bg-transparent text-[#A1A1AA] hover:border-[rgba(255,107,0,0.5)] hover:text-[#FF6B00] hover:bg-[rgba(255,107,0,0.05)]",
+          "border border-white/[0.18] bg-transparent text-[#F5F5F7] hover:border-white/40",
         secondary:
-          "bg-[#111117] text-white border border-white/08 hover:bg-[#17171F] hover:border-white/15",
+          "bg-[#161617] text-[#F5F5F7] hover:bg-[#1D1D1F]",
         ghost:
-          "hover:bg-white/05 hover:text-white text-[#A1A1AA]",
-        link: "text-[#FF6B00] underline-offset-4 hover:underline",
+          "text-[#A1A1AA] hover:bg-white/[0.06] hover:text-white",
+        link: "text-[#2997FF] underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-11 px-6 py-3",
-        sm: "h-9 rounded-lg px-4 text-xs",
-        lg: "h-13 px-8 py-4 text-base",
-        xl: "h-14 px-10 py-4 text-lg",
+        default: "h-11 px-6",
+        sm: "h-9 px-4 text-[13px]",
+        lg: "h-12 px-7",
+        xl: "h-14 px-8 text-base",
         icon: "h-10 w-10",
       },
     },

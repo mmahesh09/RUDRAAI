@@ -1,37 +1,37 @@
-"use client";
-
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
 import Link from "next/link";
-import { Zap, Mail, MapPin } from "lucide-react";
-import dynamic from "next/dynamic";
+import { SITE } from "@/lib/site";
 
-const Globe = dynamic(() => import("@/components/globe"), { ssr: false });
+const COLUMNS = [
+  {
+    title: "Work",
+    links: [
+      { label: "Services", href: "/services" },
+      { label: "Showcase", href: "/showcase" },
+      { label: "Case studies", href: "/case-studies" },
+      { label: "Industries", href: "/industries" },
+    ],
+  },
+  {
+    title: "Learn",
+    links: [
+      { label: "About", href: "/about" },
+      { label: "Blog", href: "/blog" },
+      { label: "Automation guide", href: "/automation-guide" },
+      { label: "Feedback", href: "/feedback" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Privacy", href: "/privacy" },
+      { label: "Terms", href: "/terms" },
+      { label: "Cookies", href: "/privacy#cookies" },
+      { label: "DPDP Act 2023", href: "/privacy#dpdp" },
+    ],
+  },
+];
 
-const footerLinks = {
-  "Quick Links": [
-    { label: "Home", href: "/" },
-    { label: "Services", href: "/services" },
-    { label: "Showcase", href: "/showcase" },
-    { label: "Case Studies", href: "/case-studies" },
-    { label: "About", href: "/about" },
-    { label: "Blog", href: "/blog" },
-  ],
-  Resources: [
-    { label: "Book Free Audit", href: "/booking" },
-    { label: "Contact Us", href: "/services#contact" },
-    { label: "Feedback", href: "/feedback" },
-    { label: "Automation Guide", href: "/automation-guide" },
-  ],
-  Legal: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-    { label: "Cookie Policy", href: "/privacy#cookies" },
-    { label: "DPDP Act 2023", href: "/privacy#dpdp" },
-  ],
-};
-
-// Custom X (Twitter) icon — the bird logo was retired
+// X (Twitter) mark — the bird logo was retired
 function XIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -40,7 +40,6 @@ function XIcon({ className }: { className?: string }) {
   );
 }
 
-// Custom Instagram icon — not in lucide-react
 function InstagramIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -59,187 +58,75 @@ function LinkedInIcon({ className }: { className?: string }) {
   );
 }
 
-const social = [
-  { icon: XIcon, label: "X (Twitter)", href: "https://x.com/Rudraai2" },
-  { icon: InstagramIcon, label: "Instagram", href: "https://www.instagram.com/rudrai.in?igsh=NmF3azZuNWJlenk4" },
-  { icon: LinkedInIcon, label: "LinkedIn", href: "https://www.linkedin.com/company/rudrai" },
+const SOCIAL = [
+  { icon: XIcon, label: "RudraAI on X", href: "https://x.com/Rudraai2" },
+  { icon: InstagramIcon, label: "RudraAI on Instagram", href: "https://www.instagram.com/rudrai.in?igsh=NmF3azZuNWJlenk4" },
+  { icon: LinkedInIcon, label: "RudraAI on LinkedIn", href: "https://www.linkedin.com/company/rudrai" },
 ];
 
 export default function Footer() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-60px" });
-
   return (
-    <footer ref={ref} className="relative overflow-hidden">
-      {/* Newsletter + Globe Section */}
-      <div className="relative bg-[#09090B] border-t border-white/06">
-        <div className="absolute inset-0 grid-bg opacity-20" />
+    <footer className="relative border-t border-white/[0.08] bg-black">
+      <div className="container-wide pt-20 pb-10">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-x-8">
+          <div className="lg:col-span-5">
+            <p className="max-w-[30ch] font-heading text-2xl font-medium leading-snug tracking-[-0.02em] text-[#F5F5F7]">
+              Websites, AI agents and automations — built properly, owned by you.
+            </p>
+            <a
+              href={`mailto:${SITE.email}`}
+              className="mt-6 inline-block text-[15px] text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#2997FF]"
+            >
+              {SITE.email}
+            </a>
+            <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
+              {SITE.location} · Working worldwide
+            </p>
+          </div>
 
-        {/* Globe promotional banner */}
-        <div className="container-wide relative z-10 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            className="relative rounded-3xl mb-16"
-            style={{ overflow: "visible" }}
-          >
-            {/* Dark gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0F0F1A] via-[#12101E] to-[#0A0A14] rounded-3xl" />
-            <div className="absolute inset-0 border border-[rgba(139,92,246,0.2)] rounded-3xl" />
-            <div className="absolute inset-px rounded-3xl">
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(139,92,246,0.4)] to-transparent" />
-            </div>
-            <div className="absolute top-0 left-0 w-[500px] h-[300px] bg-[rgba(139,92,246,0.05)] blur-3xl" />
-            <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[rgba(255,107,0,0.04)] blur-3xl" />
-
-            <div className="relative z-10 grid md:grid-cols-2 items-center gap-0">
-              {/* Left content */}
-              <div className="p-10 md:p-14">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[rgba(139,92,246,0.3)] bg-[rgba(139,92,246,0.08)] mb-6">
-                  <div className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-                  <span className="text-xs font-subheading font-medium text-purple-400">
-                    Serving clients globally
-                  </span>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-heading font-black text-white mb-4 leading-tight">
-                  Experience Superior{" "}
-                  <span
-                    style={{
-                      background: "linear-gradient(135deg, #8B5CF6 0%, #FF6B00 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                    }}
-                  >
-                    AI Automation
-                  </span>
-                </h2>
-                <p className="text-[#A1A1AA] font-body leading-relaxed mb-8 max-w-md">
-                  RudraAI is headquartered in Hyderabad, India, serving ambitious teams
-                  across India and globally. Your automations run around the clock — no
-                  borders, no downtime.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/case-studies" className="outline-button h-11 px-6">
-                    See Results
-                  </Link>
-                </div>
-
-                {/* Quick stats */}
-                <div className="flex gap-8 mt-8 pt-8 border-t border-white/06">
-                  {[
-                    { value: "India+", label: "Global Remote" },
-                    { value: "3–7d", label: "Deployment" },
-                    { value: "30d", label: "Support" },
-                  ].map((s) => (
-                    <div key={s.label}>
-                      <div className="text-xl font-heading font-bold text-[#FF6B00]">{s.value}</div>
-                      <div className="text-xs font-body text-[#71717A]">{s.label}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right — Globe */}
-              <div className="relative flex items-center justify-center p-6 md:p-10">
-                <div className="absolute inset-0 bg-gradient-to-l from-[rgba(255,107,0,0.03)] to-transparent rounded-r-3xl" />
-                <div
-                  className="relative w-full max-w-[380px]"
-                  style={{
-                    filter: "drop-shadow(0 0 40px rgba(139,92,246,0.25)) drop-shadow(0 0 80px rgba(255,107,0,0.1))",
-                  }}
-                >
-                  <Globe className="opacity-90" />
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-        </div>
-      </div>
-
-      {/* Main Footer */}
-      <div className="relative bg-[#050508] border-t border-white/06">
-        <div className="container-wide py-14">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
-            {/* Brand column */}
-            <div className="lg:col-span-2">
-              <Link href="/" className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF6B00] to-[#FF8C00] flex items-center justify-center shadow-[0_0_20px_rgba(255,107,0,0.4)]">
-                  <Zap className="w-5 h-5 text-white fill-white" />
-                </div>
-                <span className="font-heading font-black text-xl text-white">
-                  Rudra<span className="text-[#FF6B00]">AI</span>
-                </span>
-              </Link>
-              <p className="text-sm font-body text-[#71717A] leading-relaxed mb-6 max-w-xs">
-                The premier AI automation agency for startups and SMBs. We build
-                n8n workflows and AI agents that actually work in production.
-              </p>
-
-              {/* Contact info */}
-              <div className="space-y-2.5">
-                <div className="flex items-center gap-2.5 text-sm font-body text-[#71717A]">
-                  <MapPin className="w-4 h-4 text-[#FF6B00] flex-shrink-0" />
-                  <span> India · Remote-First</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-sm font-body text-[#71717A]">
-                  <Mail className="w-4 h-4 text-[#FF6B00] flex-shrink-0" />
-                  <a href="mailto:hello@rudraai.online" className="hover:text-white transition-colors">
-                    hello@rudraai.online
-                  </a>
-                </div>
-              </div>
-
-              {/* Social links */}
-              <div className="flex gap-2 mt-6">
-                {social.map(({ icon: Icon, label, href }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    aria-label={label}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-lg border border-white/08 flex items-center justify-center text-[#71717A] hover:text-white hover:border-[rgba(255,107,0,0.4)] hover:bg-[rgba(255,107,0,0.08)] transition-all duration-200"
-                  >
-                    <Icon className="w-4 h-4" />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* Link columns */}
-            {Object.entries(footerLinks).map(([category, links]) => (
-              <div key={category}>
-                <h4 className="font-subheading font-semibold text-white text-sm mb-4">
-                  {category}
-                </h4>
-                <ul className="space-y-2.5">
-                  {links.map((link) => (
-                    <li key={link.label}>
-                      <Link
-                        href={link.href}
-                        className="text-sm font-body text-[#71717A] hover:text-white transition-colors"
-                      >
-                        {link.label}
+          <nav className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:col-span-6 lg:col-start-7" aria-label="Footer">
+            {COLUMNS.map((col) => (
+              <div key={col.title}>
+                <h2 className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">{col.title}</h2>
+                <ul className="mt-4 space-y-3">
+                  {col.links.map((l) => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="text-[14px] text-[#A1A1AA] transition-colors hover:text-[#F5F5F7]">
+                        {l.label}
                       </Link>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
-          </div>
+          </nav>
+        </div>
 
-          {/* Bottom bar */}
-          <div className="pt-8 border-t border-white/06 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs font-body text-[#71717A]">
-              © {new Date().getFullYear()} RudraAI. All rights reserved. Built with ⚡ in India.
-            </p>
-            <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-green-500/08 border border-green-500/15">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-xs font-body text-green-400">All systems operational</span>
-            </div>
-          </div>
+        {/* Oversized wordmark — the footer's one bold move */}
+        <p
+          className="mt-20 select-none font-heading font-semibold leading-[0.8] tracking-[-0.06em] text-[#F5F5F7] text-[clamp(4.5rem,21vw,19rem)]"
+          aria-hidden="true"
+        >
+          Rudra<span className="text-[#2997FF]">AI</span>
+        </p>
+
+        <div className="mt-8 flex flex-col gap-4 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[13px] text-[#8A8A93]">© {new Date().getFullYear()} RudraAI. All rights reserved.</p>
+          <ul className="flex gap-1">
+            {SOCIAL.map(({ icon: Icon, label, href }) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  aria-label={label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-11 w-11 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#F5F5F7]"
+                >
+                  <Icon className="h-4 w-4" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </footer>

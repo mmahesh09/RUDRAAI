@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
             to: process.env.CONTACT_TO,
             subject: `New Booking: ${safeName} (${safeCompany}) — ${safeTimeSlot}`,
             html: `
-              <h2 style="color:#FF6B00">New Automation Audit Booking</h2>
+              <h2 style="color:#2997FF">New Automation Audit Booking</h2>
               <table cellpadding="8" style="border-collapse:collapse">
                 <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
                 <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
@@ -195,9 +195,9 @@ export async function POST(req: NextRequest) {
           subject: "Your Automation Audit is Confirmed — RudraAI",
           html: `
             <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
-              <h2 style="color:#FF6B00">You're booked, ${safeName}!</h2>
+              <h2 style="color:#2997FF">You're booked, ${safeName}!</h2>
               <p>Your <strong>Free Automation Audit</strong> is confirmed for:</p>
-              <div style="background:#fff8f0;border-left:4px solid #FF6B00;padding:12px 16px;margin:16px 0;border-radius:4px">
+              <div style="background:#fff8f0;border-left:4px solid #2997FF;padding:12px 16px;margin:16px 0;border-radius:4px">
                 <strong style="font-size:1.1em">${safeTimeSlot}</strong>
               </div>
               ${zoomSection}

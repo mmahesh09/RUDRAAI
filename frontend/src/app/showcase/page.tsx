@@ -1,12 +1,13 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import ShowcaseSection from "@/components/showcase-section";
+import ShowcaseHeroVisual from "@/components/showcase-hero-visual";
 import CTASection from "@/components/cta-section";
-import { Badge } from "@/components/ui/badge";
+import PageHero from "@/components/site/page-hero";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Showcase — n8n Workflows & AI Agents We've Built",
+  title: "Showcase — Workflows & AI Agents, Step by Step",
   description:
     "See the n8n workflows and AI agents RudraAI has built — lead qualification, support agents, booking, email, WhatsApp nurturing, and invoice automation, node by node.",
   alternates: { canonical: "/showcase" },
@@ -15,21 +16,15 @@ export const metadata: Metadata = {
 
 export default function ShowcasePage() {
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
-      <div className="relative pt-32 pb-4 text-center overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide">
-          <Badge className="mb-4">Showcase</Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white mb-4 leading-tight">
-            Automations We&apos;ve <span className="text-gradient-orange">Built</span>
-          </h1>
-          <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto leading-relaxed">
-            Real workflows, node by node — from trigger to outcome. Every build is
-            custom, documented, and handed over for you to own.
-          </p>
-        </div>
+      <PageHero
+        label="Showcase"
+        title="What we've built, step by step."
+        intro="Each of these is a real-shaped workflow: what starts it, what the AI decides, and what happens next. Every build is custom, documented, and handed over for you to own."
+      />
+      <div className="container-wide pb-16">
+        <ShowcaseHeroVisual />
       </div>
       <ShowcaseSection />
       <CTASection />

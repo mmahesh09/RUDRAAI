@@ -1,210 +1,202 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ArrowRight, CheckCircle2, Zap, Clock, DollarSign, AlertCircle } from "lucide-react";
+import CTASection from "@/components/cta-section";
+import PageHero from "@/components/site/page-hero";
+import type { Metadata } from "next";
 
-export const metadata = {
-  title: "The Automation Guide — RudraAI",
+export const metadata: Metadata = {
+  title: "The Automation Guide — What to Automate First and How to Measure It",
   description:
-    "A practical guide to automating your business with n8n and AI. Learn what to automate first, which tools to use, and how to measure ROI.",
+    "A practical guide to automating a small business with n8n and AI: what to automate first, the mistakes to avoid, the tools we use, and a simple way to work out if it pays off.",
   alternates: { canonical: "/automation-guide" },
 };
 
-const sections = [
+type Block = { kind: "p"; text: string } | { kind: "list"; items: { title: string; body: string }[] } | { kind: "formula"; lines: string[] };
+
+const SECTIONS: { id: string; title: string; blocks: Block[] }[] = [
   {
-    number: "01",
-    title: "What is business automation?",
-    content: `Automation means making a computer do a task that a human currently does by hand — sending an email, updating a spreadsheet, qualifying a lead, scheduling a meeting.
-
-Most businesses are losing 10–30 hours per week on work like this. It's not the important work. It's the copy-paste, the follow-up, the data entry.
-
-n8n is the tool we use. It's a visual workflow builder that connects 400+ apps — Gmail, Slack, Notion, HubSpot, Cal.com, WhatsApp, and hundreds more — and lets you define exactly what should happen when something occurs.`,
+    id: "what",
+    title: "What automation actually is",
+    blocks: [
+      { kind: "p", text: "Automation means a computer doing a task a person currently does by hand: sending an email, updating a spreadsheet, logging a lead, booking a meeting." },
+      { kind: "p", text: "For most small teams it isn't the important work that piles up — it's the copy-paste, the follow-ups and the data entry around it. That's what automation is for." },
+      { kind: "p", text: "We mostly use n8n: a visual workflow builder that connects 400+ apps — Gmail, Slack, Notion, HubSpot, Cal.com, WhatsApp and more — and lets you define exactly what happens, step by step, when something occurs." },
+    ],
   },
   {
-    number: "02",
-    title: "The 3 questions to ask before automating anything",
-    content: `Before touching a single workflow, answer these three questions:
-
-1. Does this happen more than 5 times a week?
-If it's a one-off task, it's not worth automating. Automation pays off through repetition.
-
-2. Is the process consistent and predictable?
-Automation works best when the same input always produces the same output. If every case is unique, a human makes a better decision.
-
-3. What happens if it breaks?
-High-stakes tasks (moving money, deleting data) need more testing and fallbacks. Low-stakes tasks (sending a notification, logging a row) are safe to automate quickly.`,
+    id: "questions",
+    title: "Three questions before you automate anything",
+    blocks: [
+      {
+        kind: "list",
+        items: [
+          { title: "Does it happen more than a few times a week?", body: "A one-off task isn't worth automating. The payoff comes from repetition." },
+          { title: "Is it predictable?", body: "Automation works best when the same input should always lead to the same result. If every case needs judgement, keep a person in the loop." },
+          { title: "What happens if it breaks?", body: "Tasks that move money or delete data need more testing and fallbacks. Notifications and logging are safe to automate quickly." },
+        ],
+      },
+    ],
   },
   {
-    number: "03",
-    title: "The 5 automations most businesses need first",
-    content: `In order of ROI, here are the workflows that make the biggest difference fastest:
-
-1. Lead capture → CRM
-Every contact form submission, inbound DM, or email inquiry automatically logged in Notion or your CRM, tagged with source and timestamp. Nothing falls through the cracks.
-
-2. Meeting booked → Preparation
-When a call is booked, an AI automatically pulls the prospect's LinkedIn, website, and any prior emails and creates a briefing doc. You walk into every call prepared.
-
-3. Proposal generation
-Send us a lead's name, company, and goal — we generate a branded HTML proposal via AI and email it within 60 seconds.
-
-4. Invoice → Follow-up sequence
-When an invoice is issued, start a follow-up email sequence that pauses automatically the moment payment lands.
-
-5. New client → Onboarding
-When a contract is signed, automatically: create the project in Notion, send a welcome email with a checklist, add them to Slack, and schedule the kickoff call.`,
+    id: "first",
+    title: "Five automations most businesses need first",
+    blocks: [
+      {
+        kind: "list",
+        items: [
+          { title: "Lead capture → CRM", body: "Every form, DM or email enquiry logged automatically, tagged with where it came from. Nothing falls through the cracks." },
+          { title: "Meeting booked → briefing", body: "When a call is booked, an AI pulls together the prospect's website and past emails into a one-page brief, so you walk in prepared." },
+          { title: "Brief → proposal draft", body: "A short form with the client's goal produces a first-draft proposal in your format, ready for you to edit and send." },
+          { title: "Invoice → follow-ups", body: "Reminders go out on a schedule and stop automatically the moment payment lands." },
+          { title: "New client → onboarding", body: "Contract signed: project created, welcome email sent with a checklist, team channel set up, kick-off call scheduled." },
+        ],
+      },
+    ],
   },
   {
-    number: "04",
-    title: "How to measure automation ROI",
-    content: `Use this simple formula:
-
-Monthly ROI = (Hours saved × Your hourly rate × 4.3 weeks) − Monthly automation cost
-
-Example:
-A 2-hour/day manual lead qualification process at ₹1,000/hr:
-Hours saved = 2 × 5 days × 4.3 weeks = 43 hours/month
-Value = 43 × ₹1,000 = ₹43,000/month
-Automation cost = ₹8,300/month (our Growth plan)
-Net ROI = ₹34,700/month
-
-The free automation audit we offer includes this exact calculation for your top 3 processes.`,
+    id: "roi",
+    title: "Working out whether it pays off",
+    blocks: [
+      { kind: "p", text: "A simple way to estimate it:" },
+      {
+        kind: "formula",
+        lines: [
+          "Monthly value = hours saved per week × hourly cost × 4.3",
+          "Net = monthly value − running cost of the automation",
+        ],
+      },
+      { kind: "p", text: "Example: two hours a day of manual lead handling at ₹1,000/hour is about 43 hours a month — roughly ₹43,000 of time. If the automation costs a fraction of that to build and run, it pays for itself quickly. If it doesn't, it isn't worth building yet." },
+      { kind: "p", text: "On the free call we'll do this rough maths with you for the tasks you mention." },
+    ],
   },
   {
-    number: "05",
-    title: "Common automation mistakes",
-    content: `1. Automating a broken process
-Automation makes bad processes faster and more consistent. Fix the process first, then automate it.
-
-2. Skipping error handling
-What happens if Slack is down? If your CRM API rate-limits? Every production workflow needs fallbacks. We build these into every automation.
-
-3. Not monitoring after launch
-Workflows can break when APIs change, tokens expire, or data formats shift. We include 30 days of monitoring on every project — and alert you before a silent failure costs you a client.
-
-4. Automating too much too fast
-Start with one workflow. Learn from it. Then add more. Trying to automate everything at once usually results in nothing working well.
-
-5. Ignoring data quality
-Garbage in, garbage out. If your CRM has inconsistent data, your automation will propagate that mess. A data audit often precedes a successful automation project.`,
+    id: "mistakes",
+    title: "Common mistakes",
+    blocks: [
+      {
+        kind: "list",
+        items: [
+          { title: "Automating a broken process", body: "Automation makes a process faster, not better. Fix the steps first, then automate them." },
+          { title: "Skipping error handling", body: "What happens when an app is down or rate-limits you? Every real workflow needs retries and a fallback path." },
+          { title: "Not watching it after launch", body: "Workflows break when APIs change or logins expire. Set up alerts so failures are noticed, not discovered weeks later." },
+          { title: "Doing too much at once", body: "Start with one workflow, learn from it, then add the next. Automating everything at once usually means nothing works well." },
+          { title: "Ignoring data quality", body: "Messy data in means messy data everywhere, faster. Sometimes a clean-up comes before the automation." },
+        ],
+      },
+    ],
   },
   {
-    number: "06",
+    id: "tools",
     title: "The tools we use",
-    content: `n8n — workflow orchestration engine (self-hostable, open source)
-OpenRouter — AI model access (Claude, GPT-4, Llama via one API)
-Ollama — local AI model runner (free, private, runs on your machine)
-Notion — internal knowledge base and CRM
-Cal.com — open-source booking and scheduling
-Gmail / SMTP — email delivery
-Slack — team notifications
-Supabase / PostgreSQL — structured data storage
-Vercel — frontend hosting
-
-We don't lock you into proprietary tools. Everything we build can be handed over and maintained by your own team.`,
+    blocks: [
+      {
+        kind: "list",
+        items: [
+          { title: "n8n", body: "Workflow engine — open source and self-hostable." },
+          { title: "OpenRouter + Ollama", body: "Access to models like Claude, GPT and Llama, or local models that keep data on your machine." },
+          { title: "Notion, Cal.com, Slack, Gmail", body: "Where the work actually happens for most small teams." },
+          { title: "Supabase / PostgreSQL", body: "Structured data when a spreadsheet stops being enough." },
+          { title: "Next.js + Vercel", body: "Websites and lightweight internal tools." },
+        ],
+      },
+      { kind: "p", text: "Nothing here locks you in. Everything we build can be handed over and maintained by your own team." },
+    ],
   },
 ];
 
-const quickWins = [
-  "Contact form → Notion CRM (2 hours to build)",
-  "New booking → Slack alert (1 hour to build)",
-  "Invoice sent → Follow-up email sequence (3 hours to build)",
-  "Support email → AI draft reply (4 hours to build)",
-  "New blog post → Social media draft (2 hours to build)",
+const QUICK_WINS = [
+  { task: "Contact form → CRM", effort: "~2 hours" },
+  { task: "New booking → Slack alert", effort: "~1 hour" },
+  { task: "Invoice sent → reminder sequence", effort: "~3 hours" },
+  { task: "Support email → AI draft reply", effort: "~4 hours" },
+  { task: "New blog post → social drafts", effort: "~2 hours" },
 ];
+
+function BlockView({ block }: { block: Block }) {
+  if (block.kind === "p") return <p className="text-[17px] leading-[1.8] text-[#A1A1AA]">{block.text}</p>;
+  if (block.kind === "formula")
+    return (
+      <div className="rounded-xl border border-white/[0.08] bg-[#0B0B0C] px-5 py-4 font-mono text-[13px] leading-[1.9] text-[#F5F5F7]">
+        {block.lines.map((l) => (
+          <div key={l}>{l}</div>
+        ))}
+      </div>
+    );
+  return (
+    <ol className="ledger border-y border-white/[0.08]">
+      {block.items.map((item, i) => (
+        <li key={item.title} className="grid grid-cols-[2.5rem_1fr] py-5">
+          <span className="pt-1 font-mono text-[11px] tracking-[0.14em] text-[#8A8A93]">{String(i + 1).padStart(2, "0")}</span>
+          <div>
+            <h3 className="font-heading text-lg font-semibold tracking-[-0.02em] text-[#F5F5F7]">{item.title}</h3>
+            <p className="mt-1 text-[15px] leading-[1.7] text-[#A1A1AA]">{item.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 export default function AutomationGuidePage() {
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
+      <PageHero
+        label="Guide"
+        title="What to automate first — and how to tell if it's working."
+        intro="A short, practical guide for small teams. No jargon, no hype — just the questions, examples and maths we use with clients."
+      />
 
-      {/* Hero */}
-      <div className="relative pt-32 pb-16 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide text-center">
-          <Badge className="mb-4">Practical Guide</Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white mb-5 leading-tight">
-            The Business{" "}
-            <span className="text-gradient-orange">Automation</span> Guide
-          </h1>
-          <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto">
-            What to automate first, which tools to use, and how to measure whether it's actually working.
-            Written from building 10+ real automations for real businesses.
-          </p>
-        </div>
+      <div className="container-wide grid gap-12 border-t border-white/[0.08] py-16 md:py-24 lg:grid-cols-12 lg:gap-x-8">
+        {/* Sidebar: contents + quick wins */}
+        <aside className="lg:col-span-3">
+          <div className="lg:sticky lg:top-24 space-y-10">
+            <nav aria-label="Guide contents">
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">Contents</p>
+              <ol className="mt-3 space-y-2.5">
+                {SECTIONS.map((s, i) => (
+                  <li key={s.id}>
+                    <a href={`#${s.id}`} className="flex gap-3 text-[14px] leading-snug text-[#A1A1AA] transition-colors hover:text-[#F5F5F7]">
+                      <span className="font-mono text-[11px] text-[#8A8A93] pt-0.5">{String(i + 1).padStart(2, "0")}</span>
+                      {s.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#2997FF]">Quick wins</p>
+              <ul className="mt-3 ledger border-y border-white/[0.08]">
+                {QUICK_WINS.map((w) => (
+                  <li key={w.task} className="flex items-baseline justify-between gap-3 py-2.5">
+                    <span className="text-[14px] text-[#F5F5F7]">{w.task}</span>
+                    <span className="shrink-0 font-mono text-[11px] text-[#8A8A93]">{w.effort}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </aside>
+
+        {/* Reading column */}
+        <article className="max-w-[68ch] space-y-20 lg:col-span-8 lg:col-start-5">
+          {SECTIONS.map((s, i) => (
+            <section key={s.id} id={s.id} className="scroll-mt-24">
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#2997FF]">{String(i + 1).padStart(2, "0")}</p>
+              <h2 className="mt-3 font-heading text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#F5F5F7]">
+                {s.title}
+              </h2>
+              <div className="mt-6 space-y-5">
+                {s.blocks.map((b, j) => (
+                  <BlockView key={j} block={b} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </article>
       </div>
 
-      <section className="section-padding pt-4">
-        <div className="container-wide max-w-4xl mx-auto">
-
-          {/* Quick wins box */}
-          <div className="mb-16 p-6 rounded-2xl bg-gradient-to-br from-[rgba(255,107,0,0.1)] to-[rgba(255,107,0,0.03)] border border-[rgba(255,107,0,0.2)]">
-            <div className="flex items-center gap-2 mb-4">
-              <Zap className="w-5 h-5 text-[#FF6B00]" />
-              <h3 className="font-heading font-bold text-white">Quick wins — automate these this week</h3>
-            </div>
-            <div className="space-y-2">
-              {quickWins.map((win) => (
-                <div key={win} className="flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-[#10B981] flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-body text-[#A1A1AA]">{win}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sections */}
-          <div className="space-y-16">
-            {sections.map((section) => (
-              <div key={section.number} className="group">
-                <div className="flex items-start gap-5 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-[rgba(255,107,0,0.1)] border border-[rgba(255,107,0,0.2)] flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-xs font-mono font-bold text-[#FF6B00]">{section.number}</span>
-                  </div>
-                  <h2 className="text-2xl sm:text-3xl font-heading font-black text-white leading-tight">
-                    {section.title}
-                  </h2>
-                </div>
-                <div className="ml-15 pl-[60px]">
-                  {section.content.split("\n\n").map((para, i) => (
-                    <p key={i} className="text-[#A1A1AA] font-body leading-relaxed mb-4 text-base whitespace-pre-line">
-                      {para}
-                    </p>
-                  ))}
-                </div>
-                <div className="border-b border-white/06 mt-12" />
-              </div>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <div className="mt-16 p-8 rounded-2xl bg-white/[0.03] border border-white/08 text-center">
-            <div className="flex items-center justify-center gap-3 mb-3">
-              <Clock className="w-5 h-5 text-[#FF6B00]" />
-              <DollarSign className="w-5 h-5 text-[#10B981]" />
-              <AlertCircle className="w-5 h-5 text-purple-400" />
-            </div>
-            <h3 className="font-heading font-bold text-white text-xl mb-3">
-              Want someone to do this for you?
-            </h3>
-            <p className="text-[#A1A1AA] font-body mb-6 max-w-lg mx-auto">
-              Book a free 60-minute automation audit. I'll map your top 3 manual processes,
-              calculate the ROI, and tell you exactly what to automate first — at no cost.
-            </p>
-            <Button asChild size="lg">
-              <Link href="/booking">
-                Book Free Audit
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Button>
-          </div>
-
-        </div>
-      </section>
-
+      <CTASection />
       <Footer />
     </main>
   );

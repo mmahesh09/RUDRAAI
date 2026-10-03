@@ -48,7 +48,7 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Total Projects", value: projectCount ?? 0, icon: FolderOpen, color: "text-[#FF6B00]" },
+          { label: "Total Projects", value: projectCount ?? 0, icon: FolderOpen, color: "text-[#2997FF]" },
           { label: "Bookings", value: bookingCount ?? 0, icon: CalendarCheck, color: "text-green-400" },
           { label: "Deployed", value: deployedCount, icon: TrendingUp, color: "text-teal-400" },
           { label: "In Progress", value: (recentProjects?.filter((p) => p.status === "in_dev").length ?? 0), icon: Users, color: "text-blue-400" },
@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
         <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-heading font-semibold">Recent Projects</h2>
-            <Link href="/admin/clients" className="text-[#FF6B00] text-sm hover:underline">View all</Link>
+            <Link href="/admin/clients" className="text-[#2997FF] text-sm hover:underline">View all</Link>
           </div>
           {!recentProjects?.length ? (
             <p className="text-[#52525B] text-sm text-center py-4">No projects yet</p>
@@ -92,7 +92,7 @@ export default async function AdminDashboard() {
         <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-heading font-semibold">Recent Bookings</h2>
-            <Link href="/admin/bookings" className="text-[#FF6B00] text-sm hover:underline">View all</Link>
+            <Link href="/admin/bookings" className="text-[#2997FF] text-sm hover:underline">View all</Link>
           </div>
           {!recentBookings?.length ? (
             <p className="text-[#52525B] text-sm text-center py-4">No bookings yet</p>
@@ -104,7 +104,7 @@ export default async function AdminDashboard() {
                     <p className="text-white text-sm font-medium">{b.name}</p>
                     <p className="text-[#71717A] text-xs mt-0.5">{b.email} · {b.time_slot}</p>
                   </div>
-                  <Link href="/admin/bookings" className="text-[#FF6B00] text-xs hover:underline">View</Link>
+                  <Link href="/admin/bookings" className="text-[#2997FF] text-xs hover:underline">View</Link>
                 </div>
               ))}
             </div>

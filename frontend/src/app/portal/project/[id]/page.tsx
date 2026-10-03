@@ -79,7 +79,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="relative">
           <div className="absolute top-3 left-0 right-0 h-0.5 bg-white/[0.06]" />
           <div
-            className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#FF6B00] to-[#FF8C00]"
+            className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#2997FF] to-[#5CB0FF]"
             style={{ width: `${(PIPELINE.indexOf(project.status) / (PIPELINE.length - 1)) * 100}%` }}
           />
           <div className="relative flex justify-between">
@@ -87,7 +87,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               const done = i <= PIPELINE.indexOf(project.status);
               return (
                 <div key={step} className="flex flex-col items-center gap-2">
-                  <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#FF6B00] border-[#FF6B00]" : "bg-[#09090B] border-white/20"}`}>
+                  <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#2997FF] border-[#2997FF]" : "bg-[#09090B] border-white/20"}`}>
                     {done && <CheckCircle2 className="w-4 h-4 text-white" />}
                   </div>
                   <span className={`text-[10px] font-medium text-center leading-tight max-w-[70px] ${done ? "text-white" : "text-[#52525B]"}`}>
@@ -185,13 +185,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       {/* Activity feed */}
       <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6">
         <h2 className="text-white font-heading font-semibold mb-4 flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-[#FF6B00]" /> Activity & Updates
+          <MessageSquare className="w-4 h-4 text-[#2997FF]" /> Activity & Updates
         </h2>
         {updates && updates.length > 0 && (
           <div className="space-y-4 mb-6">
             {updates.map((u) => (
               <div key={u.id} className="flex gap-3">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${u.author_role === "admin" ? "bg-[rgba(255,107,0,0.15)] text-[#FF6B00]" : "bg-white/[0.06] text-[#A1A1AA]"}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${u.author_role === "admin" ? "bg-[rgba(41,151,255,0.15)] text-[#2997FF]" : "bg-white/[0.06] text-[#A1A1AA]"}`}>
                   {u.author_role === "admin" ? "R" : "Y"}
                 </div>
                 <div className="flex-1">

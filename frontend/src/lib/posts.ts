@@ -22,7 +22,7 @@ export const posts: BlogPost[] = [
     date: "Jan 15, 2025",
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80",
     featured: true,
-    color: "#FF6B00",
+    color: "#2997FF",
     content: `
 <p>Choosing the right automation platform is one of the highest-leverage decisions an operations team can make. The wrong choice locks you into vendor pricing, limits your integration depth, and creates technical debt that costs months to unwind. In this guide, we'll break down <strong>n8n, Zapier, and Make (formerly Integromat)</strong> on the dimensions that actually matter in 2025.</p>
 
@@ -77,7 +77,7 @@ export const posts: BlogPost[] = [
     date: "Jan 8, 2025",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
     featured: false,
-    color: "#8B5CF6",
+    color: "#A1A1A6",
     content: `
 <p>Lead qualification is the highest-ROI automation you can build for a B2B sales team. A well-built agent replaces 2–4 hours of daily SDR work, improves lead scoring accuracy, and routes high-intent prospects to senior reps before they go cold. Here's the exact architecture we deployed for a SaaS client last quarter.</p>
 
@@ -494,8 +494,8 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
 }
 
 export const categoryColors: Record<string, string> = {
-  Comparison: "#FF6B00",
-  Tutorial: "#8B5CF6",
+  Comparison: "#2997FF",
+  Tutorial: "#A1A1A6",
   Strategy: "#10B981",
   DevOps: "#F59E0B",
 };

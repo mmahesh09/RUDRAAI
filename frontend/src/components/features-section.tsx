@@ -1,280 +1,219 @@
 "use client";
 
-import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
-import { Zap, Shield, Clock, BarChart2, Code2, CheckCircle2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useEffect, useRef, useState } from "react";
+import { useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
+import SectionHead from "@/components/site/section-head";
 
-const NODE_W = 160;
-const NODE_H = 52;
+/**
+ * §03 — the signature moment. One real-shaped workflow (lead qualification) pinned on
+ * screen while scroll steps through its run, lighting each node as it "executes".
+ * Without JS, on small screens, or with reduced motion: the whole run is shown lit.
+ */
 
-interface WFNode {
-  id: string;
-  x: number;
-  y: number;
-  label: string;
-  sub: string;
-  color: string;
-  initial: string;
-}
+const NODE_W = 168;
+const NODE_H = 54;
 
-const wfNodes: WFNode[] = [
-  { id: "webhook",  x: 10,  y: 174, label: "Webhook Trigger", sub: "Form submitted",      color: "#7C3AED", initial: "W"  },
-  { id: "openai",   x: 210, y: 174, label: "OpenAI",          sub: "Score lead intent",   color: "#10B981", initial: "AI" },
-  { id: "if",       x: 410, y: 174, label: "IF Node",         sub: "Lead score ≥ 7?",     color: "#F59E0B", initial: "IF" },
-  { id: "hubspot",  x: 600, y: 50,  label: "HubSpot CRM",     sub: "Create contact",      color: "#FF6B00", initial: "HS" },
-  { id: "gmail1",   x: 600, y: 120, label: "Gmail",           sub: "Send welcome email",  color: "#EA4335", initial: "G"  },
-  { id: "slack",    x: 600, y: 190, label: "Slack",           sub: "Notify sales team",   color: "#611F69", initial: "S"  },
-  { id: "gmail2",   x: 600, y: 300, label: "Gmail",           sub: "Nurture sequence",    color: "#EA4335", initial: "G"  },
+type Node = { id: string; x: number; y: number; label: string; sub: string; step: number };
+
+const NODES: Node[] = [
+  { id: "form", x: 8, y: 168, label: "Website form", sub: "Enquiry submitted", step: 0 },
+  { id: "ai", x: 208, y: 168, label: "AI model", sub: "Reads + scores intent", step: 1 },
+  { id: "if", x: 408, y: 168, label: "Score ≥ 7?", sub: "Branch", step: 2 },
+  { id: "crm", x: 608, y: 40, label: "CRM", sub: "Create contact", step: 3 },
+  { id: "mail", x: 608, y: 110, label: "Email", sub: "Personal reply", step: 3 },
+  { id: "slack", x: 608, y: 180, label: "Slack", sub: "Alert sales", step: 3 },
+  { id: "nurture", x: 608, y: 296, label: "Email sequence", sub: "Nurture over 2 weeks", step: 4 },
 ];
 
-type ConnType = "default" | "true" | "false";
+const EDGES: { from: string; to: string; label?: "yes" | "no"; vertical?: boolean }[] = [
+  { from: "form", to: "ai" },
+  { from: "ai", to: "if" },
+  { from: "if", to: "crm", label: "yes" },
+  { from: "crm", to: "mail", vertical: true },
+  { from: "mail", to: "slack", vertical: true },
+  { from: "if", to: "nurture", label: "no" },
+];
 
-const ARROW_COLORS: Record<ConnType, string> = {
-  default: "#4B5563",
-  true: "#10B981",
-  false: "#EF4444",
-};
+const STEPS = [
+  { title: "Something happens", body: "A visitor fills in your contact form. That's the trigger — no one has to be watching." },
+  { title: "AI reads it", body: "A language model reads the message and scores how ready this person is to buy, with a one-line reason." },
+  { title: "The workflow decides", body: "A simple rule splits the path. You set the threshold; we can change it in a minute." },
+  { title: "Hot leads get people", body: "Contact created in your CRM, a personal reply sent, and your sales channel pinged — in under ten seconds." },
+  { title: "Everyone else is looked after", body: "Not ready yet? They get a short, useful email sequence instead of silence. Nobody falls through." },
+];
 
-interface ConnProps {
-  fromId: string;
-  toId: string;
-  type?: ConnType;
-  vertical?: boolean;
-  showLabel?: boolean;
-}
+const byId = (id: string) => NODES.find((n) => n.id === id)!;
 
-function Connection({ fromId, toId, type = "default", vertical = false, showLabel = false }: ConnProps) {
-  const from = wfNodes.find((n) => n.id === fromId)!;
-  const to   = wfNodes.find((n) => n.id === toId)!;
-  const color = ARROW_COLORS[type];
-
-  let d: string;
-  let labelX = 0, labelY = 0;
-
-  if (vertical) {
-    const cx = from.x + NODE_W / 2;
-    d = `M${cx},${from.y + NODE_H} L${cx},${to.y}`;
-  } else {
-    const fromX = from.x + NODE_W;
-    const fromY = from.y + NODE_H / 2;
-    const toX   = to.x;
-    const toY   = to.y + NODE_H / 2;
-    d = `M${fromX},${fromY} C${fromX + 28},${fromY} ${toX - 28},${toY} ${toX},${toY}`;
-    labelX = (fromX + toX) / 2;
-    labelY = (fromY + toY) / 2 - 8;
+function edgePath(e: (typeof EDGES)[number]) {
+  const a = byId(e.from);
+  const b = byId(e.to);
+  if (e.vertical) {
+    const cx = a.x + NODE_W / 2;
+    return `M${cx},${a.y + NODE_H} L${cx},${b.y}`;
   }
-
-  return (
-    <g>
-      <path d={d} fill="none" stroke={color} strokeWidth="1.5" markerEnd={`url(#arrow-${type})`} />
-      {showLabel && !vertical && (
-        <text x={labelX} y={labelY} textAnchor="middle" fill={color} fontSize="9" fontWeight="700" fontFamily="monospace">
-          {type.toUpperCase()}
-        </text>
-      )}
-    </g>
-  );
+  const x1 = a.x + NODE_W;
+  const y1 = a.y + NODE_H / 2;
+  const x2 = b.x;
+  const y2 = b.y + NODE_H / 2;
+  return `M${x1},${y1} C${x1 + 30},${y1} ${x2 - 30},${y2} ${x2},${y2}`;
 }
 
-function WFNode({ node }: { node: WFNode }) {
+function Canvas({ active }: { active: number }) {
   return (
-    <g>
-      <rect x={node.x} y={node.y} width={NODE_W} height={NODE_H} rx="8"
-        fill="#080810" stroke={node.color} strokeWidth="1" strokeOpacity="0.45" />
-      <circle cx={node.x + 26} cy={node.y + NODE_H / 2} r="15" fill={node.color} fillOpacity="0.15" />
-      <text x={node.x + 26} y={node.y + NODE_H / 2 + 4} textAnchor="middle"
-        fontSize="9" fontWeight="700" fill={node.color} fontFamily="monospace">
-        {node.initial}
-      </text>
-      <text x={node.x + 48} y={node.y + 21} fontSize="10" fontWeight="600"
-        fill="#E4E4E7" fontFamily="system-ui,sans-serif">
-        {node.label}
-      </text>
-      <text x={node.x + 48} y={node.y + 36} fontSize="8.5"
-        fill="#71717A" fontFamily="system-ui,sans-serif">
-        {node.sub}
-      </text>
-    </g>
-  );
-}
-
-function N8nWorkflowCanvas() {
-  return (
-    <div className="relative w-full rounded-2xl bg-[#080810] border border-white/08 overflow-hidden">
-      <div className="flex items-center gap-3 px-4 py-3 bg-white/02 border-b border-white/06">
-        <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
-          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-        </div>
-        <span className="text-[11px] text-[#52525B] font-mono ml-1">
-          Lead Qualification Automation · n8n Canvas
+    <div className="relative w-full overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0B0B0C]">
+      <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em]">
+        <span className="text-[#A1A1AA]">lead_qualification.json</span>
+        <span className="flex items-center gap-2 text-[#A1A1AA]">
+          <span className={`h-1.5 w-1.5 rounded-full ${active >= 4 ? "bg-[#22C55E]" : "bg-[#2997FF]"}`} aria-hidden="true" />
+          {active >= 4 ? "Run complete" : `Step ${active + 1} of 5`}
         </span>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="text-[10px] text-[#3F3F46] font-mono">7 nodes</span>
-          <span className="text-[#27272A]">|</span>
-          <div className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-[10px] text-green-400 font-mono">active</span>
-          </div>
-        </div>
       </div>
+      <svg viewBox="0 0 784 372" className="block w-full" role="img" aria-label="Workflow: website form, AI scoring, a branch, then CRM, email and Slack for hot leads or an email sequence for others">
+        <defs>
+          <pattern id="run-dots" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="1" cy="1" r="0.7" fill="rgba(255,255,255,0.07)" />
+          </pattern>
+        </defs>
+        <rect width="784" height="372" fill="url(#run-dots)" />
 
-      <div className="overflow-x-auto px-4 py-5">
-        <svg viewBox="0 0 780 390" width="100%" style={{ minWidth: 520 }}>
-          <defs>
-            {(Object.keys(ARROW_COLORS) as ConnType[]).map((t) => (
-              <marker key={t} id={`arrow-${t}`} markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-                <path d="M0,0 L6,3 L0,6 Z" fill={ARROW_COLORS[t]} />
-              </marker>
-            ))}
-            <pattern id="n8n-dots" width="22" height="22" patternUnits="userSpaceOnUse">
-              <circle cx="1" cy="1" r="0.6" fill="#16162A" />
-            </pattern>
-          </defs>
+        {EDGES.map((e) => {
+          const lit = byId(e.to).step <= active;
+          const color = e.label === "no" ? "#A1A1AA" : "#2997FF";
+          return (
+            <g key={`${e.from}-${e.to}`}>
+              <path
+                d={edgePath(e)}
+                fill="none"
+                stroke={lit ? color : "rgba(255,255,255,0.12)"}
+                strokeWidth="1.5"
+                style={{ transition: "stroke 0.5s ease" }}
+              />
+              {e.label && (
+                <text
+                  x={(byId(e.from).x + NODE_W + byId(e.to).x) / 2}
+                  y={(byId(e.from).y + byId(e.to).y + NODE_H) / 2 - 10}
+                  textAnchor="middle"
+                  fontSize="10"
+                  fontFamily="var(--font-mono), monospace"
+                  letterSpacing="0.1em"
+                  fill={lit ? color : "rgba(255,255,255,0.3)"}
+                >
+                  {e.label.toUpperCase()}
+                </text>
+              )}
+            </g>
+          );
+        })}
 
-          <rect width="780" height="390" fill="url(#n8n-dots)" />
-
-          <Connection fromId="webhook" toId="openai" />
-          <Connection fromId="openai"  toId="if" />
-          <Connection fromId="if"      toId="hubspot" type="true"  showLabel />
-          <Connection fromId="hubspot" toId="gmail1"  vertical />
-          <Connection fromId="gmail1"  toId="slack"   vertical />
-          <Connection fromId="if"      toId="gmail2"  type="false" showLabel />
-
-          <rect x="598" y="8"   width="44" height="16" rx="4" fill="#10B98112" stroke="#10B98135" strokeWidth="1" />
-          <text x="620" y="20" textAnchor="middle" fontSize="8" fill="#10B981" fontWeight="700" fontFamily="monospace">TRUE</text>
-
-          <rect x="598" y="260" width="48" height="16" rx="4" fill="#EF444412" stroke="#EF444435" strokeWidth="1" />
-          <text x="622" y="272" textAnchor="middle" fontSize="8" fill="#EF4444" fontWeight="700" fontFamily="monospace">FALSE</text>
-
-          {wfNodes.map((node) => (
-            <WFNode key={node.id} node={node} />
-          ))}
-        </svg>
-      </div>
-
-      <div className="px-4 py-2.5 bg-white/01 border-t border-white/05 flex flex-wrap items-center gap-x-6 gap-y-1">
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-[#10B981]" />
-          <span className="text-[10px] text-[#52525B] font-mono">TRUE → CRM create · welcome email · Slack alert</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-[#EF4444]" />
-          <span className="text-[10px] text-[#52525B] font-mono">FALSE → nurture email sequence</span>
-        </div>
-      </div>
+        {NODES.map((n) => {
+          const lit = n.step <= active;
+          const current = n.step === active;
+          return (
+            <g key={n.id} style={{ transition: "opacity 0.5s ease", opacity: lit ? 1 : 0.35 }}>
+              <rect
+                x={n.x}
+                y={n.y}
+                width={NODE_W}
+                height={NODE_H}
+                rx="10"
+                fill="#000"
+                stroke={current ? "#2997FF" : lit ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.12)"}
+                strokeWidth={current ? 1.5 : 1}
+                style={{ transition: "stroke 0.5s ease" }}
+              />
+              <circle cx={n.x + 22} cy={n.y + NODE_H / 2} r="4" fill={lit ? (current ? "#2997FF" : "#22C55E") : "rgba(255,255,255,0.2)"} />
+              <text x={n.x + 38} y={n.y + 23} fontSize="12" fontWeight="600" fill="#F5F5F7" fontFamily="var(--font-display), system-ui, sans-serif">
+                {n.label}
+              </text>
+              <text x={n.x + 38} y={n.y + 40} fontSize="10.5" fill="#A1A1AA" fontFamily="system-ui, sans-serif">
+                {n.sub}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }
 
-const features = [
-  {
-    icon: Zap,
-    title: "Deploy in 3–7 Days",
-    description: "Battle-tested n8n workflow templates and expert builds — production-ready in 3–7 days, not weeks.",
-    color: "#FF6B00",
-  },
-  {
-    icon: Shield,
-    title: "99.9% Uptime SLA",
-    description: "Every workflow ships with monitoring, error handling, and automatic retries built in from day one.",
-    color: "#10B981",
-  },
-  {
-    icon: Clock,
-    title: "Reclaim Manual Hours",
-    description: "Eliminate repetitive tasks from your ops stack. What took hours runs unattended in minutes.",
-    color: "#8B5CF6",
-  },
-  {
-    icon: BarChart2,
-    title: "Full Observability",
-    description: "Real-time execution logs, success rates, and failure alerts — always know exactly what's running.",
-    color: "#3B82F6",
-  },
-  {
-    icon: Code2,
-    title: "Fully Custom Builds",
-    description: "No cookie-cutter templates. Every automation is purpose-built for your exact business logic.",
-    color: "#F59E0B",
-  },
-  {
-    icon: CheckCircle2,
-    title: "Ongoing Support",
-    description: "Monthly maintenance and a dedicated Slack channel — we stay accountable long after delivery.",
-    color: "#EC4899",
-  },
-];
-
 export default function FeaturesSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
   const prefersReducedMotion = useReducedMotion();
+  const trackRef = useRef<HTMLDivElement>(null);
+  // Server/no-JS render shows the full run lit
+  const [active, setActive] = useState(STEPS.length - 1);
+  const [pinned, setPinned] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setPinned(mq.matches && !prefersReducedMotion);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, [prefersReducedMotion]);
+
+  const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
+  useMotionValueEvent(scrollYProgress, "change", (p) => {
+    if (!pinned) return;
+    setActive(Math.min(STEPS.length - 1, Math.floor(p * STEPS.length)));
+  });
+
+  useEffect(() => {
+    if (!pinned) setActive(STEPS.length - 1);
+    else setActive(Math.min(STEPS.length - 1, Math.floor(scrollYProgress.get() * STEPS.length)));
+  }, [pinned, scrollYProgress]);
 
   return (
-    <section id="features" className="py-16 md:py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[#0D0D14]" />
-      <div className="absolute inset-0 grid-bg opacity-30" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+    <section id="how-a-run-works" className="relative bg-black pt-24 md:pt-32 lg:pt-40">
+      <div className="container-wide">
+        <SectionHead
+          index="03"
+          label="Inside one workflow"
+          title="Watch a lead get handled — without anyone touching it."
+          intro="This is the shape of a real automation we build often. Scroll to run it."
+        />
+      </div>
 
-      <div ref={ref} className="container-wide relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <Badge className="mb-4">Why RudraAI</Badge>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-heading font-black text-white mb-4 leading-tight">
-            Production Automation,{" "}
-            <span className="text-gradient-orange">Not One-Off Scripts</span>
-          </h2>
-          <p className="text-[#A1A1AA] font-body max-w-2xl mx-auto leading-relaxed text-sm sm:text-base">
-            We engineer n8n workflows built to run reliably at scale — with error handling,
-            retries, and full observability baked in from day one.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: prefersReducedMotion ? 0 : 0.15 }}
-          className="mb-12"
-        >
-          <N8nWorkflowCanvas />
-        </motion.div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {features.map((feature, i) => {
-            const Icon = feature.icon;
-            return (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: prefersReducedMotion ? 0 : 16 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: prefersReducedMotion ? 0 : 0.3 + i * 0.07 }}
-                className="flex items-start gap-4 p-5 rounded-xl bg-white/02 border border-white/06 hover:border-white/12 hover:bg-white/04 transition-all duration-300"
-              >
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                  style={{ background: `${feature.color}15`, border: `1px solid ${feature.color}30` }}
-                >
-                  <Icon className="w-5 h-5" style={{ color: feature.color }} />
+      {/* Tall track gives the pinned stage room to step through the run */}
+      <div ref={trackRef} className={pinned ? "relative h-[320vh]" : "relative"}>
+        <div className={pinned ? "sticky top-0 flex h-screen items-center" : "py-16"}>
+          <div className="container-wide grid w-full items-center gap-10 lg:grid-cols-12 lg:gap-x-8">
+            <ol className="lg:col-span-4 ledger border-y border-white/[0.08]">
+              {STEPS.map((s, i) => {
+                const state = !pinned ? "done" : i < active ? "done" : i === active ? "current" : "next";
+                return (
+                  <li key={s.title} className="py-5" aria-current={pinned && state === "current" ? "step" : undefined}>
+                    <div className="flex items-baseline gap-4">
+                      <span className={`font-mono text-[11px] tracking-[0.14em] ${state === "current" ? "text-[#2997FF]" : "text-[#8A8A93]"}`}>
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <div>
+                        <p className={`font-heading text-lg font-semibold tracking-[-0.02em] transition-colors duration-500 ${state === "next" ? "text-[#8A8A93]" : "text-[#F5F5F7]"}`}>
+                          {s.title}
+                        </p>
+                        <p
+                          className={`mt-1.5 max-w-[40ch] text-[15px] leading-relaxed text-[#A1A1AA] ${
+                            pinned && state !== "current" ? "lg:hidden" : ""
+                          }`}
+                        >
+                          {s.body}
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+            <div className="lg:col-span-8">
+              <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+                <div className="min-w-[560px]">
+                  <Canvas active={active} />
                 </div>
-                <div>
-                  <h4 className="font-subheading font-semibold text-sm text-white mb-1">
-                    {feature.title}
-                  </h4>
-                  <p className="text-xs font-body text-[#71717A] leading-relaxed">
-                    {feature.description}
-                  </p>
-                </div>
-              </motion.div>
-            );
-          })}
+              </div>
+              <p className="mt-4 font-mono text-[11px] uppercase tracking-[0.12em] text-[#8A8A93]">
+                Illustrative example · built in n8n · runs on your own account
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

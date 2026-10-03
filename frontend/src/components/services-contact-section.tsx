@@ -1,29 +1,24 @@
-﻿"use client";
+"use client";
 
-import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { AlertCircle, ArrowRight, Check, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Send, MessageSquare, Loader2, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import SectionHead from "@/components/site/section-head";
 import { apiPost } from "@/lib/api";
-
-const contactInfo = [
-  { icon: Mail, label: "Email", value: "hello@rudraai.online", href: "mailto:hello@rudraai.online" },
-  { icon: Phone, label: "Phone", value: "+91 98765 43210", href: "tel:+919876543210" },
-  { icon: MapPin, label: "Location", value: "Hyderabad, India · Remote Worldwide", href: null },
-  { icon: MessageSquare, label: "Response Time", value: "Within 4 business hours", href: null },
-];
+import { SITE } from "@/lib/site";
 
 const budgetOptions = [
-  { value: "", label: "Select budget range" },
+  { value: "", label: "Not sure yet" },
   { value: "under1k", label: "Under $1,000" },
   { value: "1k-5k", label: "$1,000 – $5,000" },
   { value: "5k-15k", label: "$5,000 – $15,000" },
   { value: "15k+", label: "$15,000+" },
 ];
+
+const MIN_MESSAGE = 20;
 
 export default function ServicesContactSection() {
   const [submitted, setSubmitted] = useState(false);
@@ -42,221 +37,162 @@ export default function ServicesContactSection() {
       await apiPost("/api/contact", { ...form, website: honeypot });
       setSubmitted(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send message. Please try again.");
+      setError(err instanceof Error ? err.message : "Your message didn't send. Check your connection and try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const remaining = Math.max(0, MIN_MESSAGE - form.message.trim().length);
+
   return (
-    <section id="contact" className="section-padding scroll-mt-24">
+    <section id="contact" className="section-padding scroll-mt-24 bg-black">
       <div className="container-wide">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <Badge className="mb-4">Get in Touch</Badge>
-          <h2 className="text-3xl sm:text-4xl font-heading font-black text-white mb-4">
-            Let&apos;s Scope Your <span className="text-gradient-orange">Automation Project</span>
-          </h2>
-          <p className="text-[#A1A1AA] font-body text-lg max-w-xl mx-auto">
-            Tell us about your business and automation goals. We&apos;ll come back within 4 hours
-            with an initial assessment.
-          </p>
-        </motion.div>
+        <SectionHead
+          label="Write to us"
+          title="Prefer to write it down?"
+          intro="Describe the work you'd like to hand off. We read every message ourselves and reply personally."
+        />
 
-        <div className="grid lg:grid-cols-5 gap-10">
-          {/* Left — Contact info */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="p-6 rounded-2xl neo-card">
-              <h3 className="font-heading font-bold text-white mb-5">Contact Information</h3>
-              <div className="space-y-4">
-                {contactInfo.map((item) => {
-                  const Icon = item.icon;
-                  const content = (
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-lg bg-[rgba(255,107,0,0.1)] border border-[rgba(255,107,0,0.2)] flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-4 h-4 text-[#FF6B00]" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-body text-[#71717A] mb-0.5">{item.label}</div>
-                        <div className="text-sm font-body text-white">{item.value}</div>
-                      </div>
-                    </div>
-                  );
-                  return item.href ? (
-                    <a key={item.label} href={item.href} className="block hover:opacity-80 transition-opacity">
-                      {content}
-                    </a>
-                  ) : (
-                    <div key={item.label}>{content}</div>
-                  );
-                })}
+        <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-x-8">
+          {/* Facts */}
+          <dl className="ledger border-y border-white/[0.08] lg:col-span-4 self-start">
+            {[
+              { k: "Email", v: <a href={`mailto:${SITE.email}`} className="underline decoration-white/30 underline-offset-4 hover:decoration-[#2997FF]">{SITE.email}</a> },
+              { k: "Based in", v: `${SITE.location} · working worldwide` },
+              { k: "Rather talk?", v: <a href="/booking" className="underline decoration-white/30 underline-offset-4 hover:decoration-[#2997FF]">Book a free {SITE.call.minutes}-minute call</a> },
+              { k: "Your details", v: "Used only to reply to you. Never shared or sold." },
+            ].map((row) => (
+              <div key={row.k} className="py-5">
+                <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">{row.k}</dt>
+                <dd className="mt-1.5 text-[15px] text-[#F5F5F7]">{row.v}</dd>
               </div>
-            </div>
+            ))}
+          </dl>
 
-            <div className="p-5 rounded-2xl bg-white/02 border border-white/06 space-y-3">
-              {[
-                { icon: "🔒", text: "Your data is never shared or sold" },
-                { icon: "⚡", text: "Response guaranteed within 4 hours" },
-                { icon: "🤝", text: "No spam, no pushy sales calls" },
-              ].map((t) => (
-                <div key={t.text} className="flex items-center gap-2.5">
-                  <span className="text-base">{t.icon}</span>
-                  <span className="text-xs font-body text-[#71717A]">{t.text}</span>
+          {/* Form */}
+          <div className="lg:col-span-7 lg:col-start-6">
+            {submitted ? (
+              <div className="border-t border-white/[0.08] pt-10" role="status">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#22C55E]/15 text-[#22C55E]">
+                  <Check className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <h3 className="mt-6 font-heading text-3xl font-semibold tracking-[-0.03em] text-[#F5F5F7]">Message sent.</h3>
+                <p className="mt-3 max-w-[48ch] text-[15px] leading-[1.7] text-[#A1A1AA]">
+                  Thanks{form.name ? `, ${form.name.split(" ")[0]}` : ""}. We&apos;ll reply to <span className="text-[#F5F5F7]">{form.email}</span> once
+                  we&apos;ve read it properly.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Honeypot — hidden from humans, bots fill it */}
+                <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }}>
+                  <label htmlFor="services-contact-website">Website</label>
+                  <input
+                    id="services-contact-website"
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Right — Form */}
-          <div className="lg:col-span-3">
-            <div className="p-7 rounded-2xl neo-card">
-              {submitted ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="text-center py-12"
-                >
-                  <div className="w-16 h-16 rounded-2xl bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-5">
-                    <Send className="w-7 h-7 text-green-400" />
+                {error && (
+                  <div role="alert" className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-300">
+                    <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                    <p className="text-[15px]">{error}</p>
                   </div>
-                  <h3 className="font-heading font-bold text-white text-xl mb-2">Message Sent!</h3>
-                  <p className="text-[#A1A1AA] font-body mb-1">
-                    We&apos;ll review your project details and get back to you within 4 business hours.
-                  </p>
-                  <p className="text-sm font-body text-[#71717A]">
-                    Check your inbox — we&apos;ve sent a confirmation to <span className="text-white">{form.email}</span>
-                  </p>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Honeypot — hidden from humans, bots fill it */}
-                  <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, overflow: "hidden" }}>
-                    <label htmlFor="services-contact-website">Website</label>
-                    <input
-                      id="services-contact-website"
-                      type="text"
-                      name="website"
-                      tabIndex={-1}
-                      autoComplete="off"
-                      value={honeypot}
-                      onChange={(e) => setHoneypot(e.target.value)}
-                    />
-                  </div>
+                )}
 
-                  <h3 className="font-heading font-bold text-white text-xl mb-1">Tell Us About Your Project</h3>
-                  <p className="text-sm font-body text-[#71717A] mb-6">
-                    Fill in the details below and our team will get back to you shortly.
-                  </p>
-
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400"
-                    >
-                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm font-body">{error}</p>
-                    </motion.div>
-                  )}
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="services-name">Full Name *</Label>
-                      <Input
-                        id="services-name"
-                        placeholder="John Smith"
-                        required
-                        minLength={2}
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="services-email">Work Email *</Label>
-                      <Input
-                        id="services-email"
-                        type="email"
-                        placeholder="john@company.com"
-                        required
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="services-company">Company</Label>
-                      <Input
-                        id="services-company"
-                        placeholder="Acme Inc."
-                        value={form.company}
-                        onChange={(e) => setForm({ ...form, company: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="services-budget">Monthly Budget</Label>
-                      <select
-                        id="services-budget"
-                        className="flex h-11 w-full rounded-xl bg-[rgba(255,255,255,0.05)] border border-white/10 px-4 py-2 text-sm font-body text-white focus:outline-none focus:border-[rgba(255,107,0,0.5)] transition-all"
-                        value={form.budget}
-                        onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                      >
-                        {budgetOptions.map((o) => (
-                          <option key={o.value} value={o.value} className="bg-[#111117]">
-                            {o.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="services-message">
-                      Describe Your Automation Needs *{" "}
-                      <span className="text-[#71717A] font-normal">(min. 20 characters)</span>
-                    </Label>
-                    <Textarea
-                      id="services-message"
-                      placeholder="Tell us about your current manual processes, what tools you use, and what you'd like to automate..."
-                      rows={5}
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-2.5">
+                    <Label htmlFor="services-name">Name</Label>
+                    <Input
+                      id="services-name"
+                      autoComplete="name"
                       required
-                      minLength={20}
-                      value={form.message}
-                      onChange={(e) => setForm({ ...form, message: e.target.value })}
+                      minLength={2}
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
                     />
-                    <div className="flex justify-end">
-                      <span className={`text-xs font-body transition-colors ${form.message.length < 20 ? "text-[#71717A]" : "text-[#10B981]"}`}>
-                        {form.message.length}/20 min
-                      </span>
-                    </div>
                   </div>
+                  <div className="space-y-2.5">
+                    <Label htmlFor="services-email">Work email</Label>
+                    <Input
+                      id="services-email"
+                      type="email"
+                      autoComplete="email"
+                      inputMode="email"
+                      required
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    />
+                  </div>
+                </div>
 
-                  <Button type="submit" size="lg" className="w-full" disabled={loading}>
-                    {loading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Sending…
-                      </>
-                    ) : (
-                      <>
-                        Send Message
-                        <Send className="w-4 h-4" />
-                      </>
-                    )}
-                  </Button>
+                <div className="grid gap-6 sm:grid-cols-2">
+                  <div className="space-y-2.5">
+                    <Label htmlFor="services-company">
+                      Company <span className="normal-case tracking-normal text-[#8A8A93]">(optional)</span>
+                    </Label>
+                    <Input
+                      id="services-company"
+                      autoComplete="organization"
+                      value={form.company}
+                      onChange={(e) => setForm({ ...form, company: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2.5">
+                    <Label htmlFor="services-budget">Project budget</Label>
+                    <select
+                      id="services-budget"
+                      className="flex h-11 w-full rounded-xl border border-white/[0.12] bg-[#0B0B0C] px-4 text-base text-[#F5F5F7] transition-colors focus-visible:border-[#2997FF] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2997FF]"
+                      value={form.budget}
+                      onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                    >
+                      {budgetOptions.map((o) => (
+                        <option key={o.value} value={o.value} className="bg-[#161617]">
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
 
-                  <p className="text-xs font-body text-[#71717A] text-center">
-                    We respond within 4 business hours. No spam, ever.
+                <div className="space-y-2.5">
+                  <Label htmlFor="services-message">What would you like to hand off?</Label>
+                  <Textarea
+                    id="services-message"
+                    placeholder="The task, the tools you use today, and roughly how often it happens."
+                    rows={6}
+                    required
+                    minLength={MIN_MESSAGE}
+                    aria-describedby="services-message-hint"
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  />
+                  <p id="services-message-hint" className="text-[13px] text-[#8A8A93]" aria-live="polite">
+                    {remaining > 0 ? `${remaining} more characters needed` : "Looks good"}
                   </p>
-                </form>
-              )}
-            </div>
+                </div>
+
+                <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                      Sending…
+                    </>
+                  ) : (
+                    <>
+                      Send message
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            )}
           </div>
         </div>
       </div>

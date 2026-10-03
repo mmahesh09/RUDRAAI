@@ -245,9 +245,9 @@ export function CoachSchedulingCard({
               </div>
 
               <div className="text-right flex-shrink-0">
-                <p className="text-[10px] text-[#71717A] uppercase tracking-wider mb-1 font-body">Free</p>
-                <p className="text-2xl font-heading font-black text-[#10B981]">$0</p>
-                <p className="text-[10px] text-[#71717A] font-body">15 min call</p>
+                <p className="text-[10px] text-[#8A8A93] uppercase tracking-wider mb-1 font-body">Free</p>
+                <p className="text-2xl font-heading font-semibold tracking-[-0.03em] text-[#10B981]">$0</p>
+                <p className="text-[10px] text-[#8A8A93] font-body">15 min call</p>
               </div>
             </div>
           </motion.div>
@@ -258,7 +258,7 @@ export function CoachSchedulingCard({
             className="px-6 pb-4 relative z-50"
             style={{ overflow: "visible" }}
           >
-            <label className="block text-xs font-subheading font-semibold text-[#71717A] uppercase tracking-wider mb-2">
+            <label className="block text-xs font-subheading font-semibold text-[#8A8A93] uppercase tracking-wider mb-2">
               Meeting format
             </label>
             <div className="relative z-50" ref={dropdownRef}>
@@ -273,7 +273,7 @@ export function CoachSchedulingCard({
                 <span>{selectedLocation}</span>
                 <ChevronDown
                   className={cn(
-                    "w-4 h-4 text-[#71717A] transition-transform",
+                    "w-4 h-4 text-[#8A8A93] transition-transform",
                     isLocationDropdownOpen && "rotate-180"
                   )}
                 />
@@ -349,7 +349,7 @@ export function CoachSchedulingCard({
                     {day.dayName}, {day.date}
                   </h4>
                   {!day.hasAvailability && (
-                    <span className="text-xs text-[#71717A] font-body">No availability</span>
+                    <span className="text-xs text-[#8A8A93] font-body">No availability</span>
                   )}
                 </div>
 
@@ -398,7 +398,7 @@ export function CoachSchedulingCard({
               <motion.button
                 whileHover={shouldAnimate ? { scale: 1.02 } : {}}
                 whileTap={shouldAnimate ? { scale: 0.98 } : {}}
-                className="flex-1 bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] text-white py-2.5 rounded-xl font-heading font-semibold text-sm hover:shadow-[0_4px_20px_rgba(255,107,0,0.4)] transition-all"
+                className="flex-1 bg-[#0071E3] hover:bg-[#0077ED] text-white py-2.5 rounded-xl font-heading font-semibold text-sm transition-all"
               >
                 Next
               </motion.button>
@@ -439,24 +439,24 @@ export function CoachSchedulingCard({
               />
               <div>
                 <h4 className="font-heading font-semibold text-white">{coach.name}</h4>
-                <p className="text-sm font-body text-[#71717A]">{coach.title}</p>
+                <p className="text-sm font-body text-[#8A8A93]">{coach.title}</p>
               </div>
             </div>
 
             {selectedTimeSlot && (
               <div className="space-y-4">
                 <div className="text-center">
-                  <p className="text-xs font-subheading text-[#71717A] uppercase tracking-wider mb-3">
+                  <p className="text-xs font-subheading text-[#8A8A93] uppercase tracking-wider mb-3">
                     Your Selected Slot
                   </p>
-                  <div className="bg-[rgba(255,107,0,0.08)] border border-[rgba(255,107,0,0.2)] rounded-xl p-4">
+                  <div className="bg-[rgba(41,151,255,0.08)] border border-[rgba(41,151,255,0.2)] rounded-xl p-4">
                     <p className="text-base font-heading font-semibold text-white">
                       {selectedTimeSlot.dayName}, {selectedTimeSlot.day}
                     </p>
-                    <p className="text-2xl font-heading font-black text-[#FF6B00]">
+                    <p className="text-2xl font-heading font-semibold tracking-[-0.03em] text-[#2997FF]">
                       {selectedTimeSlot.time}
                     </p>
-                    <p className="text-xs font-body text-[#71717A] mt-1">India Standard Time (IST)</p>
+                    <p className="text-xs font-body text-[#8A8A93] mt-1">India Standard Time (IST)</p>
                   </div>
                 </div>
 
@@ -481,7 +481,7 @@ export function CoachSchedulingCard({
               whileHover={shouldAnimate ? { scale: 1.02, y: -1 } : {}}
               whileTap={shouldAnimate ? { scale: 0.98 } : {}}
               onClick={handleConfirmBooking}
-              className="w-full relative overflow-hidden py-3 rounded-xl font-heading font-bold text-white bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] hover:shadow-[0_6px_30px_rgba(255,107,0,0.5)] transition-all group"
+              className="w-full relative overflow-hidden py-3 rounded-xl font-heading font-bold text-white bg-[#0071E3] hover:bg-[#0077ED] transition-all group"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 CONFIRM BOOKING

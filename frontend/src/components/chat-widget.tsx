@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -111,7 +111,7 @@ export default function ChatWidget() {
             style={{ maxHeight: "520px" }}
           >
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-[#FF6B00] to-[#FF8C00]">
+            <div className="flex items-center gap-3 px-4 py-3 bg-[#0071E3] hover:bg-[#0077ED]">
               <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
                 <Zap className="w-4 h-4 text-white fill-white" />
               </div>
@@ -142,15 +142,15 @@ export default function ChatWidget() {
                   )}
                 >
                   {msg.role === "assistant" && (
-                    <div className="w-6 h-6 rounded-full bg-[rgba(255,107,0,0.15)] border border-[rgba(255,107,0,0.3)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Bot className="w-3 h-3 text-[#FF6B00]" />
+                    <div className="w-6 h-6 rounded-full bg-[rgba(41,151,255,0.15)] border border-[rgba(41,151,255,0.3)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Bot className="w-3 h-3 text-[#2997FF]" />
                     </div>
                   )}
                   <div
                     className={cn(
                       "max-w-[80%] px-3 py-2 rounded-xl text-sm font-body leading-relaxed",
                       msg.role === "user"
-                        ? "bg-[#FF6B00] text-white rounded-tr-sm"
+                        ? "bg-[#2997FF] text-white rounded-tr-sm"
                         : "bg-white/[0.06] text-[#E4E4E7] border border-white/08 rounded-tl-sm"
                     )}
                   >
@@ -161,11 +161,11 @@ export default function ChatWidget() {
 
               {loading && (
                 <div className="flex gap-2 items-start">
-                  <div className="w-6 h-6 rounded-full bg-[rgba(255,107,0,0.15)] border border-[rgba(255,107,0,0.3)] flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-3 h-3 text-[#FF6B00]" />
+                  <div className="w-6 h-6 rounded-full bg-[rgba(41,151,255,0.15)] border border-[rgba(41,151,255,0.3)] flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-3 h-3 text-[#2997FF]" />
                   </div>
                   <div className="px-3 py-2 rounded-xl bg-white/[0.06] border border-white/08 rounded-tl-sm">
-                    <Loader2 className="w-4 h-4 text-[#FF6B00] animate-spin" />
+                    <Loader2 className="w-4 h-4 text-[#2997FF] animate-spin" />
                   </div>
                 </div>
               )}
@@ -199,13 +199,13 @@ export default function ChatWidget() {
                   onKeyDown={handleKey}
                   placeholder="Ask about services, past builds…"
                   maxLength={500}
-                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm font-body text-white placeholder-[#71717A] focus:outline-none focus:border-[rgba(255,107,0,0.5)] transition-colors"
+                  className="flex-1 bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm font-body text-white placeholder-[#71717A] focus:outline-none focus:border-[rgba(41,151,255,0.5)] transition-colors"
                   disabled={loading}
                 />
                 <button
                   onClick={() => send()}
                   disabled={!input.trim() || loading}
-                  className="w-9 h-9 rounded-xl bg-[#FF6B00] flex items-center justify-center text-white hover:bg-[#e55f00] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+                  className="w-9 h-9 rounded-xl bg-[#2997FF] flex items-center justify-center text-white hover:bg-[#e55f00] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -220,7 +220,7 @@ export default function ChatWidget() {
         onClick={() => setOpen((v) => !v)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF6B00] to-[#FF8C00] shadow-[0_8px_30px_rgba(255,107,0,0.45)] flex items-center justify-center text-white"
+        className="w-14 h-14 rounded-2xl bg-[#0071E3] hover:bg-[#0077ED] flex items-center justify-center text-white"
         aria-label="Open chat assistant"
       >
         <AnimatePresence mode="wait">

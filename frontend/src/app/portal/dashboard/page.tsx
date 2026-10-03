@@ -53,7 +53,7 @@ export default async function PortalDashboard() {
           <p className="text-[#A1A1AA] text-sm mb-6">Your project will appear here once your audit call is complete.</p>
           <Link
             href="/booking"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] text-white text-sm font-medium"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2997FF] to-[#5CB0FF] text-white text-sm font-medium"
           >
             Book your audit <ArrowRight className="w-4 h-4" />
           </Link>
@@ -63,7 +63,7 @@ export default async function PortalDashboard() {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             {[
-              { label: "Project Status", value: STATUS_LABELS[activeProject.status] ?? activeProject.status, icon: Clock, color: "text-[#FF6B00]" },
+              { label: "Project Status", value: STATUS_LABELS[activeProject.status] ?? activeProject.status, icon: Clock, color: "text-[#2997FF]" },
               { label: "Deliverables Done", value: `${completedDeliverables} / ${totalDeliverables}`, icon: Package, color: "text-green-400" },
               { label: "Active Projects", value: projects?.length ?? 0, icon: TrendingUp, color: "text-blue-400" },
             ].map(({ label, value, icon: Icon, color }) => (
@@ -89,7 +89,7 @@ export default async function PortalDashboard() {
               </div>
               <Link
                 href={`/portal/project/${activeProject.id}`}
-                className="flex items-center gap-1.5 text-[#FF6B00] text-sm font-medium hover:underline"
+                className="flex items-center gap-1.5 text-[#2997FF] text-sm font-medium hover:underline"
               >
                 View details <ArrowRight className="w-4 h-4" />
               </Link>
@@ -99,7 +99,7 @@ export default async function PortalDashboard() {
             <div className="relative">
               <div className="absolute top-3 left-0 right-0 h-0.5 bg-white/[0.06]" />
               <div
-                className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] transition-all duration-500"
+                className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#2997FF] to-[#5CB0FF] transition-all duration-500"
                 style={{ width: `${(PIPELINE.indexOf(activeProject.status) / (PIPELINE.length - 1)) * 100}%` }}
               />
               <div className="relative flex justify-between">
@@ -108,7 +108,7 @@ export default async function PortalDashboard() {
                   const done = i <= currentIdx;
                   return (
                     <div key={step} className="flex flex-col items-center gap-2">
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#FF6B00] border-[#FF6B00]" : "bg-[#09090B] border-white/20"}`}>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#2997FF] border-[#2997FF]" : "bg-[#09090B] border-white/20"}`}>
                         {done && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
                       </div>
                       <span className={`text-[10px] font-medium text-center leading-tight max-w-[60px] ${done ? "text-white" : "text-[#52525B]"}`}>

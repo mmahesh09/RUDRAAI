@@ -14,14 +14,15 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#FF6B00",
-          hover: "#FF8533",
-          dark: "#CC5500",
+          DEFAULT: "#2997FF",
+          hover: "#5CB0FF",
+          dark: "#0A7AE6",
           foreground: "#FFFFFF",
         },
+        // Apple Pro dark surfaces: pure black page, #161617 / #1D1D1F raised tiles
         surface: {
-          DEFAULT: "#111117",
-          hover: "#17171F",
+          DEFAULT: "#161617",
+          hover: "#1D1D1F",
           card: "rgba(255,255,255,0.03)",
         },
         border: {
@@ -29,12 +30,18 @@ const config: Config = {
           strong: "rgba(255,255,255,0.15)",
         },
         muted: {
-          DEFAULT: "#71717A",
+          DEFAULT: "#8A8A93",
           foreground: "#A1A1AA",
         },
+        // Text scale on black: ink 19:1, secondary 8.1:1, tertiary 6.1:1
+        ink: {
+          DEFAULT: "#F5F5F7",
+          secondary: "#A1A1AA",
+          tertiary: "#8A8A93",
+        },
         accent: {
-          orange: "#FF6B00",
-          "orange-glow": "rgba(255,107,0,0.2)",
+          orange: "#2997FF",
+          "orange-glow": "rgba(41,151,255,0.2)",
           purple: "#8B5CF6",
           blue: "#3B82F6",
           green: "#10B981",
@@ -66,22 +73,23 @@ const config: Config = {
         },
       },
       fontFamily: {
-        heading: ["var(--font-montserrat)", "sans-serif"],
-        subheading: ["var(--font-raleway)", "sans-serif"],
-        body: ["var(--font-dm-sans)", "sans-serif"],
-        sans: ["var(--font-dm-sans)", "sans-serif"],
+        heading: ["var(--font-display)", "system-ui", "sans-serif"],
+        subheading: ["var(--font-display)", "system-ui", "sans-serif"],
+        body: ["\"Google Sans\"", "system-ui", "sans-serif"],
+        sans: ["\"Google Sans\"", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       backgroundImage: {
         "grid-pattern":
           "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-        "orange-gradient": "linear-gradient(135deg, #FF6B00 0%, #FF8C00 100%)",
+        "orange-gradient": "linear-gradient(135deg, #2997FF 0%, #5CB0FF 100%)",
         "dark-gradient": "linear-gradient(180deg, #09090B 0%, #111117 100%)",
         "hero-glow":
-          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,107,0,0.15), transparent)",
+          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(41,151,255,0.15), transparent)",
         "card-gradient":
           "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",
         shimmer:
-          "linear-gradient(90deg, transparent 0%, rgba(255,107,0,0.4) 50%, transparent 100%)",
+          "linear-gradient(90deg, transparent 0%, rgba(41,151,255,0.4) 50%, transparent 100%)",
       },
       backgroundSize: {
         "grid-sm": "24px 24px",
@@ -132,8 +140,8 @@ const config: Config = {
           "100%": { transform: "translateX(-50%)" },
         },
         "border-glow": {
-          "0%, 100%": { borderColor: "rgba(255,107,0,0.3)" },
-          "50%": { borderColor: "rgba(255,107,0,0.8)" },
+          "0%, 100%": { borderColor: "rgba(41,151,255,0.3)" },
+          "50%": { borderColor: "rgba(41,151,255,0.8)" },
         },
         "accordion-down": {
           from: { height: "0" },
@@ -150,8 +158,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        "glow-orange": "0 0 40px rgba(255,107,0,0.3)",
-        "glow-orange-sm": "0 0 20px rgba(255,107,0,0.2)",
+        "glow-orange": "0 0 40px rgba(41,151,255,0.3)",
+        "glow-orange-sm": "0 0 20px rgba(41,151,255,0.2)",
         "neo-dark":
           "8px 8px 16px rgba(0,0,0,0.6), -2px -2px 8px rgba(255,255,255,0.02)",
         "neo-card":

@@ -1,154 +1,142 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useRef, type CSSProperties } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import WorkflowAnimation from "@/components/workflow-animation";
-import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
+import HeroTornado from "@/components/hero-tornado";
+import HeroRunTicker from "@/components/hero-run-ticker";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.3 },
-  },
-};
+// The three services, each revealed from behind a mask — then the promise underneath
+const SERVICES = ["Websites.", "AI agents.", "Automations."];
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 24 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { type: "spring", stiffness: 300, damping: 25 },
-  },
-};
+const PROOF = ["Fast delivery", "Real-time support", "No tech skills needed"];
+
+// Entrance animations are CSS (.hero-rise / .hero-fade in globals.css) so the copy
+// is visible in the server HTML; this just sets each element's start delay.
+const delay = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 
 export default function Hero() {
   const prefersReducedMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
 
-  const resolvedContainer = prefersReducedMotion
-    ? { hidden: { opacity: 1 }, visible: { opacity: 1, transition: { staggerChildren: 0 } } }
-    : containerVariants;
-
-  const resolvedItem = prefersReducedMotion
-    ? { hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0 } }
-    : itemVariants;
+  // Scroll-out parallax: the vortex sinks and dims slower than the copy lifts away
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] });
+  const vortexY = useTransform(scrollYProgress, [0, 1], [0, 140]);
+  const vortexOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.25]);
+  const copyY = useTransform(scrollYProgress, [0, 1], [0, -60]);
 
   return (
-    <section className="relative min-h-screen flex items-center pt-28 md:pt-32 pb-16 overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 grid-bg opacity-60" />
-      <div className="absolute inset-0 bg-hero-glow" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-[rgba(255,107,0,0.04)] blur-3xl pointer-events-none" />
-      <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-[rgba(139,92,246,0.05)] blur-3xl pointer-events-none" />
+    <section
+      ref={sectionRef}
+      className="relative isolate overflow-hidden bg-black lg:min-h-[100svh] flex flex-col pt-24 sm:pt-28 lg:pt-24 pb-6"
+    >
+      {/* Hairline frame — the visible grid the layout sits on */}
+      <div className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+        <div className="h-full border-x border-white/[0.06]" />
+      </div>
 
-      <div className="container-wide relative z-10 w-full">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left Content */}
+      <div className="container-wide w-full flex-1 flex flex-col">
+        <div className="flex-1 grid lg:grid-cols-12 items-center gap-y-6">
+          {/* Copy */}
           <motion.div
-            variants={resolvedContainer}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-col gap-6"
+            style={{ y: prefersReducedMotion ? 0 : copyY }}
+            className="relative z-10 lg:col-span-7 flex flex-col"
           >
-            {/* Announcement badge */}
-            <motion.div variants={resolvedItem} className="flex items-center">
-              <Link href="/blog" className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,107,0,0.25)] bg-[rgba(255,107,0,0.07)] hover:border-[rgba(255,107,0,0.5)] transition-colors group">
-                <span className="flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-[#FF6B00] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF6B00]" />
-                </span>
-                <AnimatedShinyText
-                  shimmerWidth={180}
-                  className="text-xs font-subheading font-medium text-[#A1A1AA] group-hover:text-white transition-colors"
-                >
-                  Read Our Latest Blog
-                </AnimatedShinyText>
-                <ArrowRight className="w-3 h-3 text-[#FF6B00] group-hover:translate-x-0.5 transition-transform" />
+            {/* Eyebrow: index label + latest-post link */}
+            <div style={delay(0.1)} className="hero-fade font-mono flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-[0.14em]">
+              <span className="text-[#A1A1AA]">
+                <span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;AI services company
+              </span>
+              <span className="hidden sm:block h-px w-8 bg-white/15" aria-hidden="true" />
+              <Link href="/blog" className="group inline-flex items-center gap-1.5 text-[#A1A1AA] hover:text-white transition-colors">
+                Latest from the blog
+                <ArrowUpRight className="h-3 w-3 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </Link>
-            </motion.div>
+            </div>
 
-            {/* Headline */}
-            <motion.div variants={resolvedItem} className="space-y-2">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white leading-[1.08] tracking-tight">
-                Stop Hiring For{" "}
-                <span className="relative">
-                  <span className="text-gradient-orange">Repetitive</span>
+            <h1 className="mt-6 lg:mt-7 font-heading font-bold tracking-[-0.035em] leading-[0.98]">
+              <span className="block text-[clamp(2.6rem,11vw,4.25rem)] lg:text-[clamp(3rem,min(5.2vw,10.5svh),5.5rem)]">
+                {SERVICES.map((text, i) => (
+                  <span key={text} className="block overflow-hidden pb-[0.06em]">
+                    <span style={delay(0.25 + i * 0.09)} className="hero-rise inline-block text-white">
+                      {text}
+                    </span>{" "}
+                  </span>
+                ))}
+              </span>
+              <span className="mt-3 block overflow-hidden pb-[0.08em] font-subheading font-medium tracking-[-0.01em] text-[clamp(1.25rem,4.6vw,1.75rem)] lg:text-[clamp(1.35rem,min(2vw,4.2svh),2rem)]">
+                <span style={delay(0.25 + SERVICES.length * 0.09)} className="hero-rise inline-block text-[#2997FF]">
+                  Built to work for your business.
                 </span>
-                <br />
-                Work. Deploy{" "}
-                <span className="relative inline-block">
-                  AI Automations
-                  <motion.div
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ delay: 1, duration: 0.6, ease: "easeOut" }}
-                    className="absolute -bottom-1 left-0 right-0 h-[3px] bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] rounded-full origin-left"
-                  />
+              </span>
+            </h1>
+
+            <p
+              style={delay(0.75)}
+              className="hero-fade mt-6 lg:mt-7 max-w-[44ch] text-[15px] sm:text-base leading-[1.7] text-[#A1A1AA] font-body"
+            >
+              RudraAI is an AI services company. We design fast, search-ready
+              websites, build custom AI agents that answer and act for you, and
+              automate the repetitive work in between — so your team can focus on
+              growth.
+            </p>
+
+            <div style={delay(0.9)} className="hero-fade mt-8 flex flex-col min-[420px]:flex-row min-[420px]:items-center gap-x-8 gap-y-4">
+              <Link
+                href="/booking"
+                className="group inline-flex h-12 items-center justify-between gap-4 rounded-full bg-[#0071E3] pl-6 pr-1.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#0077ED] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2997FF]"
+              >
+                Book a free call
+                <span className="font-mono inline-flex h-9 items-center gap-2 rounded-full bg-black px-3.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white">
+                  15 min · Sat–Sun
+                  <ArrowRight className="h-3.5 w-3.5 text-[#2997FF] transition-transform duration-300 group-hover:translate-x-0.5" />
                 </span>
-                <br />
-                Instead.
-              </h1>
-            </motion.div>
-
-            {/* Sub-headline */}
-            <motion.p
-              variants={resolvedItem}
-              className="text-base sm:text-lg text-[#A1A1AA] font-body leading-relaxed max-w-xl"
-            >
-              We build intelligent n8n workflows and AI agents that run 24/7,
-              eliminate human error, and scale with your business — so your team
-              can focus on what actually moves the needle.
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              variants={resolvedItem}
-              className="flex flex-wrap gap-3 items-center"
-            >
-              <Button asChild size="lg" className="h-12 px-7 text-base font-bold group">
-                <Link href="/booking">
-                  Book Free call
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-              <Link href="/services" className="outline-button h-12 px-6 flex items-center gap-2 group">
-                See How It Works
               </Link>
-            </motion.div>
-
-            {/* Benefits */}
-            <motion.div variants={resolvedItem} className="flex flex-wrap gap-3 pt-1">
-              {["3–7 day deploy", "Real Time Support", "No code needed"].map((text) => (
-                <div key={text} className="flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
-                  <span className="text-xs font-body text-[#A1A1AA]">{text}</span>
-                </div>
-              ))}
-            </motion.div>
+              <Link
+                href="/services"
+                className="group relative inline-flex w-fit items-center gap-2 py-1 text-[15px] font-medium text-white"
+              >
+                See how it works
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-[0.35] bg-white/40 transition-transform duration-500 ease-out group-hover:scale-x-100 group-hover:bg-[#2997FF]" />
+              </Link>
+            </div>
           </motion.div>
 
-          {/* Right — Workflow Animation */}
+          {/* Vortex — overlaps the copy column slightly on desktop.
+              Outer layer owns the scroll-linked y/opacity; inner layer owns the CSS
+              entrance, so the two never fight over the same property. */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-            className="relative hidden lg:flex items-center justify-center"
+            style={{
+              y: prefersReducedMotion ? 0 : vortexY,
+              opacity: prefersReducedMotion ? 1 : vortexOpacity,
+            }}
+            className="relative lg:col-span-5 lg:-ml-20 -mx-4 sm:mx-0"
           >
-            <WorkflowAnimation />
+            <div style={delay(0.4)} className="hero-fade-scale flex items-center justify-center">
+              <HeroTornado />
+            </div>
           </motion.div>
         </div>
 
-        {/* Mobile workflow (below content) */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.6 }}
-          className="mt-12 lg:hidden"
+        {/* Baseline strip: live-feeling run log + proof points */}
+        <div
+          style={delay(1.2)}
+          className="hero-fade mt-6 lg:mt-0 flex flex-col gap-3 border-t border-white/[0.08] pt-4 md:flex-row md:items-center md:justify-between md:gap-8"
         >
-          <WorkflowAnimation />
-        </motion.div>
+          <div className="min-w-0 md:max-w-[50%] flex-1">
+            <HeroRunTicker />
+          </div>
+          <ul className="font-mono flex flex-wrap gap-x-5 gap-y-1.5 text-[11px] uppercase tracking-[0.12em] text-[#A1A1AA]">
+            {PROOF.map((item, i) => (
+              <li key={item} className="flex items-center gap-2">
+                <span className="text-[#3F3F46]" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   );

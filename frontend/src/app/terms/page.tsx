@@ -1,6 +1,5 @@
-﻿import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { Badge } from "@/components/ui/badge";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -15,18 +14,19 @@ const COMPANY = "RudraAI";
 
 export default function TermsPage() {
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
 
-      <div className="relative pt-32 pb-8 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-20" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide text-center">
-          <Badge className="mb-4">Legal</Badge>
-          <h1 className="text-4xl sm:text-5xl font-heading font-black text-white mb-4">
+      <div className="relative pt-36 pb-8 overflow-hidden md:pt-44">
+        <div className="pointer-events-none absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+          <div className="h-full border-x border-white/[0.06]" />
+        </div>
+        <div className="relative z-10 container-wide max-w-3xl">
+          <p className="eyebrow mb-8"><span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;Legal</p>
+          <h1 className="font-heading font-semibold leading-[1] tracking-[-0.045em] text-[#F5F5F7] text-[clamp(2.75rem,6vw,4.5rem)] mb-6">
             Terms of Service
           </h1>
-          <p className="text-[#71717A] font-body text-sm">Last updated: {LAST_UPDATED}</p>
+          <p className="text-[#8A8A93] font-body text-sm">Last updated: {LAST_UPDATED}</p>
         </div>
       </div>
 
@@ -51,7 +51,7 @@ export default function TermsPage() {
               },
               {
                 title: "3. Free Automation Audit",
-                body: "The free 60-minute automation audit is a no-obligation consultation. We will provide strategic recommendations, but are not contractually obligated to provide any specific deliverable from the audit call. Booking a free audit does not create a client-agency relationship.",
+                body: "The free 15-minute consultation call is a no-obligation consultation. We will provide strategic recommendations, but are not contractually obligated to provide any specific deliverable from the audit call. Booking a free audit does not create a client-agency relationship.",
               },
               {
                 title: "4. Payment Terms",
@@ -118,19 +118,19 @@ export default function TermsPage() {
               },
               {
                 title: "15. Contact",
-                body: `For questions about these terms, email <a href="mailto:${CONTACT_EMAIL}" class="text-[#FF6B00] hover:underline">${CONTACT_EMAIL}</a>.`,
+                body: `For questions about these terms, email <a href="mailto:${CONTACT_EMAIL}" class="text-[#2997FF] hover:underline">${CONTACT_EMAIL}</a>.`,
                 isHtml: true,
               },
             ].map((section) => (
               <div key={section.title}>
-                <h2 className="text-xl font-heading font-bold text-white mb-3">{section.title}</h2>
+                <h2 className="text-2xl font-heading font-semibold tracking-[-0.02em] text-[#F5F5F7] mb-3">{section.title}</h2>
                 {section.body && section.isHtml ? (
                   <p dangerouslySetInnerHTML={{ __html: section.body }} />
                 ) : section.body ? (
                   <p>{section.body}</p>
                 ) : null}
                 {section.list && (
-                  <ul className="mt-3 space-y-2 list-disc list-inside marker:text-[#FF6B00]">
+                  <ul className="mt-3 space-y-2 list-disc list-inside marker:text-[#2997FF]">
                     {section.list.map((item) => (
                       <li key={item} className="pl-1">{item}</li>
                     ))}

@@ -1,114 +1,114 @@
-"use client";
-
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import ServicesSection from "@/components/services-section";
+import HowItWorksSection from "@/components/how-it-works-section";
 import ServicesContactSection from "@/components/services-contact-section";
 import CTASection from "@/components/cta-section";
-import { Badge } from "@/components/ui/badge";
-import { AnimatedRoadmap } from "@/components/ui/animated-roadmap";
-import { motion } from "framer-motion";
+import PageHero from "@/components/site/page-hero";
+import Reveal from "@/components/site/reveal";
+import { SERVICES, SITE } from "@/lib/site";
 
-const milestones = [
-  {
-    id: 1,
-    name: "Free Automation Audit",
-    status: "complete" as const,
-    position: { top: "72%", left: "4%" },
-  },
-  {
-    id: 2,
-    name: "Custom Roadmap",
-    status: "complete" as const,
-    position: { top: "18%", left: "18%" },
-  },
-  {
-    id: 3,
-    name: "Build & Integrate",
-    status: "in-progress" as const,
-    position: { top: "48%", left: "48%" },
-  },
-  {
-    id: 4,
-    name: "Launch in 3–7d",
-    status: "pending" as const,
-    position: { top: "8%", right: "12%" },
-  },
-];
+// What each service looks like in practice — concrete examples, not categories.
+const EXAMPLES: Record<(typeof SERVICES)[number]["slug"], string[]> = {
+  websites: [
+    "A clinic site where patients find the right doctor and book in two taps",
+    "A product site that ranks for what your customers actually search",
+    "A landing page for a launch, live in days, measured from the first visit",
+  ],
+  "ai-agents": [
+    "A website assistant that answers pricing and availability from your own docs",
+    "A WhatsApp agent that qualifies leads and books calls into your calendar",
+    "An internal helper that finds the right policy or SOP in seconds",
+  ],
+  automations: [
+    "Form → CRM → personal reply → Slack alert, in under ten seconds",
+    "Invoices created when a job is marked done, reminders sent automatically",
+    "A Monday-morning report pulled from five tools into one message",
+  ],
+};
 
 export default function ServicesView() {
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
-      <div className="relative pt-32 pb-16 text-center overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide">
-          <Badge className="mb-4">What We Build</Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white mb-4 leading-tight">
-            AI Automation <span className="text-gradient-orange">Services</span>
-          </h1>
-          <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto leading-relaxed">
-            End-to-end automation solutions tailored to your business — from strategy
-            to deployment and ongoing support.
-          </p>
-        </div>
-      </div>
+      <PageHero
+        label="Services"
+        title="Built to take work off your plate."
+        intro="Websites that bring people in, AI agents that answer them, and automations that handle what happens next. Each one fixed-price, documented, and yours to keep."
+      >
+        <nav aria-label="Services on this page" className="flex flex-wrap gap-2">
+          {SERVICES.map((s) => (
+            <a
+              key={s.slug}
+              href={`#${s.slug}`}
+              className="inline-flex h-10 items-center rounded-full border border-white/[0.18] px-5 text-[14px] font-medium text-[#F5F5F7] transition-colors hover:border-white/40"
+            >
+              {s.name}
+            </a>
+          ))}
+        </nav>
+      </PageHero>
 
-      <ServicesSection />
+      {SERVICES.map((s, i) => (
+        <section key={s.slug} id={s.slug} className="scroll-mt-16 border-t border-white/[0.08] py-24 md:py-32">
+          <div className="container-wide grid gap-12 lg:grid-cols-12 lg:gap-x-8">
+            <div className="lg:col-span-5">
+              <Reveal>
+                <p className="eyebrow">
+                  <span className="text-[#2997FF]">{String(i + 1).padStart(2, "0")}&nbsp;&nbsp;</span>
+                  {s.timeline} typical
+                </p>
+              </Reveal>
+              <h2 className="mt-6 font-heading font-semibold leading-none tracking-[-0.045em] text-[#F5F5F7] text-[clamp(3rem,7vw,5.5rem)]">
+                <Reveal as="span" variant="line">{s.name}</Reveal>
+              </h2>
+              <Reveal delay={0.1}>
+                <p className="mt-6 max-w-[34ch] text-xl leading-snug text-[#F5F5F7]">{s.line}</p>
+                <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{s.detail}</p>
+              </Reveal>
+            </div>
 
-      {/* Our Deployment Process */}
-      <section className="relative section-padding overflow-hidden">
-        <div className="absolute inset-0 bg-[#0D0D14]" />
-        <div className="absolute inset-0 grid-bg opacity-20" />
-        <div className="relative z-10 container-wide">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8"
-          >
-            <Badge className="mb-4">Our Process</Badge>
-            <h2 className="text-3xl sm:text-4xl font-heading font-black text-white mb-4">
-              From Audit to <span className="text-gradient-orange">Live in 3–7 Days</span>
-            </h2>
-            <p className="text-[#A1A1AA] font-body text-lg max-w-xl mx-auto">
-              A proven, fast-track deployment path that gets your automation running before your competitors even finish planning.
-            </p>
-          </motion.div>
-
-          <AnimatedRoadmap
-            milestones={milestones}
-            aria-label="RudraAI deployment process milestones"
-          />
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-4">
-            {[
-              { step: "01", title: "Free Audit", desc: "We map your workflows and find automation opportunities — free, no obligation." },
-              { step: "02", title: "Custom Roadmap", desc: "You get a tailored plan with estimated ROI, tool stack, and timeline." },
-              { step: "03", title: "Build & Integrate", desc: "I build your n8n workflows and AI agents, integrated directly with your existing tools." },
-              { step: "04", title: "Launch in 3–7 Days", desc: "Go live in 3–7 days. We monitor, support, and iterate post-launch." },
-            ].map((s) => (
-              <motion.div
-                key={s.step}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: parseInt(s.step) * 0.1 }}
-                className="p-5 rounded-2xl neo-card"
-              >
-                <div className="text-3xl font-heading font-black text-[#FF6B00]/30 mb-2">{s.step}</div>
-                <h3 className="font-heading font-bold text-white mb-2">{s.title}</h3>
-                <p className="text-sm font-body text-[#71717A] leading-relaxed">{s.desc}</p>
-              </motion.div>
-            ))}
+            <div className="grid gap-12 sm:grid-cols-2 lg:col-span-6 lg:col-start-7 lg:pt-16">
+              <Reveal delay={0.1}>
+                <h3 className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">What you get</h3>
+                <ul className="ledger mt-4 border-y border-white/[0.08]">
+                  {s.deliverables.map((d) => (
+                    <li key={d} className="py-3.5 text-[15px] text-[#F5F5F7]">
+                      {d}
+                    </li>
+                  ))}
+                  <li className="py-3.5 text-[15px] text-[#F5F5F7]">{SITE.supportDays} days of free fixes</li>
+                </ul>
+              </Reveal>
+              <Reveal delay={0.16}>
+                <h3 className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">For example</h3>
+                <ul className="ledger mt-4 border-y border-white/[0.08]">
+                  {EXAMPLES[s.slug].map((e) => (
+                    <li key={e} className="py-3.5 text-[15px] leading-snug text-[#A1A1AA]">
+                      {e}
+                    </li>
+                  ))}
+                </ul>
+              </Reveal>
+              <Reveal delay={0.2} className="sm:col-span-2">
+                <Link
+                  href="/booking"
+                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#2997FF]"
+                >
+                  Talk about {s.name.toLowerCase()}
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                </Link>
+              </Reveal>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ))}
 
+      <div className="border-t border-white/[0.08]">
+        <HowItWorksSection index="04" />
+      </div>
       <ServicesContactSection />
-
       <CTASection />
       <Footer />
     </main>

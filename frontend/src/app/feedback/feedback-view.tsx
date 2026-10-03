@@ -3,7 +3,7 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
+import PageHero from "@/components/site/page-hero";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,29 +43,18 @@ export default function FeedbackView() {
   };
 
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
+      <PageHero
+        label="Feedback"
+        title="Tell us how we're doing."
+        intro="Working with us, or just have thoughts on the site? Good or bad, we read every note and reply when there's something to answer."
+      />
 
-      {/* Hero */}
-      <div className="relative pt-32 pb-16 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide text-center">
-          <Badge className="mb-4">We're Listening</Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white mb-4 leading-tight">
-            Share Your <span className="text-gradient-orange">Feedback</span>
-          </h1>
-          <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto">
-            Already working with RudraAI, or just have thoughts on our site or services?
-            Tell us how we&apos;re doing — good or bad, we read every note.
-          </p>
-        </div>
-      </div>
-
-      <section className="section-padding pt-8">
+      <section className="border-t border-white/[0.08] pb-24 pt-16 md:pb-32">
         <div className="container-wide">
-          <div className="max-w-2xl mx-auto">
-            <div className="p-7 rounded-2xl neo-card">
+          <div className="max-w-2xl">
+            <div>
               {submitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -75,13 +64,13 @@ export default function FeedbackView() {
                   <div className="w-16 h-16 rounded-2xl bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-5">
                     <Send className="w-7 h-7 text-green-400" />
                   </div>
-                  <h3 className="font-heading font-bold text-white text-xl mb-2">Thank You!</h3>
+                  <h2 className="font-heading font-semibold tracking-[-0.03em] text-[#F5F5F7] text-3xl mb-2">Thank you.</h2>
                   <p className="text-[#A1A1AA] font-body mb-1">
                     Your feedback has been received. We genuinely appreciate you taking the time.
                   </p>
-                  <p className="text-sm font-body text-[#71717A]">
+                  <p className="text-sm font-body text-[#8A8A93]">
                     Looking to start a new project instead?{" "}
-                    <Link href="/services#contact" className="text-[#FF6B00] hover:underline">
+                    <Link href="/services#contact" className="text-[#2997FF] hover:underline">
                       Contact us on the Services page
                     </Link>
                     .
@@ -104,10 +93,10 @@ export default function FeedbackView() {
                   </div>
 
                   <div className="flex items-center gap-2 mb-1">
-                    <MessageSquare className="w-5 h-5 text-[#FF6B00]" />
-                    <h3 className="font-heading font-bold text-white text-xl">Tell Us What You Think</h3>
+                    <MessageSquare className="w-5 h-5 text-[#2997FF]" />
+                    <h2 className="font-heading font-semibold tracking-[-0.02em] text-[#F5F5F7] text-2xl">What&apos;s on your mind?</h2>
                   </div>
-                  <p className="text-sm font-body text-[#71717A] mb-6">
+                  <p className="text-sm font-body text-[#8A8A93] mb-6">
                     Takes less than a minute. No pitch, just listening.
                   </p>
 
@@ -139,8 +128,8 @@ export default function FeedbackView() {
                           <Star
                             className="w-7 h-7 transition-colors"
                             style={{
-                              fill: star <= (hoverRating || rating) ? "#FF6B00" : "transparent",
-                              color: star <= (hoverRating || rating) ? "#FF6B00" : "#3F3F46",
+                              fill: star <= (hoverRating || rating) ? "#2997FF" : "transparent",
+                              color: star <= (hoverRating || rating) ? "#2997FF" : "#3F3F46",
                             }}
                           />
                         </button>
@@ -176,7 +165,7 @@ export default function FeedbackView() {
                   <div className="space-y-1.5">
                     <Label htmlFor="feedback-message">
                       Your Feedback *{" "}
-                      <span className="text-[#71717A] font-normal">(min. 20 characters)</span>
+                      <span className="text-[#8A8A93] font-normal">(min. 20 characters)</span>
                     </Label>
                     <Textarea
                       id="feedback-message"
@@ -188,7 +177,7 @@ export default function FeedbackView() {
                       onChange={(e) => setForm({ ...form, message: e.target.value })}
                     />
                     <div className="flex justify-end">
-                      <span className={`text-xs font-body transition-colors ${form.message.length < 20 ? "text-[#71717A]" : "text-[#10B981]"}`}>
+                      <span className={`text-xs font-body transition-colors ${form.message.length < 20 ? "text-[#8A8A93]" : "text-[#10B981]"}`}>
                         {form.message.length}/20 min
                       </span>
                     </div>
@@ -208,9 +197,9 @@ export default function FeedbackView() {
                     )}
                   </Button>
 
-                  <p className="text-xs font-body text-[#71717A] text-center">
+                  <p className="text-xs font-body text-[#8A8A93] text-center">
                     Have a new project in mind instead?{" "}
-                    <Link href="/services#contact" className="text-[#FF6B00] hover:underline">
+                    <Link href="/services#contact" className="text-[#2997FF] hover:underline">
                       Reach out via Services
                     </Link>
                     .

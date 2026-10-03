@@ -43,23 +43,23 @@ export default function CookieConsent() {
             {/* Close button */}
             <button
               onClick={decline}
-              className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-md text-[#71717A] hover:text-white transition-colors"
+              className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-md text-[#8A8A93] hover:text-white transition-colors"
               aria-label="Dismiss"
             >
               <X className="w-3.5 h-3.5" />
             </button>
 
             <div className="flex items-start gap-3 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[rgba(255,107,0,0.1)] border border-[rgba(255,107,0,0.2)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Cookie className="w-4 h-4 text-[#FF6B00]" />
+              <div className="w-8 h-8 rounded-lg bg-[rgba(41,151,255,0.1)] border border-[rgba(41,151,255,0.2)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Cookie className="w-4 h-4 text-[#2997FF]" />
               </div>
               <div>
                 <p className="text-sm font-subheading font-semibold text-white mb-1">
                   We use cookies
                 </p>
-                <p className="text-xs font-body text-[#71717A] leading-relaxed">
+                <p className="text-xs font-body text-[#8A8A93] leading-relaxed">
                   We use one cookie to remember your consent preference. No tracking, no ads.{" "}
-                  <Link href="/privacy" className="text-[#FF6B00] hover:underline">
+                  <Link href="/privacy" className="text-[#2997FF] hover:underline">
                     Privacy Policy
                   </Link>
                 </p>
@@ -75,7 +75,7 @@ export default function CookieConsent() {
               </button>
               <button
                 onClick={accept}
-                className="flex-1 py-2 px-3 rounded-xl text-xs font-heading font-semibold text-white bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] hover:shadow-[0_4px_16px_rgba(255,107,0,0.4)] transition-all"
+                className="flex-1 py-2 px-3 rounded-xl text-xs font-heading font-semibold text-white bg-[#0071E3] hover:bg-[#0077ED] transition-all"
               >
                 Accept
               </button>

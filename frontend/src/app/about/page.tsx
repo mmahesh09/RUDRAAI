@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import AboutView from "./about-view";
 
 export const metadata: Metadata = {
-  title: "About RudraAI — AI Automation Agency",
+  title: "About — An Engineer-Led AI Studio",
   description:
-    "Meet the team behind RudraAI and why we build production-grade n8n workflows and AI agents instead of fragile no-code demos.",
+    "RudraAI is a small, engineer-led studio in Hyderabad building websites, AI agents and n8n automations — documented, owned by you, and built to keep running.",
   alternates: { canonical: "/about" },
 };
 

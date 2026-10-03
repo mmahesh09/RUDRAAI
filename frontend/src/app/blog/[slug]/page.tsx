@@ -4,9 +4,8 @@ import Link from "next/link";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
-import { Badge } from "@/components/ui/badge";
-import { Clock, Calendar, ArrowLeft } from "lucide-react";
-import { posts, getPostBySlug, categoryColors } from "@/lib/posts";
+import { ArrowLeft } from "lucide-react";
+import { posts, getPostBySlug } from "@/lib/posts";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -45,8 +44,6 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
-  const color = categoryColors[post.category] ?? "#A1A1AA";
-
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -59,79 +56,41 @@ export default async function BlogPostPage({ params }: Props) {
   };
 
   return (
-    <main>
+    <main className="bg-black">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <Navbar />
 
-      {/* Hero */}
-      <div className="relative pt-32 pb-0 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-20" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide">
-          {/* Back link */}
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-1.5 text-sm font-body text-[#71717A] hover:text-white transition-colors mb-8"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Blog
-          </Link>
-
-          {/* Category + meta */}
-          <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <Badge
-              style={{
-                color,
-                background: `${color}15`,
-                borderColor: `${color}30`,
-              }}
+      <article>
+        <header className="container-wide pt-32 md:pt-40">
+          <div className="mx-auto max-w-3xl">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#A1A1AA] transition-colors hover:text-[#F5F5F7]"
             >
-              {post.category}
-            </Badge>
-            <span className="flex items-center gap-1 text-sm font-body text-[#71717A]">
-              <Clock className="w-3.5 h-3.5" />
-              {post.readTime}
-            </span>
-            <span className="flex items-center gap-1 text-sm font-body text-[#71717A]">
-              <Calendar className="w-3.5 h-3.5" />
-              {post.date}
-            </span>
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+              All posts
+            </Link>
+            <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
+              <span className="text-[#2997FF]">{post.category}</span>&nbsp;&nbsp;·&nbsp;&nbsp;{post.date}&nbsp;&nbsp;·&nbsp;&nbsp;{post.readTime}
+            </p>
+            <h1 className="mt-5 font-heading text-[clamp(2.25rem,5vw,3.75rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-[#F5F5F7] [text-wrap:balance]">
+              {post.title}
+            </h1>
+            <p className="mt-6 text-xl leading-[1.6] text-[#A1A1AA]">{post.excerpt}</p>
           </div>
+        </header>
 
-          {/* Title */}
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black text-white leading-tight mb-6 max-w-4xl">
-            {post.title}
-          </h1>
-
-          {/* Excerpt */}
-          <p className="text-[#A1A1AA] font-body text-lg max-w-3xl mb-10 leading-relaxed">
-            {post.excerpt}
-          </p>
-        </div>
-      </div>
-
-      {/* Hero image */}
-      <div className="relative w-full" style={{ maxHeight: "480px", overflow: "hidden" }}>
-        <img
-          src={post.image}
-          alt={post.title}
-          className="w-full object-cover opacity-60"
-          style={{ maxHeight: "480px" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D14] via-[#0D0D14]/20 to-transparent" />
-      </div>
-
-      {/* Article body */}
-      <section className="section-padding">
-        <div className="container-wide">
-          <div className="max-w-3xl mx-auto">
-            <div
-              className="prose-blog"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
+        <div className="container-wide mt-12 md:mt-16">
+          <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl bg-[#0B0B0C]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={post.image} alt="" className="aspect-[16/8] w-full object-cover" />
           </div>
         </div>
-      </section>
+
+        <div className="container-wide py-16 md:py-24">
+          <div className="prose-blog mx-auto max-w-[68ch]" dangerouslySetInnerHTML={{ __html: post.content }} />
+        </div>
+      </article>
 
       <CTASection />
       <Footer />

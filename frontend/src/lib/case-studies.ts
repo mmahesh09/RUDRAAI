@@ -40,11 +40,11 @@ export const caseStudies: CaseStudy[] = [
     metrics: [
       { icon: TrendingUp, value: "340%", label: "More qualified leads", color: "#10B981" },
       { icon: Clock, value: "92%", label: "Reduction in response time", color: "#3B82F6" },
-      { icon: DollarSign, value: "$180K", label: "Pipeline added in 90 days", color: "#FF6B00" },
+      { icon: DollarSign, value: "$180K", label: "Pipeline added in 90 days", color: "#2997FF" },
     ],
     tags: ["n8n", "GPT-4o", "HubSpot", "Clearbit"],
-    gradient: "from-[#FF6B00]/10 to-transparent",
-    accentColor: "#FF6B00",
+    gradient: "from-[#2997FF]/10 to-transparent",
+    accentColor: "#2997FF",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
     timeline: "3 weeks build · 90-day results",
     content: `
@@ -89,13 +89,13 @@ export const caseStudies: CaseStudy[] = [
     outcome:
       "80% of tickets are now resolved without any human involvement. Average resolution time dropped from 48 hours to 4 minutes. The brand saves $95K annually in support costs and has reallocated the team to handle high-value pre-sales conversations.",
     metrics: [
-      { icon: TrendingUp, value: "80%", label: "Tickets auto-resolved", color: "#8B5CF6" },
+      { icon: TrendingUp, value: "80%", label: "Tickets auto-resolved", color: "#A1A1A6" },
       { icon: Clock, value: "4 min", label: "Avg resolution time", color: "#10B981" },
-      { icon: DollarSign, value: "$95K", label: "Annual support savings", color: "#FF6B00" },
+      { icon: DollarSign, value: "$95K", label: "Annual support savings", color: "#2997FF" },
     ],
     tags: ["AI Agent", "Zendesk", "Shopify", "OpenAI"],
-    gradient: "from-[#8B5CF6]/10 to-transparent",
-    accentColor: "#8B5CF6",
+    gradient: "from-[#A1A1A6]/10 to-transparent",
+    accentColor: "#A1A1A6",
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
     timeline: "4 weeks build · 6-month results",
     content: `
@@ -192,7 +192,7 @@ export const caseStudies: CaseStudy[] = [
     metrics: [
       { icon: TrendingUp, value: "210%", label: "Email revenue growth", color: "#3B82F6" },
       { icon: Mail, value: "41%", label: "Avg open rate (was 19%)", color: "#10B981" },
-      { icon: Clock, value: "18h", label: "Strategist hours saved/week", color: "#8B5CF6" },
+      { icon: Clock, value: "18h", label: "Strategist hours saved/week", color: "#A1A1A6" },
     ],
     tags: ["n8n", "GPT-4o", "Instantly", "Segment", "Klaviyo"],
     gradient: "from-[#3B82F6]/10 to-transparent",

@@ -4,8 +4,7 @@ import Link from "next/link";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { caseStudies, getCaseStudyBySlug } from "@/lib/case-studies";
 
 interface Props {
@@ -39,117 +38,70 @@ export default async function CaseStudyDetailPage({ params }: Props) {
   if (!study) notFound();
 
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
 
-      {/* Hero */}
-      <div className="relative pt-32 pb-0 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-20" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide">
+      <article>
+        <header className="container-wide pt-32 md:pt-40">
           <Link
             href="/case-studies"
-            className="inline-flex items-center gap-1.5 text-sm font-body text-[#71717A] hover:text-white transition-colors mb-8"
+            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-[#A1A1AA] transition-colors hover:text-[#F5F5F7]"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Case Studies
+            <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            All case studies
           </Link>
-
-          <div className="flex items-center gap-3 mb-4">
-            <Badge style={{ color: study.accentColor, background: `${study.accentColor}15`, borderColor: `${study.accentColor}30` }}>
-              {study.industry}
-            </Badge>
-            <span className="flex items-center gap-1 text-sm font-body text-[#71717A]">
-              <Clock className="w-3.5 h-3.5" />
-              {study.timeline}
-            </span>
-          </div>
-
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black text-white leading-tight mb-6 max-w-4xl">
+          <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
+            <span className="text-[#2997FF]">{study.industry}</span>&nbsp;&nbsp;·&nbsp;&nbsp;{study.timeline}
+          </p>
+          <h1 className="mt-5 max-w-[20ch] font-heading text-[clamp(2.25rem,5.5vw,4.5rem)] font-semibold leading-[1.0] tracking-[-0.045em] text-[#F5F5F7] [text-wrap:balance]">
             {study.title}
           </h1>
+          <p className="mt-6 max-w-[56ch] text-xl leading-[1.6] text-[#A1A1AA]">{study.description}</p>
+        </header>
 
-          <p className="text-[#A1A1AA] font-body text-lg max-w-3xl mb-10 leading-relaxed">
-            {study.description}
-          </p>
-        </div>
-      </div>
+        {/* Outcome band */}
+        <dl className="container-wide mt-16 grid grid-cols-1 border-y border-white/[0.08] sm:grid-cols-3">
+          {study.metrics.map((m, i) => (
+            <div key={m.label} className={`py-8 ${i > 0 ? "border-t border-white/[0.08] sm:border-t-0 sm:border-l sm:pl-8" : ""}`}>
+              <dt className="sr-only">{m.label}</dt>
+              <dd className="font-heading text-[clamp(2.5rem,5vw,4rem)] font-semibold leading-none tracking-[-0.045em] text-[#F5F5F7]">{m.value}</dd>
+              <dd className="mt-2 text-[15px] text-[#A1A1AA]">{m.label}</dd>
+            </div>
+          ))}
+        </dl>
 
-      {/* Hero image */}
-      <div className="relative w-full overflow-hidden" style={{ maxHeight: "460px" }}>
-        <img
-          src={study.image}
-          alt={study.title}
-          className="w-full object-cover opacity-50"
-          style={{ maxHeight: "460px" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D14] via-[#0D0D14]/20 to-transparent" />
-      </div>
-
-      {/* Metrics bar */}
-      <div className="bg-[rgba(255,255,255,0.02)] border-y border-white/[0.06]">
-        <div className="container-wide py-8">
-          <div className="grid grid-cols-3 gap-6">
-            {study.metrics.map((m) => {
-              const Icon = m.icon;
-              return (
-                <div key={m.label} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${m.color}15` }}>
-                    <Icon className="w-5 h-5" style={{ color: m.color }} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-heading font-black text-white">{m.value}</p>
-                    <p className="text-sm text-[#71717A] font-body">{m.label}</p>
-                  </div>
-                </div>
-              );
-            })}
+        <div className="container-wide mt-16">
+          <div className="overflow-hidden rounded-2xl bg-[#0B0B0C]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={study.image} alt="" className="aspect-[16/7] w-full object-cover" />
           </div>
         </div>
-      </div>
 
-      {/* Content */}
-      <section className="section-padding">
-        <div className="container-wide">
-          <div className="grid lg:grid-cols-[1fr_300px] gap-12 max-w-5xl mx-auto">
-            {/* Main content */}
-            <div
-              className="prose-blog"
-              dangerouslySetInnerHTML={{ __html: study.content }}
-            />
-
-            {/* Sidebar */}
-            <aside className="space-y-6">
-              <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-5">
-                <h3 className="text-white font-heading font-semibold text-sm mb-4">Tools & Stack</h3>
-                <div className="flex flex-wrap gap-2">
-                  {study.tags.map((tag) => (
-                    <span key={tag} className="text-xs font-body text-[#A1A1AA] px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.06]">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+        <div className="container-wide grid gap-12 py-16 md:py-24 lg:grid-cols-12 lg:gap-x-8">
+          <aside className="lg:col-span-3">
+            <dl className="ledger border-y border-white/[0.08] lg:sticky lg:top-24">
+              <div className="py-4">
+                <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">Timeline</dt>
+                <dd className="mt-1 text-[15px] text-[#F5F5F7]">{study.timeline}</dd>
               </div>
-
-              <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-5">
-                <h3 className="text-white font-heading font-semibold text-sm mb-3">Timeline</h3>
-                <p className="text-[#A1A1AA] text-sm font-body">{study.timeline}</p>
+              <div className="py-4">
+                <dt className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">Stack</dt>
+                <dd className="mt-1 text-[15px] leading-relaxed text-[#F5F5F7]">{study.tags.join(", ")}</dd>
               </div>
-
-              <div className="bg-gradient-to-br from-[rgba(255,107,0,0.12)] to-transparent border border-[rgba(255,107,0,0.2)] rounded-2xl p-5">
-                <h3 className="text-white font-heading font-semibold text-sm mb-2">Want similar results?</h3>
-                <p className="text-[#A1A1AA] text-xs font-body mb-4 leading-relaxed">Book a free 15-minute automation audit and see what we can build for you.</p>
+              <div className="py-4">
                 <Link
                   href="/booking"
-                  className="block text-center px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] text-white text-sm font-medium shadow-[0_4px_20px_rgba(255,107,0,0.3)]"
+                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] hover:decoration-[#2997FF]"
                 >
-                  Book free audit
+                  Build something similar
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
                 </Link>
               </div>
-            </aside>
-          </div>
+            </dl>
+          </aside>
+          <div className="prose-blog max-w-[68ch] lg:col-span-8 lg:col-start-5" dangerouslySetInnerHTML={{ __html: study.content }} />
         </div>
-      </section>
+      </article>
 
       <CTASection />
       <Footer />

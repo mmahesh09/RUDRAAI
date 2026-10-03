@@ -34,7 +34,7 @@ export const showcaseBuilds: ShowcaseBuild[] = [
       { label: "Update + assign rep", tool: "HubSpot", kind: "action" },
     ],
     stack: ["n8n", "GPT-4o", "HubSpot", "Clearbit"],
-    accentColor: "#FF6B00",
+    accentColor: "#2997FF",
     caseStudySlug: "lead-qualification-automation",
   },
   {
@@ -85,7 +85,7 @@ export const showcaseBuilds: ShowcaseBuild[] = [
       { label: "Sync profile", tool: "Klaviyo", kind: "action" },
     ],
     stack: ["n8n", "GPT-4o", "Instantly", "Segment", "Klaviyo"],
-    accentColor: "#8B5CF6",
+    accentColor: "#A1A1A6",
     caseStudySlug: "email-marketing-automation",
   },
   {

@@ -39,13 +39,13 @@ export const researchCaseStudies: ResearchCaseStudy[] = [
     description:
       "A research review of Klarna's OpenAI-powered support assistant: the 2.3M-conversation first month, the $40M profit claim, and the 2025 course-correction that's more instructive than the headline number.",
     metrics: [
-      { icon: MessageSquare, value: "2.3M", label: "Conversations handled, month 1", color: "#8B5CF6" },
+      { icon: MessageSquare, value: "2.3M", label: "Conversations handled, month 1", color: "#A1A1A6" },
       { icon: Clock, value: "<2 min", label: "Resolution time (was 11 min)", color: "#10B981" },
-      { icon: DollarSign, value: "$40M", label: "Estimated 2024 profit impact", color: "#FF6B00" },
+      { icon: DollarSign, value: "$40M", label: "Estimated 2024 profit impact", color: "#2997FF" },
     ],
     tags: ["OpenAI", "LLM Agents", "Customer Support", "Fintech"],
-    gradient: "from-[#8B5CF6]/10 to-transparent",
-    accentColor: "#8B5CF6",
+    gradient: "from-[#A1A1A6]/10 to-transparent",
+    accentColor: "#A1A1A6",
     image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&q=80",
     publishedContext: "Public case study · Feb 2024 launch, 2025 follow-up reporting",
     sources: [
@@ -128,7 +128,7 @@ export const researchCaseStudies: ResearchCaseStudy[] = [
     metrics: [
       { icon: Clock, value: "200h", label: "Delivery Hero: hours saved/month", color: "#10B981" },
       { icon: Percent, value: "51%", label: "Unbabel: manual ops reduced", color: "#3B82F6" },
-      { icon: DollarSign, value: "25:1", label: "Koralplay: reported ROI", color: "#FF6B00" },
+      { icon: DollarSign, value: "25:1", label: "Koralplay: reported ROI", color: "#2997FF" },
     ],
     tags: ["n8n", "Workflow Automation", "ROI Analysis", "SMB Automation"],
     gradient: "from-[#10B981]/10 to-transparent",

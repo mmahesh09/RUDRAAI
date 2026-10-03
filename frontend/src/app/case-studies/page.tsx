@@ -1,237 +1,112 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
-import { Badge } from "@/components/ui/badge";
+import PageHero from "@/components/site/page-hero";
+import SectionHead from "@/components/site/section-head";
 import Link from "next/link";
-import { ArrowRight, Clock, BookOpen } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { caseStudies } from "@/lib/case-studies";
 import { researchCaseStudies } from "@/lib/research-case-studies";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Case Studies — RudraAI | AI Automation Results",
+  title: "Case Studies — AI Agents & Automation in Practice",
   description:
-    "See real results from RudraAI's AI automation projects — lead qualification, customer support AI, appointment booking, and more.",
+    "How RudraAI's automations and AI agents work in practice — lead qualification, support agents, booking and more — plus public AI automation research with linked sources.",
   alternates: { canonical: "/case-studies" },
 };
 
+type Metric = { value: string; label: string };
+
+function MetricRow({ metrics }: { metrics: readonly Metric[] }) {
+  return (
+    <dl className="grid grid-cols-3 border-t border-white/[0.08]">
+      {metrics.map((m, i) => (
+        <div key={m.label} className={`pt-4 ${i > 0 ? "border-l border-white/[0.08] pl-4" : ""}`}>
+          <dt className="sr-only">{m.label}</dt>
+          <dd className="font-heading text-2xl font-semibold tracking-[-0.03em] text-[#F5F5F7]">{m.value}</dd>
+          <dd className="mt-1 text-[13px] leading-snug text-[#A1A1AA]">{m.label}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 export default function CaseStudiesPage() {
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
+      <PageHero
+        label="Case studies"
+        title="How it works in practice."
+        intro="What we built, why, and what changed afterwards. Each one walks through the problem, the workflow and the numbers."
+      />
 
-      {/* Hero */}
-      <div className="relative pt-32 pb-16 text-center overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide">
-          <Badge className="mb-4">Proven Results</Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white mb-4 leading-tight">
-            Case <span className="text-gradient-orange">Studies</span>
-          </h1>
-          <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto leading-relaxed">
-            Real automations we&apos;ve built for real businesses. Metrics verified,
-            results measured.
-          </p>
-        </div>
-      </div>
-
-      {/* Case studies grid */}
-      <section className="section-padding">
+      <section className="pb-24 md:pb-32">
         <div className="container-wide">
-          <div className="grid lg:grid-cols-3 gap-6 mb-12">
-            {caseStudies.map((study) => (
-              <Link
-                key={study.slug}
-                href={`/case-studies/${study.slug}`}
-                className="group relative rounded-2xl neo-card overflow-hidden hover:border-white/12 transition-all duration-300 block"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${study.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-
-                <div className="relative h-44 overflow-hidden">
-                  <img
-                    src={study.image}
-                    alt={study.title}
-                    className="w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-105 transition-all duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111117] via-[#111117]/60 to-transparent" />
-                  <div className="absolute top-3 left-3">
-                    <Badge variant="secondary" className="text-[10px]">{study.industry}</Badge>
+          <ol className="border-b border-white/[0.08]">
+            {caseStudies.map((study, i) => (
+              <li key={study.slug} className="border-t border-white/[0.08]">
+                <Link href={`/case-studies/${study.slug}`} className="group grid gap-8 py-12 lg:grid-cols-12 lg:gap-x-8 lg:py-16">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-[#0B0B0C] lg:col-span-4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={study.image}
+                      alt=""
+                      className="h-full w-full object-cover opacity-75 transition-[opacity,transform] duration-700 group-hover:scale-[1.03] group-hover:opacity-95"
+                    />
                   </div>
-                </div>
-
-                <div className="relative z-10 p-5">
-                  <h2 className="text-lg font-heading font-bold text-white mb-2 group-hover:text-[#FF6B00] transition-colors">
-                    {study.title}
-                  </h2>
-                  <p className="text-sm text-[#A1A1AA] font-body leading-relaxed mb-5">
-                    {study.description}
-                  </p>
-
-                  {/* Metrics */}
-                  <div className="grid grid-cols-3 gap-2 mb-5">
-                    {study.metrics.map((metric) => {
-                      const Icon = metric.icon;
-                      return (
-                        <div key={metric.label} className="text-center p-2 rounded-lg bg-white/03 border border-white/05">
-                          <div className="font-heading font-bold text-base" style={{ color: metric.color }}>
-                            {metric.value}
-                          </div>
-                          <div className="text-[9px] text-[#71717A] font-body leading-tight mt-0.5">{metric.label}</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-wrap gap-1.5">
-                      {study.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="text-[10px] font-body text-[#71717A] px-2 py-0.5 rounded bg-white/05 border border-white/06">
-                          {tag}
-                        </span>
-                      ))}
+                  <div className="flex flex-col lg:col-span-7 lg:col-start-6">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
+                      <span className="text-[#2997FF]">{String(i + 1).padStart(2, "0")}</span>&nbsp;&nbsp;{study.industry}
+                    </p>
+                    <h2 className="mt-4 font-heading text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF]">
+                      {study.title}
+                    </h2>
+                    <p className="mt-4 max-w-[56ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{study.description}</p>
+                    <div className="mt-8">
+                      <MetricRow metrics={study.metrics} />
                     </div>
-                    <span className="inline-flex items-center gap-1 text-sm font-medium text-[#A1A1AA] group-hover:text-[#FF6B00] transition-colors whitespace-nowrap">
-                      Read more <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <span className="mt-8 inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7]">
+                      Read the case study
+                      <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
                     </span>
                   </div>
-                </div>
-              </Link>
+                </Link>
+              </li>
             ))}
-          </div>
-
-          {/* Summary stats */}
-          <div className="border border-white/[0.06] rounded-2xl p-8 bg-[rgba(255,255,255,0.02)]">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-heading font-bold text-white mb-2">Results at a glance</h2>
-              <p className="text-[#71717A] text-sm">Across all RudraAI automation engagements</p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-              {[
-                { value: "340%", label: "Avg lead volume increase", color: "#10B981" },
-                { value: "80%", label: "Tasks automated end-to-end", color: "#8B5CF6" },
-                { value: "45%", label: "Avg no-show reduction", color: "#EC4899" },
-                { value: "28h", label: "Staff hours saved per week", color: "#3B82F6" },
-              ].map(({ value, label, color }) => (
-                <div key={label} className="text-center">
-                  <p className="text-3xl font-heading font-black mb-1" style={{ color }}>{value}</p>
-                  <p className="text-[#71717A] text-sm font-body">{label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          </ol>
         </div>
       </section>
 
-      {/* Industry research */}
-      <section className="section-padding pt-0">
+      {/* Public research — clearly separated from our own work */}
+      <section className="section-padding border-t border-white/[0.08]">
         <div className="container-wide">
-          <div className="text-center mb-10">
-            <Badge className="mb-4">
-              <BookOpen className="w-3 h-3 mr-1.5" />
-              Industry Research
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl font-heading font-black text-white mb-3">
-              What the market is learning about AI automation
-            </h2>
-            <p className="text-[#A1A1AA] font-body max-w-2xl mx-auto leading-relaxed">
-              Beyond our own client work, we track and analyze publicly published AI automation
-              case studies from sources like Medium and Google Cloud — every source is linked so
-              you can verify the numbers yourself.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-6">
+          <SectionHead
+            label="Industry research"
+            title="What others are learning."
+            intro="Published AI automation results from other companies, summarised. Not our work — every source is linked so you can check the numbers yourself."
+          />
+          <ul className="mt-16 grid gap-x-8 gap-y-14 md:grid-cols-2 lg:mt-20 lg:grid-cols-3">
             {researchCaseStudies.map((study) => (
-              <Link
-                key={study.slug}
-                href={`/case-studies/research/${study.slug}`}
-                className="group relative rounded-2xl neo-card overflow-hidden hover:border-white/12 transition-all duration-300 block"
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${study.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-
-                <div className="relative h-44 overflow-hidden">
-                  <img
-                    src={study.image}
-                    alt={`${study.company} — ${study.category}`}
-                    className="w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-105 transition-all duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#111117] via-[#111117]/60 to-transparent" />
-                  <div className="absolute top-3 left-3 flex gap-2">
-                    <Badge variant="secondary" className="text-[10px]">{study.sourceType}</Badge>
-                    <Badge variant="secondary" className="text-[10px]">{study.company}</Badge>
-                  </div>
-                </div>
-
-                <div className="relative z-10 p-5">
-                  <h3 className="text-lg font-heading font-bold text-white mb-2 group-hover:text-[#FF6B00] transition-colors">
+              <li key={study.slug}>
+                <Link href={`/case-studies/research/${study.slug}`} className="group block">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
+                    {study.company} · {study.sourceType}
+                  </p>
+                  <h3 className="mt-3 font-heading text-xl font-semibold leading-snug tracking-[-0.02em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF]">
                     {study.title}
                   </h3>
-                  <p className="text-sm text-[#A1A1AA] font-body leading-relaxed mb-5">
-                    {study.description}
-                  </p>
-
-                  {/* Metrics */}
-                  <div className="grid grid-cols-3 gap-2 mb-5">
-                    {study.metrics.map((metric) => {
-                      const Icon = metric.icon;
-                      return (
-                        <div key={metric.label} className="text-center p-2 rounded-lg bg-white/03 border border-white/05">
-                          <div className="font-heading font-bold text-base" style={{ color: metric.color }}>
-                            {metric.value}
-                          </div>
-                          <div className="text-[9px] text-[#71717A] font-body leading-tight mt-0.5">{metric.label}</div>
-                        </div>
-                      );
-                    })}
+                  <p className="mt-3 text-[15px] leading-[1.7] text-[#A1A1AA]">{study.description}</p>
+                  <div className="mt-6">
+                    <MetricRow metrics={study.metrics} />
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-wrap gap-1.5">
-                      {study.tags.slice(0, 2).map((tag) => (
-                        <span key={tag} className="text-[10px] font-body text-[#71717A] px-2 py-0.5 rounded bg-white/05 border border-white/06">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-sm font-medium text-[#A1A1AA] group-hover:text-[#FF6B00] transition-colors whitespace-nowrap">
-                      Read research <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </span>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       </section>
-
-      {/* CTA */}
-      <div className="section-padding pt-0">
-        <div className="container-wide">
-          <div className="text-center bg-gradient-to-br from-[rgba(255,107,0,0.08)] to-transparent border border-[rgba(255,107,0,0.15)] rounded-2xl p-12">
-            <h2 className="text-2xl sm:text-3xl font-heading font-black text-white mb-3">
-              Ready to be our next case study?
-            </h2>
-            <p className="text-[#A1A1AA] font-body mb-8 max-w-xl mx-auto">
-              Book a free 15-minute automation audit. We&apos;ll map your workflows and show you exactly what&apos;s possible.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/booking"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] text-white font-heading font-semibold shadow-[0_4px_20px_rgba(255,107,0,0.4)] hover:shadow-[0_6px_30px_rgba(255,107,0,0.6)] hover:-translate-y-0.5 transition-all duration-300"
-              >
-                Book free audit <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/services"
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl border border-white/15 text-[#A1A1AA] font-heading font-semibold hover:text-white hover:border-white/30 transition-all duration-300"
-              >
-                View services <Clock className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <CTASection />
       <Footer />

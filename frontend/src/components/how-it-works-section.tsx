@@ -1,150 +1,59 @@
-"use client";
+import SectionHead from "@/components/site/section-head";
+import Reveal from "@/components/site/reveal";
+import { SITE } from "@/lib/site";
 
-import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-
-const steps = [
+const STEPS = [
   {
-    step: "01",
-    title: "Free Automation Audit",
-    description:
-      "We spend 15 minutes with you mapping your current workflows, identifying the highest-ROI automation opportunities, and calculating your potential time/cost savings. No sales pitch — pure strategy.",
-    duration: "15 min call",
-    color: "#FF6B00",
+    when: `${SITE.call.minutes} min`,
+    title: "A short call",
+    body: "You tell us what eats your week. We tell you honestly what's worth building — and what isn't.",
   },
   {
-    step: "02",
-    title: "Custom Blueprint",
-    description:
-      "I design a detailed automation architecture tailored to your stack and goals. You get a visual workflow map, tech spec, timeline, and fixed-price quote — all before I write a single line.",
-    duration: "3–7 day turnaround",
-    color: "#8B5CF6",
+    when: "2–3 days",
+    title: "A written plan",
+    body: "What we'll build, which tools it touches, how long it takes and a fixed price. Nothing starts until you say yes.",
   },
   {
-    step: "03",
-    title: "Build & Deploy",
-    description:
-      "We build, test, and deploy your automations in a staging environment first. After your sign-off, we go live — with full monitoring, error alerts, and a 30-day free maintenance window.",
-    duration: "Live in 1–2 weeks",
-    color: "#10B981",
+    when: "Days to weeks",
+    title: "Build and test",
+    body: "We build on test data first, show you it working, then switch it on. You see progress as it happens.",
   },
   {
-    step: "04",
-    title: "Scale & Optimize",
-    description:
-      "Monthly reviews keep your automations running at peak efficiency. We add new workflows as your business grows and handle any changes to third-party APIs or business logic.",
-    duration: "Ongoing support",
-    color: "#3B82F6",
+    when: `${SITE.supportDays} days`,
+    title: "Handover and support",
+    body: "Logins, documentation and a walkthrough. We fix anything that breaks for the first month, at no cost.",
   },
 ];
 
-export default function HowItWorksSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-
+/** §04 — process as a horizontal ruled ledger; each step carries its own duration. */
+export default function HowItWorksSection({ index = "04" }: { index?: string } = {}) {
   return (
-    <section id="process" className="section-padding relative overflow-hidden">
-      <div className="absolute inset-0 bg-[#0D0D14]" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+    <section id="process" className="section-padding relative bg-black">
+      <div className="container-wide">
+        <SectionHead
+          index={index}
+          label="How we work"
+          title="From first call to running system."
+          intro="Four steps, no surprises. You always know what's being built, what it costs, and when it lands."
+        />
 
-      <div ref={ref} className="container-wide relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          className="text-center mb-14"
-        >
-          <Badge className="mb-4">The Process</Badge>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black text-white mb-4 leading-tight">
-            From Audit to{" "}
-            <span className="text-gradient-orange">Automation Live</span>
-            <br />
-            in Under 2 Weeks
-          </h2>
-          <p className="text-[#A1A1AA] font-body text-lg max-w-2xl mx-auto">
-            A proven 4-step process that gets your business automated fast — without disrupting your operations.
-          </p>
-        </motion.div>
-
-        <div className="relative">
-          {/* Connecting line */}
-          <div className="absolute left-8 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent hidden md:block lg:hidden" />
-          <div className="absolute left-1/2 -translate-x-1/2 top-12 bottom-12 w-px bg-gradient-to-b from-transparent via-white/08 to-transparent hidden lg:block" />
-
-          <div className="grid md:grid-cols-2 gap-5 lg:gap-8">
-            {steps.map((step, i) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 30 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
-                className="group relative flex gap-5 p-6 rounded-2xl neo-card hover:border-white/12 transition-all duration-300"
-              >
-                {/* Hover glow */}
-                <div
-                  className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: `radial-gradient(ellipse at top left, ${step.color}08, transparent)` }}
-                />
-
-                {/* Step number */}
-                <div className="relative z-10 flex-shrink-0">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center font-heading font-black text-lg transition-all duration-300"
-                    style={{
-                      background: `${step.color}15`,
-                      border: `1px solid ${step.color}30`,
-                      color: step.color,
-                    }}
-                  >
-                    {step.step}
-                  </div>
-                </div>
-
-                <div className="relative z-10 flex-1">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-heading font-bold text-white text-lg group-hover:text-[#FF6B00] transition-colors">
-                      {step.title}
-                    </h3>
-                    <span
-                      className="text-[10px] font-body px-2 py-1 rounded-full flex-shrink-0 ml-2"
-                      style={{
-                        color: step.color,
-                        background: `${step.color}12`,
-                        border: `1px solid ${step.color}25`,
-                      }}
-                    >
-                      {step.duration}
-                    </span>
-                  </div>
-                  <p className="text-sm text-[#A1A1AA] font-body leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-12"
-        >
-          <Link
-            href="/booking"
-            className="inline-flex items-center gap-2 text-sm font-subheading font-medium text-[#A1A1AA] hover:text-white transition-colors"
-          >
-            Start with a free consultation
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-          <p className="mt-2 text-sm text-[#71717A] font-body">
-            No credit card required. No commitment.
-          </p>
-        </motion.div>
+        <ol className="mt-16 grid border-t border-white/[0.08] md:grid-cols-2 lg:mt-24 lg:grid-cols-4">
+          {STEPS.map((s, i) => (
+            <Reveal
+              as="li"
+              key={s.title}
+              delay={i * 0.08}
+              className="border-b border-white/[0.08] py-8 md:px-6 md:[&:nth-child(odd)]:pl-0 lg:border-b-0 lg:border-r lg:[&:last-child]:border-r-0 lg:[&:nth-child(odd)]:pl-6 lg:first:pl-0"
+            >
+              <div className="flex items-baseline justify-between gap-4 font-mono text-[11px] uppercase tracking-[0.14em]">
+                <span className="text-[#2997FF]">Step {String(i + 1).padStart(2, "0")}</span>
+                <span className="text-[#A1A1AA]">{s.when}</span>
+              </div>
+              <h3 className="mt-10 font-heading text-2xl font-semibold tracking-[-0.025em] text-[#F5F5F7] lg:mt-16">{s.title}</h3>
+              <p className="mt-3 max-w-[36ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{s.body}</p>
+            </Reveal>
+          ))}
+        </ol>
       </div>
     </section>
   );

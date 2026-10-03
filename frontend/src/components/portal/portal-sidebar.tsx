@@ -29,7 +29,7 @@ export default function PortalSidebar({ userEmail }: { userEmail: string }) {
     <aside className="fixed left-0 top-0 h-full w-64 bg-[#0D0D10] border-r border-white/[0.06] flex flex-col z-40">
       <div className="p-6 border-b border-white/[0.06]">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#FF6B00] to-[#FF8C00] flex items-center justify-center">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#2997FF] to-[#5CB0FF] flex items-center justify-center">
             <Zap className="w-3.5 h-3.5 text-white" />
           </div>
           <span className="font-heading font-bold text-white text-sm">RudraAI</span>
@@ -47,7 +47,7 @@ export default function PortalSidebar({ userEmail }: { userEmail: string }) {
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                 active
-                  ? "bg-[rgba(255,107,0,0.12)] text-[#FF6B00] border border-[rgba(255,107,0,0.2)]"
+                  ? "bg-[rgba(41,151,255,0.12)] text-[#2997FF] border border-[rgba(41,151,255,0.2)]"
                   : "text-[#A1A1AA] hover:text-white hover:bg-white/[0.04]"
               )}
             >

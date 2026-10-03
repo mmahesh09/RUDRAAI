@@ -24,7 +24,7 @@ interface AnimatedRoadmapProps extends React.HTMLAttributes<HTMLDivElement> {
 const MilestoneMarker = ({ milestone }: { milestone: Milestone }) => {
   const statusClasses = {
     complete: "bg-[#10B981] border-[#059669]",
-    "in-progress": "bg-[#FF6B00] border-[#EA580C] animate-pulse",
+    "in-progress": "bg-[#2997FF] border-[#EA580C] animate-pulse",
     pending: "bg-white/20 border-white/30",
   };
 
@@ -39,7 +39,7 @@ const MilestoneMarker = ({ milestone }: { milestone: Milestone }) => {
     >
       <div className="relative flex h-8 w-8 items-center justify-center">
         <div className={cn("absolute h-3 w-3 rounded-full border-2", statusClasses[milestone.status])} />
-        <div className="absolute h-full w-full rounded-full bg-[rgba(255,107,0,0.08)]" />
+        <div className="absolute h-full w-full rounded-full bg-[rgba(41,151,255,0.08)]" />
       </div>
       <div className="rounded-xl border border-white/10 bg-[rgba(255,255,255,0.04)] backdrop-blur-sm px-4 py-2 text-sm font-subheading font-medium text-white shadow-sm whitespace-nowrap">
         {milestone.name}
@@ -87,7 +87,7 @@ const AnimatedRoadmap = React.forwardRef<HTMLDivElement, AnimatedRoadmapProps>(
             <motion.path
               d="M 50 300 Q 200 50 400 180 T 750 80"
               fill="none"
-              stroke="#FF6B00"
+              stroke="#2997FF"
               strokeWidth="2"
               strokeDasharray="8 4"
               strokeLinecap="round"

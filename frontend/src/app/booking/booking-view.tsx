@@ -3,7 +3,6 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,10 +25,10 @@ import { apiPost, apiGet } from "@/lib/api";
 const CALCOM_LINK = process.env.NEXT_PUBLIC_CALCOM_LINK;
 
 const BENEFITS = [
-  "Get a complete audit of your current manual processes",
-  "Receive a custom automation roadmap with ROI estimates",
-  "Learn which tools best fit your tech stack",
-  "Walk away with actionable next steps — even if we don't work together",
+  "A quick look at the manual work slowing you down",
+  "An honest view of what's worth automating — and what isn't",
+  "A rough idea of timeline and cost for anything worth building",
+  "Clear next steps, whether or not we work together",
 ];
 
 // ── Cal.com slot types (mirrors what coach-scheduling-card expects) ────────────
@@ -197,7 +196,7 @@ export default function BookingView() {
         theme: "dark",
         hideEventTypeDetails: false,
         layout: "month_view",
-        styles: { branding: { brandColor: "#FF6B00" } },
+        styles: { branding: { brandColor: "#2997FF" } },
       });
       Cal.ns!["booking-inline"]("on", {
         action: "bookingSuccessful",
@@ -293,30 +292,33 @@ export default function BookingView() {
       <Navbar />
 
       {/* Hero */}
-      <div className="relative pt-32 pb-8 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide text-center">
-          <Badge className="mb-4">Free Consultation</Badge>
-          <h1 className="text-4xl sm:text-5xl font-heading font-black text-white mb-4 leading-tight">
-            Book Your Free{" "}
-            <span className="text-gradient-orange">Automation Audit</span>
-          </h1>
-          <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto">
-            15 minutes. No sales pitch. Walk away with a custom roadmap and ROI analysis for your business.
+      <div className="relative overflow-hidden pt-36 pb-12 md:pt-44">
+        <div className="pointer-events-none absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+          <div className="h-full border-x border-white/[0.06]" />
+        </div>
+        <div className="relative z-10 container-wide">
+          <p className="hero-fade eyebrow">
+            <span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;Free call
           </p>
-          {/* Integration badges */}
-          <div className="flex items-center justify-center gap-3 mt-5 flex-wrap">
+          <h1 className="mt-8 max-w-[16ch] font-heading font-semibold leading-[0.98] tracking-[-0.045em] text-[#F5F5F7] text-[clamp(2.75rem,7vw,5.5rem)]">
+            Fifteen minutes. <span className="text-[#2997FF]">Saturday or Sunday.</span>
+          </h1>
+          <p className="hero-fade mt-8 max-w-[52ch] text-lg leading-[1.65] text-[#A1A1AA]" style={{ "--d": "0.3s" } as React.CSSProperties}>
+            Tell us what&apos;s slowing your business down. No slides, no sales pitch — just an honest view of what&apos;s
+            worth building.
+          </p>
+          {/* What the booking sets up */}
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[#A1A1AA]">
             {(CALCOM_LINK || usingRealSlots) && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-body">
-                <CalendarCheck className="w-3.5 h-3.5" /> Cal.com Live Slots
+              <span className="inline-flex items-center gap-2">
+                <CalendarCheck className="w-3.5 h-3.5 text-[#2997FF]" aria-hidden="true" /> Live availability
               </span>
             )}
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-body">
-              <Video className="w-3.5 h-3.5" /> Zoom Meeting Link
+            <span className="inline-flex items-center gap-2">
+              <Video className="w-3.5 h-3.5 text-[#2997FF]" aria-hidden="true" /> Video link by email
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-body">
-              <FileText className="w-3.5 h-3.5" /> Notion Onboarding
+            <span className="inline-flex items-center gap-2">
+              <FileText className="w-3.5 h-3.5 text-[#2997FF]" aria-hidden="true" /> Calendar invite
             </span>
           </div>
         </div>
@@ -332,12 +334,12 @@ export default function BookingView() {
                 <div
                   className={cn(
                     "w-7 h-7 rounded-full flex items-center justify-center text-sm font-heading font-bold transition-all duration-300",
-                    step >= s.n ? "bg-[#FF6B00] text-white" : "bg-white/[0.08] text-[#71717A]"
+                    step >= s.n ? "bg-[#2997FF] text-white" : "bg-white/[0.08] text-[#8A8A93]"
                   )}
                 >
                   {s.n}
                 </div>
-                <span className={cn("text-sm font-body hidden sm:block", step >= s.n ? "text-white" : "text-[#71717A]")}>
+                <span className={cn("text-sm font-body hidden sm:block", step >= s.n ? "text-white" : "text-[#8A8A93]")}>
                   {s.label}
                 </span>
                 {idx < 1 && <div className="w-8 h-px bg-white/10 mx-1" />}
@@ -356,12 +358,12 @@ export default function BookingView() {
                 <div className="w-20 h-20 rounded-3xl bg-green-500/15 border border-green-500/30 flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 className="w-10 h-10 text-green-400" />
                 </div>
-                <h2 className="text-2xl font-heading font-black text-white mb-1">Hi {form.name},</h2>
+                <h2 className="text-2xl font-heading font-semibold tracking-[-0.03em] text-white mb-1">Hi {form.name},</h2>
                 <p className="text-[#A1A1AA] font-body mb-2">
                   Your Automation Audit is confirmed for{" "}
                   <span className="text-white font-medium">{timeSlot}</span>.
                 </p>
-                <p className="text-sm font-body text-[#71717A] mb-6">
+                <p className="text-sm font-body text-[#8A8A93] mb-6">
                   Check your email for the Zoom link and calendar invite. We&apos;ll send a pre-call questionnaire 24 hours before.
                 </p>
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-body">
@@ -376,7 +378,7 @@ export default function BookingView() {
                     <CalendarCheck className="w-5 h-5 text-blue-400 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-heading font-semibold text-blue-400">Cal.com</p>
-                      <p className="text-xs font-body text-[#71717A]">Slot reserved</p>
+                      <p className="text-xs font-body text-[#8A8A93]">Slot reserved</p>
                     </div>
                   </div>
                 )}
@@ -398,15 +400,15 @@ export default function BookingView() {
                     <Video className="w-5 h-5 text-sky-400 flex-shrink-0" />
                     <div>
                       <p className="text-xs font-heading font-semibold text-sky-400">Zoom</p>
-                      <p className="text-xs font-body text-[#71717A]">Link sent to email</p>
+                      <p className="text-xs font-body text-[#8A8A93]">Link sent to email</p>
                     </div>
                   </div>
                 )}
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-purple-500/05 border border-purple-500/15">
-                  <FileText className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-zinc-400/05 border border-zinc-400/15">
+                  <FileText className="w-5 h-5 text-zinc-300 flex-shrink-0" />
                   <div>
-                    <p className="text-xs font-heading font-semibold text-purple-400">Notion</p>
-                    <p className="text-xs font-body text-[#71717A]">Onboarding logged</p>
+                    <p className="text-xs font-heading font-semibold text-zinc-300">Notion</p>
+                    <p className="text-xs font-body text-[#8A8A93]">Onboarding logged</p>
                   </div>
                 </div>
               </div>
@@ -414,8 +416,8 @@ export default function BookingView() {
               {/* Client onboarding summary */}
               <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
                 <h3 className="font-heading font-semibold text-white mb-4 text-sm flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-md bg-purple-500/20 flex items-center justify-center">
-                    <FileText className="w-3 h-3 text-purple-400" />
+                  <span className="w-5 h-5 rounded-md bg-zinc-400/20 flex items-center justify-center">
+                    <FileText className="w-3 h-3 text-zinc-300" />
                   </span>
                   Onboarding Summary
                 </h3>
@@ -429,7 +431,7 @@ export default function BookingView() {
                     { label: "Status", value: "✓ Confirmed", highlight: true },
                   ].map(({ label, value, highlight }) => (
                     <div key={label} className="flex justify-between items-center py-2 border-b border-white/[0.05] last:border-0">
-                      <span className="text-[#71717A]">{label}</span>
+                      <span className="text-[#8A8A93]">{label}</span>
                       <span className={highlight ? "text-[#10B981] font-semibold" : "text-white"}>{value}</span>
                     </div>
                   ))}
@@ -441,7 +443,7 @@ export default function BookingView() {
               {/* Left — benefits */}
               <div className="lg:col-span-2 space-y-5">
                 <div className="p-6 rounded-2xl neo-card">
-                  <h3 className="font-heading font-bold text-white mb-4">What You&apos;ll Get</h3>
+                  <h2 className="font-heading text-xl font-semibold tracking-[-0.02em] text-[#F5F5F7] mb-4">What you&apos;ll get</h2>
                   <div className="space-y-3">
                     {BENEFITS.map((b) => (
                       <div key={b} className="flex items-start gap-2.5">
@@ -452,17 +454,17 @@ export default function BookingView() {
                   </div>
                   <div className="mt-5 pt-5 border-t border-white/[0.06]">
                     <div className="flex items-center gap-2 text-sm font-body text-[#A1A1AA]">
-                      <Clock className="w-4 h-4 text-[#FF6B00]" />
-                      <span>15 minutes · Free · No strings attached</span>
+                      <Clock className="w-4 h-4 text-[#2997FF]" />
+                      <span>15 minutes · Free · No obligation</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-                  <p className="text-xs font-body text-[#71717A] italic">
-                    &ldquo;The audit alone saved us 12 hours of research. Even before we hired them, the strategy call was invaluable.&rdquo;
+                <div className="border-t border-white/[0.08] pt-5">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">Weekends only</p>
+                  <p className="mt-2 text-[15px] leading-relaxed text-[#A1A1AA]">
+                    Calls run on Saturdays and Sundays so they never clash with your working week. Times are shown in India Standard Time (IST).
                   </p>
-                  <div className="text-xs font-body text-[#A1A1AA] mt-2">— James O., COO · MediSchedule</div>
                 </div>
               </div>
 
@@ -478,7 +480,7 @@ export default function BookingView() {
                   <div className="relative">
                     {calSlotsLoading && (
                       <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/40 backdrop-blur-sm">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#FF6B00]" />
+                        <Loader2 className="w-6 h-6 animate-spin text-[#2997FF]" />
                       </div>
                     )}
                     <CoachSchedulingCard
@@ -488,7 +490,7 @@ export default function BookingView() {
                       className="w-full"
                     />
                     {usingRealSlots && (
-                      <p className="text-center text-xs text-[#71717A] font-body mt-2">
+                      <p className="text-center text-xs text-[#8A8A93] font-body mt-2">
                         Live availability from Cal.com · All times IST
                       </p>
                     )}
@@ -516,7 +518,7 @@ export default function BookingView() {
                 {/* Selected slot summary */}
                 {timeSlot && (
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] mb-3">
-                    <Clock className="w-4 h-4 text-[#FF6B00]" />
+                    <Clock className="w-4 h-4 text-[#2997FF]" />
                     <span className="text-sm font-body text-white flex-1">
                       <strong>{timeSlot}</strong>
                     </span>
@@ -524,7 +526,7 @@ export default function BookingView() {
                       <button
                         type="button"
                         onClick={() => { setStep(1); setSelectedSlot(null); setSelectedSlotISO(null); }}
-                        className="text-xs text-[#FF6B00] hover:text-[#FF8533] font-body"
+                        className="text-xs text-[#2997FF] hover:text-[#5CB0FF] font-body"
                       >
                         Change
                       </button>
@@ -605,7 +607,7 @@ export default function BookingView() {
                 <div className="space-y-1.5">
                   <Label htmlFor="b-goal">
                     Main Automation Goal *{" "}
-                    <span className="text-[#71717A] font-normal">(min. 20 chars)</span>
+                    <span className="text-[#8A8A93] font-normal">(min. 20 chars)</span>
                   </Label>
                   <Textarea
                     id="b-goal"
@@ -617,7 +619,7 @@ export default function BookingView() {
                     onChange={(e) => setForm({ ...form, goal: e.target.value })}
                   />
                   <div className="flex justify-end">
-                    <span className={`text-xs font-body transition-colors ${form.goal.length < 20 ? "text-[#71717A]" : "text-[#10B981]"}`}>
+                    <span className={`text-xs font-body transition-colors ${form.goal.length < 20 ? "text-[#8A8A93]" : "text-[#10B981]"}`}>
                       {form.goal.length}/20 min
                     </span>
                   </div>

@@ -39,7 +39,7 @@ export default function ProjectUpdateForm({ projectId }: { projectId: string }) 
         onChange={(e) => setContent(e.target.value)}
         placeholder="Ask a question or leave a note for your project team..."
         rows={3}
-        className="w-full bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#52525B] resize-none focus:outline-none focus:border-[rgba(255,107,0,0.4)] transition-colors"
+        className="w-full bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#52525B] resize-none focus:outline-none focus:border-[rgba(41,151,255,0.4)] transition-colors"
       />
       {error && <p className="text-red-400 text-xs">{error}</p>}
       {sent && <p className="text-green-400 text-xs">Message sent!</p>}

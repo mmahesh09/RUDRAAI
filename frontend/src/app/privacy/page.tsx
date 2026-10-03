@@ -1,6 +1,5 @@
-﻿import Navbar from "@/components/navbar";
+import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { Badge } from "@/components/ui/badge";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,18 +15,19 @@ const WEBSITE = "https://www.rudraai.online";
 
 export default function PrivacyPage() {
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
 
-      <div className="relative pt-32 pb-8 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-20" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide text-center">
-          <Badge className="mb-4">Legal</Badge>
-          <h1 className="text-4xl sm:text-5xl font-heading font-black text-white mb-4">
+      <div className="relative pt-36 pb-8 overflow-hidden md:pt-44">
+        <div className="pointer-events-none absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+          <div className="h-full border-x border-white/[0.06]" />
+        </div>
+        <div className="relative z-10 container-wide max-w-3xl">
+          <p className="eyebrow mb-8"><span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;Legal</p>
+          <h1 className="font-heading font-semibold leading-[1] tracking-[-0.045em] text-[#F5F5F7] text-[clamp(2.75rem,6vw,4.5rem)] mb-6">
             Privacy Policy
           </h1>
-          <p className="text-[#71717A] font-body text-sm">Last updated: {LAST_UPDATED}</p>
+          <p className="text-[#8A8A93] font-body text-sm">Last updated: {LAST_UPDATED}</p>
         </div>
       </div>
 
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
         <div className="container-wide max-w-3xl prose-dark">
           <div className="space-y-10 font-body text-[#A1A1AA] leading-relaxed">
 
-            <div className="p-5 rounded-xl border border-[rgba(255,107,0,0.2)] bg-[rgba(255,107,0,0.05)] text-sm">
+            <div className="p-5 rounded-xl border border-[rgba(41,151,255,0.2)] bg-[rgba(41,151,255,0.05)] text-sm">
               <strong className="text-white">Plain-English Summary:</strong> We collect only what we need
               (name, email, company) to respond to your enquiry or confirm your booking. We don't sell
               your data, don't run ads, and don't use third-party tracking beyond what's listed below.
@@ -98,7 +98,7 @@ export default function PrivacyPage() {
               },
               {
                 title: "8. Cookies",
-                body: `We use one cookie: <code class="text-[#FF6B00]">rudraai_cookie_consent</code> — a first-party cookie that stores whether you have accepted or declined our cookie notice. It does not track you. It expires after 12 months. We do not use advertising cookies, third-party tracking cookies, or analytics cookies at this time.`,
+                body: `We use one cookie: <code class="text-[#2997FF]">rudraai_cookie_consent</code> — a first-party cookie that stores whether you have accepted or declined our cookie notice. It does not track you. It expires after 12 months. We do not use advertising cookies, third-party tracking cookies, or analytics cookies at this time.`,
                 isHtml: true,
               },
               {
@@ -119,19 +119,19 @@ export default function PrivacyPage() {
               },
               {
                 title: "13. Contact Us",
-                body: `To exercise your rights, request deletion, or ask any privacy question, email us at <a href="mailto:${CONTACT_EMAIL}" class="text-[#FF6B00] hover:underline">${CONTACT_EMAIL}</a>. We will respond within 30 days.`,
+                body: `To exercise your rights, request deletion, or ask any privacy question, email us at <a href="mailto:${CONTACT_EMAIL}" class="text-[#2997FF] hover:underline">${CONTACT_EMAIL}</a>. We will respond within 30 days.`,
                 isHtml: true,
               },
             ].map((section) => (
               <div key={section.title}>
-                <h2 className="text-xl font-heading font-bold text-white mb-3">{section.title}</h2>
+                <h2 className="text-2xl font-heading font-semibold tracking-[-0.02em] text-[#F5F5F7] mb-3">{section.title}</h2>
                 {section.body && section.isHtml ? (
                   <p dangerouslySetInnerHTML={{ __html: section.body }} />
                 ) : section.body ? (
                   <p>{section.body}</p>
                 ) : null}
                 {section.list && (
-                  <ul className="mt-3 space-y-2 list-disc list-inside marker:text-[#FF6B00]">
+                  <ul className="mt-3 space-y-2 list-disc list-inside marker:text-[#2997FF]">
                     {section.list.map((item) => (
                       <li key={item} className="pl-1">{item}</li>
                     ))}

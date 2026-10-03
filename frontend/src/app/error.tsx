@@ -9,19 +9,19 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-[#09090B] flex items-center justify-center px-4">
-      <div className="text-center max-w-md">
-        <div className="text-5xl font-heading font-black text-[#FF6B00] mb-4">500</div>
-        <h1 className="text-2xl font-heading font-bold text-white mb-2">Something went wrong</h1>
-        <p className="text-[#71717A] font-body mb-8">An unexpected error occurred. Our team has been notified.</p>
-        <div className="flex gap-3 justify-center">
+    <div className="min-h-[100svh] bg-black flex items-center px-4">
+      <div className="container-wide">
+        <p className="eyebrow mb-8"><span className="text-[#2997FF]">500</span>&nbsp;&nbsp;Error</p>
+        <h1 className="max-w-[14ch] font-heading font-semibold leading-[0.95] tracking-[-0.05em] text-[#F5F5F7] text-[clamp(3rem,8vw,6.5rem)] mb-8">Something went wrong.</h1>
+        <p className="max-w-[46ch] text-lg leading-[1.65] text-[#A1A1AA] mb-10">This page hit an unexpected error and we&apos;ve been notified. Try again, or head back to the homepage.</p>
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={reset}
-            className="px-5 py-2.5 rounded-xl bg-[#FF6B00] text-white text-sm font-subheading font-semibold hover:bg-[#e55f00] transition-colors"
+            className="inline-flex h-12 items-center rounded-full bg-[#0071E3] px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#0077ED]"
           >
             Try again
           </button>
-          <Link href="/" className="px-5 py-2.5 rounded-xl border border-white/10 text-[#A1A1AA] text-sm font-subheading hover:text-white transition-colors">
+          <Link href="/" className="inline-flex h-12 items-center rounded-full border border-white/[0.18] px-6 text-[15px] font-medium text-[#F5F5F7] transition-colors hover:border-white/40">
             Go home
           </Link>
         </div>

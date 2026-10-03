@@ -1,130 +1,82 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
-import { Badge } from "@/components/ui/badge";
+import PageHero from "@/components/site/page-hero";
 import Link from "next/link";
-import { ArrowRight, Clock, Calendar } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
-import { posts, categoryColors } from "@/lib/posts";
+import { posts } from "@/lib/posts";
 
 export const metadata: Metadata = {
-  title: "Blog — RudraAI | Automation Tips & AI Insights",
+  title: "Blog — Practical Notes on AI Agents & Automation",
   description:
-    "Practical guides on n8n, AI agents, workflow automation, and business process optimization from the RudraAI team.",
+    "Plain-English guides on n8n, AI agents, websites and workflow automation — what works, what it costs, and how to start — from the RudraAI studio.",
   alternates: { canonical: "/blog" },
 };
 
 export default function BlogPage() {
-  const featured = posts.find((p) => p.featured);
-  const rest = posts.filter((p) => !p.featured);
+  const featured = posts.find((p) => p.featured) ?? posts[0];
+  const rest = posts.filter((p) => p.slug !== featured?.slug);
 
   return (
-    <main>
+    <main className="bg-black">
       <Navbar />
+      <PageHero
+        label="Blog"
+        title="Notes from the workbench."
+        intro="Practical writing on AI agents, automation and the web — what we've learned building them, without the hype."
+      />
 
-      <div className="relative pt-32 pb-16 overflow-hidden">
-        <div className="absolute inset-0 grid-bg opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow" />
-        <div className="relative z-10 container-wide text-center">
-          <Badge className="mb-4">Knowledge Hub</Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-black text-white mb-4 leading-tight">
-            Automation <span className="text-gradient-orange">Insights</span>
-          </h1>
-          <p className="text-[#A1A1AA] font-body text-xl max-w-2xl mx-auto">
-            Practical guides, tutorials, and strategies from my work building real automations.
-          </p>
-        </div>
-      </div>
-
-      <section className="section-padding">
+      <section className="pb-24 md:pb-32">
         <div className="container-wide">
-          {/* Featured post */}
+          {/* Featured — image-led, full width */}
           {featured && (
-            <div className="mb-10">
-              <Link href={`/blog/${featured.slug}`} className="group block">
-                <div className="relative rounded-3xl neo-card overflow-hidden hover:border-white/12 transition-all duration-300">
-                  <div className="grid md:grid-cols-2 items-center gap-0">
-                    <div className="relative h-64 md:h-full overflow-hidden">
-                      <img
-                        src={featured.image}
-                        alt={featured.title}
-                        className="w-full h-full object-cover opacity-50 group-hover:opacity-65 group-hover:scale-105 transition-all duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#111117] hidden md:block" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#111117] via-[#111117]/30 to-transparent md:hidden" />
-                    </div>
-                    <div className="p-8 md:p-10">
-                      <div className="flex items-center gap-3 mb-4">
-                        <Badge
-                          style={{
-                            color: categoryColors[featured.category],
-                            background: `${categoryColors[featured.category]}15`,
-                            borderColor: `${categoryColors[featured.category]}30`,
-                          }}
-                        >
-                          {featured.category}
-                        </Badge>
-                        <Badge variant="default" className="text-[10px]">Featured</Badge>
-                      </div>
-                      <h2 className="text-2xl md:text-3xl font-heading font-black text-white mb-3 group-hover:text-[#FF6B00] transition-colors leading-tight">
-                        {featured.title}
-                      </h2>
-                      <p className="text-[#A1A1AA] font-body leading-relaxed mb-5">{featured.excerpt}</p>
-                      <div className="flex items-center gap-4 text-sm font-body text-[#71717A]">
-                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{featured.readTime}</span>
-                        <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{featured.date}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </div>
+            <Link href={`/blog/${featured.slug}`} className="group grid gap-8 border-t border-white/[0.08] pt-10 lg:grid-cols-12 lg:gap-x-8">
+              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-[#0B0B0C] lg:col-span-7">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={featured.image}
+                  alt=""
+                  className="h-full w-full object-cover opacity-80 transition-[opacity,transform] duration-700 group-hover:scale-[1.02] group-hover:opacity-100"
+                />
+              </div>
+              <div className="flex flex-col justify-end lg:col-span-5">
+                <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
+                  <span className="text-[#2997FF]">Featured</span>&nbsp;&nbsp;·&nbsp;&nbsp;{featured.category}
+                </p>
+                <h2 className="mt-4 font-heading text-[clamp(1.75rem,3.2vw,2.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF]">
+                  {featured.title}
+                </h2>
+                <p className="mt-4 max-w-[48ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{featured.excerpt}</p>
+                <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.12em] text-[#8A8A93]">
+                  {featured.date} · {featured.readTime}
+                </p>
+              </div>
+            </Link>
           )}
 
-          {/* Rest of posts */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Index — one post per ruled row */}
+          <ol className="mt-20 border-b border-white/[0.08]">
             {rest.map((post) => (
-              <Link key={post.slug} href={`/blog/${post.slug}`} className="group block">
-                <div className="rounded-2xl neo-card overflow-hidden hover:border-white/12 transition-all duration-300 h-full flex flex-col">
-                  <div className="relative h-44 overflow-hidden">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-105 transition-all duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#111117] via-[#111117]/40 to-transparent" />
-                    <div className="absolute top-3 left-3">
-                      <span
-                        className="text-[10px] font-body px-2 py-1 rounded"
-                        style={{
-                          color: categoryColors[post.category] || "#A1A1AA",
-                          background: `${categoryColors[post.category] || "#A1A1AA"}15`,
-                          border: `1px solid ${categoryColors[post.category] || "#A1A1AA"}30`,
-                        }}
-                      >
-                        {post.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-heading font-bold text-white mb-2 group-hover:text-[#FF6B00] transition-colors leading-snug">
+              <li key={post.slug} className="border-t border-white/[0.08]">
+                <Link href={`/blog/${post.slug}`} className="group grid gap-3 py-8 md:grid-cols-12 md:gap-x-8">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#8A8A93] md:col-span-2 md:pt-1.5">{post.date}</p>
+                  <div className="md:col-span-7">
+                    <h3 className="font-heading text-xl font-semibold leading-snug tracking-[-0.02em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF] sm:text-2xl">
                       {post.title}
                     </h3>
-                    <p className="text-sm text-[#A1A1AA] font-body leading-relaxed mb-4 flex-1">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs font-body text-[#71717A]">
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.readTime}</span>
-                        <span>{post.date}</span>
-                      </div>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:text-[#FF6B00] group-hover:translate-x-1 transition-all" />
-                    </div>
+                    <p className="mt-2 max-w-[60ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{post.excerpt}</p>
                   </div>
-                </div>
-              </Link>
+                  <div className="flex items-start justify-between gap-4 md:col-span-3 md:justify-end">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#A1A1AA] md:pt-1.5">
+                      {post.category} · {post.readTime}
+                    </p>
+                    <ArrowUpRight className="h-5 w-5 shrink-0 text-[#A1A1AA] transition-[color,transform] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#2997FF]" aria-hidden="true" />
+                  </div>
+                </Link>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </section>
 

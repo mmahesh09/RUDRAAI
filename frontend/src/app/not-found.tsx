@@ -1,73 +1,51 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Home, Zap } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyTitle,
-} from "@/components/ui/empty";
+import { ArrowRight } from "lucide-react";
 
-const ORB_OFFSET = 40;
+const LINKS = [
+  { label: "Services", href: "/services" },
+  { label: "Showcase", href: "/showcase" },
+  { label: "Blog", href: "/blog" },
+  { label: "Book a call", href: "/booking" },
+];
 
 export default function NotFound() {
   return (
-    <div className="w-full relative flex min-h-screen items-center justify-center overflow-hidden bg-[#09090B] text-white">
-      {/* Animated orbs */}
-      <div aria-hidden className="-z-10 absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            x: [0, ORB_OFFSET, -ORB_OFFSET, 0],
-            y: [0, 20, -20, 0],
-            rotate: [0, 10, -10, 0],
-          }}
-          className="absolute top-1/2 left-1/3 h-64 w-64 rounded-full bg-gradient-to-tr from-[rgba(255,107,0,0.12)] to-[rgba(139,92,246,0.08)] blur-3xl"
-          transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-        />
-        <motion.div
-          animate={{
-            x: [0, -ORB_OFFSET, ORB_OFFSET, 0],
-            y: [0, -20, 20, 0],
-          }}
-          className="absolute right-1/4 bottom-1/3 h-72 w-72 rounded-full bg-gradient-to-br from-[rgba(139,92,246,0.08)] to-[rgba(255,107,0,0.06)] blur-3xl"
-          transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-        />
-        <div className="absolute inset-0 grid-bg opacity-30" />
+    <main className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-black">
+      <div className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+        <div className="h-full border-x border-white/[0.06]" />
       </div>
-
-      <Empty>
-        <EmptyHeader>
-          <EmptyTitle className="font-heading font-black text-8xl text-gradient-orange">
-            404
-          </EmptyTitle>
-          <EmptyDescription className="text-[#A1A1AA] font-body text-center mt-3">
-            The page you&apos;re looking for might have been moved
-            <br />
-            or doesn&apos;t exist.
-          </EmptyDescription>
-        </EmptyHeader>
-
-        <EmptyContent>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Button asChild size="lg">
-              <Link href="/">
-                <Home className="mr-2 h-4 w-4" />
-                Go Home
+      <div className="container-wide py-24">
+        <p className="eyebrow">
+          <span className="text-[#2997FF]">404</span>&nbsp;&nbsp;Page not found
+        </p>
+        <h1 className="mt-8 max-w-[14ch] font-heading text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.95] tracking-[-0.05em] text-[#F5F5F7]">
+          This step didn&apos;t <span className="text-[#2997FF]">run.</span>
+        </h1>
+        <p className="mt-8 max-w-[46ch] text-lg leading-[1.65] text-[#A1A1AA]">
+          The page you&apos;re looking for has moved or never existed. Try one of these instead.
+        </p>
+        <ul className="mt-10 flex flex-wrap gap-2">
+          <li>
+            <Link
+              href="/"
+              className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#0071E3] px-6 text-[15px] font-semibold text-white transition-colors hover:bg-[#0077ED]"
+            >
+              Back to home
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />
+            </Link>
+          </li>
+          {LINKS.map((l) => (
+            <li key={l.href}>
+              <Link
+                href={l.href}
+                className="inline-flex h-12 items-center rounded-full border border-white/[0.18] px-6 text-[15px] font-medium text-[#F5F5F7] transition-colors hover:border-white/40"
+              >
+                {l.label}
               </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/booking">
-                <Zap className="mr-2 h-4 w-4 text-[#FF6B00]" />
-                Book Free Audit
-              </Link>
-            </Button>
-          </div>
-        </EmptyContent>
-      </Empty>
-    </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </main>
   );
 }

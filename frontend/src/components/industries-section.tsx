@@ -1,230 +1,78 @@
-"use client";
+import Reveal from "@/components/site/reveal";
 
-import { useRef, useState } from "react";
-import { motion, useInView } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-
-const industries = [
+// Typical starting points per sector — examples of what we'd build, not claims about past clients.
+const INDUSTRIES = [
   {
     id: "saas",
-    icon: "💻",
     label: "SaaS",
-    title: "Scale Your SaaS Operations",
-    description:
-      "Automate trial-to-paid conversion funnels, onboarding sequences, churn prevention alerts, and usage-based billing — all connected to your CRM and product analytics.",
-    useCases: [
-      "Lead-to-demo automation",
-      "Onboarding email sequences",
-      "Churn prediction & alerts",
-      "Usage analytics reports",
-      "Subscription lifecycle management",
-    ],
-    color: "#8B5CF6",
+    line: "Turn trials into customers without adding headcount.",
+    examples: ["Lead-to-demo routing", "Onboarding email sequences", "Usage alerts for at-risk accounts", "Weekly product metrics to Slack"],
   },
   {
     id: "ecommerce",
-    icon: "🛒",
-    label: "E-Commerce",
-    title: "Turn Orders Into Repeat Customers",
-    description:
-      "Connect your store to every touchpoint — abandoned cart recovery, post-purchase flows, review requests, inventory alerts, and supplier communication, all on autopilot.",
-    useCases: [
-      "Abandoned cart recovery",
-      "Post-purchase upsells",
-      "Inventory management",
-      "Review collection",
-      "Supplier order automation",
-    ],
-    color: "#F59E0B",
+    label: "E-commerce",
+    line: "Every order handled the same careful way, automatically.",
+    examples: ["Abandoned-cart follow-ups", "Order and delivery questions answered by an agent", "Review requests after delivery", "Low-stock alerts to suppliers"],
   },
   {
     id: "agencies",
-    icon: "🏢",
     label: "Agencies",
-    title: "Deliver More Without Hiring More",
-    description:
-      "Automate client reporting, proposal generation, project kickoffs, timesheet collection, and invoicing — so your team focuses on creative work, not admin.",
-    useCases: [
-      "Client reporting automation",
-      "Proposal generation",
-      "Project kickoff workflows",
-      "Invoice & payment follow-up",
-      "Social media scheduling",
-    ],
-    color: "#3B82F6",
+    line: "More client work, less admin around it.",
+    examples: ["Client reports built and sent on schedule", "Proposal drafts from a short brief", "Project kick-off checklists", "Invoice and payment reminders"],
   },
   {
     id: "healthcare",
-    icon: "🏥",
-    label: "Healthcare",
-    title: "Streamline Patient Operations",
-    description:
-      "HIPAA-compliant automation for appointment scheduling, patient follow-ups, insurance verification, and staff communications — reducing admin burden by 60%+.",
-    useCases: [
-      "Appointment scheduling",
-      "Patient reminders & follow-ups",
-      "Insurance verification",
-      "Staff shift management",
-      "Referral tracking",
-    ],
-    color: "#10B981",
+    label: "Clinics & healthcare",
+    line: "Less time on the phone, fewer missed appointments.",
+    examples: ["Online booking with reminders", "Answers to common patient questions", "Follow-up messages after visits", "Referral tracking"],
+    note: "Patient data needs care. We scope privacy and compliance requirements with you before building anything.",
   },
   {
-    id: "fintech",
-    icon: "💳",
-    label: "FinTech",
-    title: "Automate Compliance & Operations",
-    description:
-      "KYC verification workflows, transaction monitoring alerts, compliance report generation, and customer communication — built to financial industry standards.",
-    useCases: [
-      "KYC/AML workflows",
-      "Transaction monitoring",
-      "Compliance reporting",
-      "Customer communication",
-      "Fraud alert routing",
-    ],
-    color: "#EC4899",
+    id: "finance",
+    label: "Finance & fintech",
+    line: "Routine checks and reports, done on time, every time.",
+    examples: ["Document collection for onboarding", "Scheduled reconciliation reports", "Alert routing to the right person", "Customer status updates"],
+    note: "Regulated workflows are built to fit the compliance process you already have.",
   },
   {
     id: "operations",
-    icon: "⚙️",
-    label: "Operations",
-    title: "The Ops Team's Best Tool",
-    description:
-      "Cross-department automation that bridges every tool in your stack — from HR to finance to IT — creating seamless data flows without spreadsheet madness.",
-    useCases: [
-      "Employee onboarding",
-      "Expense approval workflows",
-      "IT ticket routing",
-      "Data sync across tools",
-      "SLA monitoring & alerts",
-    ],
-    color: "#FF6B00",
+    label: "Operations teams",
+    line: "The glue between every tool your company uses.",
+    examples: ["New-hire onboarding across tools", "Expense approval flows", "IT request routing", "Data kept in sync between systems"],
   },
 ];
 
+/** Sector index: one ruled row per industry, every example visible (no tabs hiding content). */
 export default function IndustriesSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
-  const [selected, setSelected] = useState("saas");
-
-  const active = industries.find((i) => i.id === selected)!;
-
   return (
-    <section id="industries" className="section-padding relative overflow-hidden">
-      <div className="absolute inset-0 bg-[#0D0D14]" />
-      <div className="absolute inset-0 grid-bg opacity-25" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-      <div ref={ref} className="container-wide relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          className="text-center mb-12"
-        >
-          <Badge className="mb-4">Industries</Badge>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black text-white mb-4 leading-tight">
-            We Automate{" "}
-            <span className="text-gradient-orange">Every Industry</span>
-          </h2>
-          <p className="text-[#A1A1AA] font-body text-lg max-w-2xl mx-auto">
-            Deep domain expertise across verticals means we understand your specific workflow
-            challenges — not just generic automation patterns.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.1 }}
-        >
-          {/* Industry tabs */}
-          <div className="flex flex-wrap gap-2 justify-center mb-10">
-            {industries.map((industry) => (
-              <button
-                key={industry.id}
-                onClick={() => setSelected(industry.id)}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-subheading font-medium transition-all duration-200",
-                  selected === industry.id
-                    ? "text-white border"
-                    : "text-[#71717A] hover:text-[#A1A1AA] border border-transparent hover:border-white/08 hover:bg-white/03"
-                )}
-                style={
-                  selected === industry.id
-                    ? {
-                        background: `${industry.color}12`,
-                        borderColor: `${industry.color}35`,
-                        color: industry.color,
-                      }
-                    : {}
-                }
-              >
-                <span>{industry.icon}</span>
-                {industry.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Active industry content */}
-          <motion.div
-            key={selected}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="grid md:grid-cols-2 gap-6 items-center"
-          >
-            <div className="p-7 rounded-2xl neo-card" style={{ borderColor: `${active.color}20` }}>
-              <div
-                className="text-4xl mb-4 w-14 h-14 rounded-xl flex items-center justify-center"
-                style={{ background: `${active.color}12` }}
-              >
-                {active.icon}
+    <section id="industries" className="bg-black pb-24 md:pb-32">
+      <div className="container-wide">
+        <ol className="border-b border-white/[0.08]">
+          {INDUSTRIES.map((ind, i) => (
+            <Reveal as="li" key={ind.id} delay={0.04} className="border-t border-white/[0.08]">
+              <div id={ind.id} className="grid scroll-mt-20 gap-6 py-12 lg:grid-cols-12 lg:gap-x-8">
+                <p className="font-mono text-[11px] tracking-[0.14em] text-[#2997FF] lg:col-span-1 lg:pt-3">{String(i + 1).padStart(2, "0")}</p>
+                <div className="lg:col-span-5">
+                  <h2 className="font-heading text-[clamp(1.75rem,3.2vw,2.75rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-[#F5F5F7]">
+                    {ind.label}
+                  </h2>
+                  <p className="mt-3 max-w-[34ch] text-lg leading-snug text-[#A1A1AA]">{ind.line}</p>
+                </div>
+                <div className="lg:col-span-5 lg:col-start-8">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">Where we&apos;d start</p>
+                  <ul className="mt-3 ledger border-y border-white/[0.08]">
+                    {ind.examples.map((e) => (
+                      <li key={e} className="py-3 text-[15px] text-[#F5F5F7]">
+                        {e}
+                      </li>
+                    ))}
+                  </ul>
+                  {ind.note && <p className="mt-4 text-[14px] leading-relaxed text-[#A1A1AA]">{ind.note}</p>}
+                </div>
               </div>
-              <h3 className="text-2xl font-heading font-bold text-white mb-3">
-                {active.title}
-              </h3>
-              <p className="text-[#A1A1AA] font-body leading-relaxed mb-6">
-                {active.description}
-              </p>
-              <Link
-                href="/booking"
-                className="inline-flex items-center gap-2 cta-button text-sm"
-              >
-                Get Industry-Specific Audit
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-sm font-subheading font-medium text-[#71717A] uppercase tracking-wider mb-4">
-                Common Use Cases
-              </p>
-              {active.useCases.map((useCase, i) => (
-                <motion.div
-                  key={useCase}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.06 }}
-                  className="flex items-center gap-3 p-4 rounded-xl bg-white/03 border border-white/06 hover:border-white/10 transition-colors group"
-                >
-                  <div
-                    className="w-2 h-2 rounded-full flex-shrink-0"
-                    style={{ background: active.color }}
-                  />
-                  <span className="text-sm font-body text-[#A1A1AA] group-hover:text-white transition-colors">
-                    {useCase}
-                  </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#71717A] group-hover:text-[#FF6B00] ml-auto opacity-0 group-hover:opacity-100 transition-all" />
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
+            </Reveal>
+          ))}
+        </ol>
       </div>
     </section>
   );

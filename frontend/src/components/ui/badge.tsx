@@ -2,19 +2,18 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+// Badges read as mono index labels, not pills — structure, not decoration.
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium font-subheading transition-colors",
+  "inline-flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.14em] transition-colors",
   {
     variants: {
       variant: {
-        default:
-          "bg-[rgba(255,107,0,0.1)] border border-[rgba(255,107,0,0.3)] text-[#FF6B00]",
-        secondary:
-          "bg-white/05 border border-white/10 text-[#A1A1AA]",
-        destructive: "bg-red-500/10 border border-red-500/30 text-red-400",
-        outline: "border border-white/15 text-white",
-        success: "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400",
-        purple: "bg-purple-500/10 border border-purple-500/30 text-purple-400",
+        default: "text-[#2997FF]",
+        secondary: "text-[#A1A1AA]",
+        destructive: "text-red-400",
+        outline: "rounded-full border border-white/15 px-3 py-1 text-[#F5F5F7]",
+        success: "text-emerald-400",
+        purple: "text-zinc-300",
       },
     },
     defaultVariants: {
