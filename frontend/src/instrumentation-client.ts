@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 
+// Client-side Sentry (replaces the deprecated sentry.client.config.ts).
 if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -10,3 +11,6 @@ if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
     integrations: [Sentry.replayIntegration()],
   });
 }
+
+// Traces App Router navigations
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

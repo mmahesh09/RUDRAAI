@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
@@ -37,6 +38,9 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Trace from this app, not the repo root (which has its own lockfile) — matches the Docker
+  // build, where /app is the root and server.js lands at the top of .next/standalone.
+  outputFileTracingRoot: path.join(__dirname),
 
   images: {
     remotePatterns: [
@@ -78,6 +82,6 @@ export default withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   silent: true,
-  disableLogger: true,
+  webpack: { treeshake: { removeDebugLogging: true } },
   sourcemaps: { disable: !process.env.SENTRY_AUTH_TOKEN },
 });
