@@ -176,7 +176,8 @@ export default function FeaturesSection() {
       {/* Tall track gives the pinned stage room to step through the run */}
       <div ref={trackRef} className={pinned ? "relative h-[320vh]" : "relative"}>
         <div className={pinned ? "sticky top-0 flex h-screen items-center" : "py-16"}>
-          <div className="container-wide grid w-full items-center gap-10 lg:grid-cols-12 lg:gap-x-8">
+          {/* grid-cols-1 = minmax(0,1fr): stops the 560px canvas from widening the mobile column */}
+          <div className="container-wide grid w-full grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-x-8">
             <ol className="lg:col-span-4 ledger border-y border-white/[0.08]">
               {STEPS.map((s, i) => {
                 const state = !pinned ? "done" : i < active ? "done" : i === active ? "current" : "next";
