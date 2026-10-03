@@ -32,7 +32,7 @@ export default function Hero() {
       className="relative isolate overflow-hidden bg-black lg:min-h-[100svh] flex flex-col pt-24 sm:pt-28 lg:pt-24 pb-6"
     >
       {/* Hairline frame — the visible grid the layout sits on */}
-      <div className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-10" aria-hidden="true">
         <div className="h-full border-x border-white/[0.06]" />
       </div>
 
@@ -46,7 +46,7 @@ export default function Hero() {
             {/* Eyebrow: index label + latest-post link */}
             <div style={delay(0.1)} className="hero-fade font-mono flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] uppercase tracking-[0.14em]">
               <span className="text-[#A1A1AA]">
-                <span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;AI services company
+                <span className="text-[#BF5AF2]" aria-hidden="true">●</span>&nbsp;&nbsp;AI services company
               </span>
               <span className="hidden sm:block h-px w-8 bg-white/15" aria-hidden="true" />
               <Link href="/blog" className="group inline-flex items-center gap-1.5 text-[#A1A1AA] hover:text-white transition-colors">
@@ -56,7 +56,7 @@ export default function Hero() {
             </div>
 
             <h1 className="mt-6 lg:mt-7 font-heading font-bold tracking-[-0.035em] leading-[0.98]">
-              <span className="block text-[clamp(2.6rem,11vw,4.25rem)] lg:text-[clamp(3rem,min(5.2vw,10.5svh),5.5rem)]">
+              <span className="block text-[clamp(2.25rem,11vw,4.25rem)] lg:text-[clamp(3rem,min(5.2vw,10.5svh),5.5rem)]">
                 {SERVICES.map((text, i) => (
                   <span key={text} className="block overflow-hidden pb-[0.06em]">
                     <span style={delay(0.25 + i * 0.09)} className="hero-rise inline-block text-white">
@@ -66,7 +66,7 @@ export default function Hero() {
                 ))}
               </span>
               <span className="mt-3 block overflow-hidden pb-[0.08em] font-subheading font-medium tracking-[-0.01em] text-[clamp(1.25rem,4.6vw,1.75rem)] lg:text-[clamp(1.35rem,min(2vw,4.2svh),2rem)]">
-                <span style={delay(0.25 + SERVICES.length * 0.09)} className="hero-rise inline-block text-[#2997FF]">
+                <span style={delay(0.25 + SERVICES.length * 0.09)} className="hero-rise inline-block text-[#BF5AF2]">
                   Built to work for your business.
                 </span>
               </span>
@@ -76,21 +76,19 @@ export default function Hero() {
               style={delay(0.75)}
               className="hero-fade mt-6 lg:mt-7 max-w-[44ch] text-[15px] sm:text-base leading-[1.7] text-[#A1A1AA] font-body"
             >
-              RudraAI is an AI services company. We design fast, search-ready
-              websites, build custom AI agents that answer and act for you, and
-              automate the repetitive work in between — so your team can focus on
-              growth.
+              Websites, AI agents and automations that take the repetitive work
+              off your team.
             </p>
 
             <div style={delay(0.9)} className="hero-fade mt-8 flex flex-col min-[420px]:flex-row min-[420px]:items-center gap-x-8 gap-y-4">
               <Link
                 href="/booking"
-                className="group inline-flex h-12 items-center justify-between gap-4 rounded-full bg-[#0071E3] pl-6 pr-1.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#0077ED] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2997FF]"
+                className="group inline-flex h-12 items-center justify-between gap-4 rounded-full bg-[#8944AB] pl-6 pr-1.5 text-[15px] font-semibold text-white transition-colors hover:bg-[#7A3A9A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#BF5AF2]"
               >
                 Book a free call
                 <span className="font-mono inline-flex h-9 items-center gap-2 rounded-full bg-black px-3.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white">
                   15 min · Sat–Sun
-                  <ArrowRight className="h-3.5 w-3.5 text-[#2997FF] transition-transform duration-300 group-hover:translate-x-0.5" />
+                  <ArrowRight className="h-3.5 w-3.5 text-[#BF5AF2] transition-transform duration-300 group-hover:translate-x-0.5" />
                 </span>
               </Link>
               <Link
@@ -99,7 +97,7 @@ export default function Hero() {
               >
                 See how it works
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-[0.35] bg-white/40 transition-transform duration-500 ease-out group-hover:scale-x-100 group-hover:bg-[#2997FF]" />
+                <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-[0.35] bg-white/40 transition-transform duration-500 ease-out group-hover:scale-x-100 group-hover:bg-[#BF5AF2]" />
               </Link>
             </div>
           </motion.div>
@@ -112,7 +110,7 @@ export default function Hero() {
               y: prefersReducedMotion ? 0 : vortexY,
               opacity: prefersReducedMotion ? 1 : vortexOpacity,
             }}
-            className="relative lg:col-span-5 lg:-ml-20 -mx-4 sm:mx-0"
+            className="relative lg:col-span-5 lg:-ml-20 -mx-5 sm:mx-0"
           >
             <div style={delay(0.4)} className="hero-fade-scale flex items-center justify-center">
               <HeroTornado />

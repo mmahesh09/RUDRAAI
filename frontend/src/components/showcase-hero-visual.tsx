@@ -8,11 +8,11 @@ import { ArrowRight } from "lucide-react";
 // Keep in sync with PIPELINE in workflow-scene-3d.tsx. Duplicated so the
 // fallback never pulls three.js into the page bundle.
 const STEPS = [
-  { label: "Trigger", color: "#2997FF" },
-  { label: "AI Agent", color: "#A1A1A6" },
-  { label: "Logic", color: "#3B82F6" },
-  { label: "Action", color: "#10B981" },
-  { label: "Notify", color: "#EC4899" },
+  { label: "Trigger", color: "#8E8E93" },
+  { label: "AI Agent", color: "#BF5AF2" },
+  { label: "Logic", color: "#8E8E93" },
+  { label: "Action", color: "#8E8E93" },
+  { label: "Notify", color: "#8E8E93" },
 ];
 
 const WorkflowScene3D = dynamic(() => import("@/components/workflow-scene-3d"), {

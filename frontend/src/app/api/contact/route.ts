@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
             subject: `New Contact: ${safeName} from ${safeCompany}`,
             replyTo: email,
             html: `
-              <h2 style="color:#2997FF">New Contact Form Submission</h2>
+              <h2 style="color:#BF5AF2">New Contact Form Submission</h2>
               <table cellpadding="8" style="border-collapse:collapse">
                 <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
                 <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
@@ -57,9 +57,9 @@ export async function POST(req: NextRequest) {
           subject: "Got your message — I'll be in touch soon | RudraAI",
           html: `
             <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
-              <h2 style="color:#2997FF">Thanks for reaching out, ${safeName}!</h2>
+              <h2 style="color:#BF5AF2">Thanks for reaching out, ${safeName}!</h2>
               <p>I've received your message and will get back to you within <strong>4 business hours</strong>.</p>
-              <p>While you wait, you're welcome to <a href="${bookingUrl}" style="color:#2997FF">book a free automation audit</a> — no pitch, just a practical look at your workflows.</p>
+              <p>While you wait, you're welcome to <a href="${bookingUrl}" style="color:#BF5AF2">book a free automation audit</a> — no pitch, just a practical look at your workflows.</p>
               <br>
               <p>Talk soon,<br>
               <strong>${escapeHtml(consultantName)}</strong><br>

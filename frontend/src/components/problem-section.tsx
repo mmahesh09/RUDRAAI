@@ -3,10 +3,9 @@ import Reveal from "@/components/site/reveal";
 
 // Illustrative examples of the work we take off people's plates — not client data.
 const ROWS = [
-  { task: "New enquiry from the website", today: "Sits in an inbox until someone notices", after: "Answered in seconds, logged in the CRM, sales pinged" },
-  { task: "“Do you deliver to…?” questions", today: "Same five answers typed out every day", after: "An assistant trained on your FAQs replies, day or night" },
-  { task: "Invoices and payment reminders", today: "Built by hand, chased by hand", after: "Generated on completion, reminders sent on schedule" },
-  { task: "Weekly numbers for the team", today: "An afternoon of copy-paste into a sheet", after: "A report lands in Slack every Monday at 9:00" },
+  { task: "New enquiry from the website", today: "Sits in an inbox until someone notices", after: "Answered in seconds, logged in the CRM" },
+  { task: "The same customer questions", today: "Same five answers typed out every day", after: "An assistant replies, day or night" },
+  { task: "Invoices and payment reminders", today: "Built by hand, chased by hand", after: "Sent and chased automatically" },
 ];
 
 /** §01 — the manual work, as a ledger: what it costs today, what replaces it. */
@@ -17,15 +16,14 @@ export default function ProblemSection() {
         <SectionHead
           index="01"
           label="The work that eats your week"
-          title="Your team is still doing a computer's job."
-          intro="None of it is hard. It's just constant — and every hour spent on it is an hour not spent on customers."
+          title={<span>Your team is still doing <span className="text-[#BF5AF2]">a computer&apos;s job.</span></span>}
         />
 
         <div className="mt-16 lg:mt-24" role="table" aria-label="Manual work and what replaces it">
           <div role="row" className="hidden md:grid grid-cols-12 gap-x-8 pb-4 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
             <span role="columnheader" className="col-span-4">The task</span>
             <span role="columnheader" className="col-span-4">Today</span>
-            <span role="columnheader" className="col-span-4 text-[#2997FF]">After</span>
+            <span role="columnheader" className="col-span-4 text-[#BF5AF2]">After</span>
           </div>
           <div role="rowgroup" className="border-b border-white/[0.08]">
             {ROWS.map((r, i) => (

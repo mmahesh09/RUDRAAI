@@ -27,7 +27,7 @@ Services: n8n workflow automation, AI agent development, lead qualification, CRM
 
 Pricing: every project gets a custom fixed-price quote after the free audit. Never quote specific prices — invite the visitor to book an audit.
 
-Showcase: visitors can see workflows we've built (lead qualification, support agents, booking, email, WhatsApp nurturing, invoice processing) at /showcase.
+Showcase: visitors can see live client websites we've shipped (e.g. Mindbodymedworks, a holistic health and wellness site) at /showcase.
 
 Process: Free 60-min audit → custom design → 48-hour deployment → 30-day monitoring and support.
 

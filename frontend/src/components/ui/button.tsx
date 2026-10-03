@@ -3,13 +3,13 @@ import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-// Apple-style pills: one solid primary (white on #0071E3 = 4.7:1), quiet secondaries.
+// Apple-style pills: one solid primary (white on #8944AB = 4.7:1), quiet secondaries.
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[15px] font-heading font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#2997FF] disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full text-[15px] font-heading font-semibold transition-colors duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#BF5AF2] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-[#0071E3] text-white hover:bg-[#0077ED]",
+        default: "bg-[#8944AB] text-white hover:bg-[#7A3A9A]",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
@@ -18,7 +18,7 @@ const buttonVariants = cva(
           "bg-[#161617] text-[#F5F5F7] hover:bg-[#1D1D1F]",
         ghost:
           "text-[#A1A1AA] hover:bg-white/[0.06] hover:text-white",
-        link: "text-[#2997FF] underline-offset-4 hover:underline",
+        link: "text-[#BF5AF2] underline-offset-4 hover:underline",
       },
       size: {
         default: "h-11 px-6",

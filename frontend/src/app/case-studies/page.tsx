@@ -58,9 +58,9 @@ export default function CaseStudiesPage() {
                   </div>
                   <div className="flex flex-col lg:col-span-7 lg:col-start-6">
                     <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
-                      <span className="text-[#2997FF]">{String(i + 1).padStart(2, "0")}</span>&nbsp;&nbsp;{study.industry}
+                      <span className="text-[#BF5AF2]">{String(i + 1).padStart(2, "0")}</span>&nbsp;&nbsp;{study.industry}
                     </p>
-                    <h2 className="mt-4 font-heading text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF]">
+                    <h2 className="mt-4 font-heading text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#F5F5F7] transition-colors group-hover:text-[#BF5AF2]">
                       {study.title}
                     </h2>
                     <p className="mt-4 max-w-[56ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{study.description}</p>
@@ -94,7 +94,7 @@ export default function CaseStudiesPage() {
                   <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
                     {study.company} · {study.sourceType}
                   </p>
-                  <h3 className="mt-3 font-heading text-xl font-semibold leading-snug tracking-[-0.02em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF]">
+                  <h3 className="mt-3 font-heading text-xl font-semibold leading-snug tracking-[-0.02em] text-[#F5F5F7] transition-colors group-hover:text-[#BF5AF2]">
                     {study.title}
                   </h3>
                   <p className="mt-3 text-[15px] leading-[1.7] text-[#A1A1AA]">{study.description}</p>

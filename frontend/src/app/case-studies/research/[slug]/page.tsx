@@ -51,13 +51,13 @@ export default async function ResearchCaseStudyDetailPage({ params }: Props) {
             All case studies
           </Link>
           <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
-            <span className="text-[#2997FF]">Industry research</span>&nbsp;&nbsp;·&nbsp;&nbsp;{study.company}&nbsp;&nbsp;·&nbsp;&nbsp;{study.category}
+            <span className="text-[#BF5AF2]">Industry research</span>&nbsp;&nbsp;·&nbsp;&nbsp;{study.company}&nbsp;&nbsp;·&nbsp;&nbsp;{study.category}
           </p>
           <h1 className="mt-5 max-w-[20ch] font-heading text-[clamp(2.25rem,5.5vw,4.5rem)] font-semibold leading-[1.0] tracking-[-0.045em] text-[#F5F5F7] [text-wrap:balance]">
             {study.title}
           </h1>
           <p className="mt-6 max-w-[56ch] text-xl leading-[1.6] text-[#A1A1AA]">{study.description}</p>
-          <p className="mt-6 max-w-[64ch] border-l-2 border-[#2997FF] pl-4 text-[15px] leading-relaxed text-[#A1A1AA]">
+          <p className="mt-6 max-w-[64ch] border-l-2 border-[#BF5AF2] pl-4 text-[15px] leading-relaxed text-[#A1A1AA]">
             A summary of publicly published results ({study.publishedContext}). This is not RudraAI client work — sources
             are linked below.
           </p>
@@ -90,7 +90,7 @@ export default async function ResearchCaseStudyDetailPage({ params }: Props) {
                           href={source.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="group inline-flex items-start gap-2 text-[14px] leading-snug text-[#F5F5F7] underline decoration-white/25 underline-offset-4 hover:decoration-[#2997FF]"
+                          className="group inline-flex items-start gap-2 text-[14px] leading-snug text-[#F5F5F7] underline decoration-white/25 underline-offset-4 hover:decoration-[#BF5AF2]"
                         >
                           {source.label}
                           <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#A1A1AA]" aria-hidden="true" />

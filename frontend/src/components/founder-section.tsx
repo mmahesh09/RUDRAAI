@@ -18,7 +18,7 @@ export default function FounderSection() {
         <div className="lg:col-span-6">
           <Reveal className="border-t border-white/[0.08] pt-5">
             <p className="eyebrow">
-              <span className="text-[#2997FF]">05&nbsp;&nbsp;</span>Who builds it
+              <span className="text-[#BF5AF2]">05&nbsp;&nbsp;</span>Who builds it
             </p>
           </Reveal>
           <Reveal delay={0.05}>
@@ -36,7 +36,7 @@ export default function FounderSection() {
             </div>
             <Link
               href="/about"
-              className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#2997FF]"
+              className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#BF5AF2]"
             >
               Our story
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />

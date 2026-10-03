@@ -4,7 +4,6 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import HowItWorksSection from "@/components/how-it-works-section";
 import ServicesContactSection from "@/components/services-contact-section";
-import CTASection from "@/components/cta-section";
 import PageHero from "@/components/site/page-hero";
 import Reveal from "@/components/site/reveal";
 import { SERVICES, SITE } from "@/lib/site";
@@ -14,17 +13,14 @@ const EXAMPLES: Record<(typeof SERVICES)[number]["slug"], string[]> = {
   websites: [
     "A clinic site where patients find the right doctor and book in two taps",
     "A product site that ranks for what your customers actually search",
-    "A landing page for a launch, live in days, measured from the first visit",
   ],
   "ai-agents": [
     "A website assistant that answers pricing and availability from your own docs",
     "A WhatsApp agent that qualifies leads and books calls into your calendar",
-    "An internal helper that finds the right policy or SOP in seconds",
   ],
   automations: [
     "Form → CRM → personal reply → Slack alert, in under ten seconds",
     "Invoices created when a job is marked done, reminders sent automatically",
-    "A Monday-morning report pulled from five tools into one message",
   ],
 };
 
@@ -34,15 +30,15 @@ export default function ServicesView() {
       <Navbar />
       <PageHero
         label="Services"
-        title="Built to take work off your plate."
-        intro="Websites that bring people in, AI agents that answer them, and automations that handle what happens next. Each one fixed-price, documented, and yours to keep."
+        title={<span>Built to take work <span className="text-[#BF5AF2]">off your plate.</span></span>}
+        intro="Fixed-price, documented, and yours to keep."
       >
         <nav aria-label="Services on this page" className="flex flex-wrap gap-2">
           {SERVICES.map((s) => (
             <a
               key={s.slug}
               href={`#${s.slug}`}
-              className="inline-flex h-10 items-center rounded-full border border-white/[0.18] px-5 text-[14px] font-medium text-[#F5F5F7] transition-colors hover:border-white/40"
+              className="inline-flex h-11 items-center rounded-full border border-white/[0.18] px-5 text-[14px] font-medium text-[#F5F5F7] transition-colors hover:border-white/40"
             >
               {s.name}
             </a>
@@ -56,7 +52,7 @@ export default function ServicesView() {
             <div className="lg:col-span-5">
               <Reveal>
                 <p className="eyebrow">
-                  <span className="text-[#2997FF]">{String(i + 1).padStart(2, "0")}&nbsp;&nbsp;</span>
+                  <span className="text-[#BF5AF2]">{String(i + 1).padStart(2, "0")}&nbsp;&nbsp;</span>
                   {s.timeline} typical
                 </p>
               </Reveal>
@@ -65,7 +61,6 @@ export default function ServicesView() {
               </h2>
               <Reveal delay={0.1}>
                 <p className="mt-6 max-w-[34ch] text-xl leading-snug text-[#F5F5F7]">{s.line}</p>
-                <p className="mt-4 max-w-[46ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{s.detail}</p>
               </Reveal>
             </div>
 
@@ -94,7 +89,7 @@ export default function ServicesView() {
               <Reveal delay={0.2} className="sm:col-span-2">
                 <Link
                   href="/booking"
-                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#2997FF]"
+                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#BF5AF2]"
                 >
                   Talk about {s.name.toLowerCase()}
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
@@ -109,7 +104,6 @@ export default function ServicesView() {
         <HowItWorksSection index="04" />
       </div>
       <ServicesContactSection />
-      <CTASection />
       <Footer />
     </main>
   );

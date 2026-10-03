@@ -5,7 +5,8 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import type { Group, Mesh } from "three";
 
 // Keep in sync with STEPS in showcase-hero-visual.tsx (the 2D fallback)
-const PIPELINE = ["#2997FF", "#A1A1A6", "#3B82F6", "#10B981", "#EC4899"];
+// Only the AI step carries the accent; every other step stays neutral
+const PIPELINE = ["#8E8E93", "#BF5AF2", "#8E8E93", "#8E8E93", "#8E8E93"];
 
 const SPACING = 2.1;
 const xOf = (i: number) => (i - (PIPELINE.length - 1) / 2) * SPACING;
@@ -50,7 +51,7 @@ function Edge({ index }: { index: number }) {
   return (
     <mesh position={position} rotation={[0, angle, 0]}>
       <boxGeometry args={[length, 0.03, 0.03]} />
-      <meshBasicMaterial color="#3F3F46" />
+      <meshBasicMaterial color="#48484A" />
     </mesh>
   );
 }
@@ -119,7 +120,7 @@ export default function WorkflowScene3D({ active }: { active: boolean }) {
     >
       <ambientLight intensity={0.6} />
       <directionalLight position={[3, 5, 4]} intensity={1.2} />
-      <pointLight position={[-4, -2, 3]} intensity={8} color="#2997FF" />
+      <pointLight position={[-4, -2, 3]} intensity={8} color="#BF5AF2" />
       <Pipeline />
     </Canvas>
   );

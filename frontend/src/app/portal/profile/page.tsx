@@ -50,8 +50,8 @@ export default function ProfilePage() {
 
       <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6 mb-4">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-[rgba(41,151,255,0.15)] border border-[rgba(41,151,255,0.2)] flex items-center justify-center">
-            <User className="w-6 h-6 text-[#2997FF]" />
+          <div className="w-14 h-14 rounded-full bg-[rgba(191,90,242,0.15)] border border-[rgba(191,90,242,0.2)] flex items-center justify-center">
+            <User className="w-6 h-6 text-[#BF5AF2]" />
           </div>
           <div>
             <p className="text-white font-medium">{user?.email}</p>

@@ -59,7 +59,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2997FF] to-[#5CB0FF] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#BF5AF2] to-[#D08BF5] flex items-center justify-center">
               <Zap className="w-4 h-4 text-white" />
             </div>
             <span className="font-heading font-bold text-white">RudraAI</span>
@@ -71,8 +71,8 @@ export default function LoginPage() {
         <div className="bg-[rgba(255,255,255,0.03)] border border-white/10 rounded-2xl p-8">
           {magicSent ? (
             <div className="text-center py-6">
-              <div className="w-12 h-12 rounded-full bg-[rgba(41,151,255,0.1)] flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-[#2997FF]" />
+              <div className="w-12 h-12 rounded-full bg-[rgba(191,90,242,0.1)] flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6 text-[#BF5AF2]" />
               </div>
               <h2 className="text-white font-heading font-semibold text-lg mb-2">Check your inbox</h2>
               <p className="text-[#A1A1AA] text-sm">
@@ -80,7 +80,7 @@ export default function LoginPage() {
               </p>
               <button
                 onClick={() => { setMagicSent(false); setEmail(""); }}
-                className="mt-6 text-sm text-[#2997FF] hover:underline"
+                className="mt-6 text-sm text-[#BF5AF2] hover:underline"
               >
                 Use a different email
               </button>
@@ -90,13 +90,13 @@ export default function LoginPage() {
               <div className="flex gap-2 mb-6">
                 <button
                   onClick={() => setMode("password")}
-                  className={`flex-1 py-2 text-sm rounded-lg font-medium transition-all ${mode === "password" ? "bg-[rgba(41,151,255,0.15)] text-[#2997FF] border border-[rgba(41,151,255,0.3)]" : "text-[#A1A1AA] hover:text-white"}`}
+                  className={`flex-1 py-2 text-sm rounded-lg font-medium transition-all ${mode === "password" ? "bg-[rgba(191,90,242,0.15)] text-[#BF5AF2] border border-[rgba(191,90,242,0.3)]" : "text-[#A1A1AA] hover:text-white"}`}
                 >
                   Password
                 </button>
                 <button
                   onClick={() => setMode("magic")}
-                  className={`flex-1 py-2 text-sm rounded-lg font-medium transition-all ${mode === "magic" ? "bg-[rgba(41,151,255,0.15)] text-[#2997FF] border border-[rgba(41,151,255,0.3)]" : "text-[#A1A1AA] hover:text-white"}`}
+                  className={`flex-1 py-2 text-sm rounded-lg font-medium transition-all ${mode === "magic" ? "bg-[rgba(191,90,242,0.15)] text-[#BF5AF2] border border-[rgba(191,90,242,0.3)]" : "text-[#A1A1AA] hover:text-white"}`}
                 >
                   Magic Link
                 </button>
@@ -153,7 +153,7 @@ export default function LoginPage() {
 
         <p className="text-center text-[#A1A1AA] text-sm mt-6">
           Not a client yet?{" "}
-          <Link href="/booking" className="text-[#2997FF] hover:underline">
+          <Link href="/booking" className="text-[#BF5AF2] hover:underline">
             Book a free consultation
           </Link>
         </p>

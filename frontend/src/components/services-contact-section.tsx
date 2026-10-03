@@ -50,17 +50,16 @@ export default function ServicesContactSection() {
       <div className="container-wide">
         <SectionHead
           label="Write to us"
-          title="Prefer to write it down?"
-          intro="Describe the work you'd like to hand off. We read every message ourselves and reply personally."
+          title={<span>Prefer to <span className="text-[#BF5AF2]">write it down?</span></span>}
         />
 
         <div className="mt-16 grid gap-12 lg:mt-24 lg:grid-cols-12 lg:gap-x-8">
           {/* Facts */}
           <dl className="ledger border-y border-white/[0.08] lg:col-span-4 self-start">
             {[
-              { k: "Email", v: <a href={`mailto:${SITE.email}`} className="underline decoration-white/30 underline-offset-4 hover:decoration-[#2997FF]">{SITE.email}</a> },
+              { k: "Email", v: <a href={`mailto:${SITE.email}`} className="underline decoration-white/30 underline-offset-4 hover:decoration-[#BF5AF2]">{SITE.email}</a> },
               { k: "Based in", v: `${SITE.location} · working worldwide` },
-              { k: "Rather talk?", v: <a href="/booking" className="underline decoration-white/30 underline-offset-4 hover:decoration-[#2997FF]">Book a free {SITE.call.minutes}-minute call</a> },
+              { k: "Rather talk?", v: <a href="/booking" className="underline decoration-white/30 underline-offset-4 hover:decoration-[#BF5AF2]">Book a free {SITE.call.minutes}-minute call</a> },
               { k: "Your details", v: "Used only to reply to you. Never shared or sold." },
             ].map((row) => (
               <div key={row.k} className="py-5">
@@ -148,7 +147,7 @@ export default function ServicesContactSection() {
                     <Label htmlFor="services-budget">Project budget</Label>
                     <select
                       id="services-budget"
-                      className="flex h-11 w-full rounded-xl border border-white/[0.12] bg-[#0B0B0C] px-4 text-base text-[#F5F5F7] transition-colors focus-visible:border-[#2997FF] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2997FF]"
+                      className="flex h-11 w-full rounded-xl border border-white/[0.12] bg-[#0B0B0C] px-4 text-base text-[#F5F5F7] transition-colors focus-visible:border-[#BF5AF2] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#BF5AF2]"
                       value={form.budget}
                       onChange={(e) => setForm({ ...form, budget: e.target.value })}
                     >

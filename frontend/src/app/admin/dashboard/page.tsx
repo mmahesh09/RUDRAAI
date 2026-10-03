@@ -15,11 +15,11 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   audit: "bg-yellow-400/10 text-yellow-400 border-yellow-400/20",
-  proposal: "bg-blue-400/10 text-blue-400 border-blue-400/20",
+  proposal: "bg-purple-400/10 text-purple-400 border-purple-400/20",
   signed: "bg-purple-400/10 text-purple-400 border-purple-400/20",
   in_dev: "bg-orange-400/10 text-orange-400 border-orange-400/20",
   deployed: "bg-green-400/10 text-green-400 border-green-400/20",
-  support: "bg-teal-400/10 text-teal-400 border-teal-400/20",
+  support: "bg-fuchsia-400/10 text-fuchsia-400 border-fuchsia-400/20",
 };
 
 export default async function AdminDashboard() {
@@ -48,10 +48,10 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-4 gap-4 mb-8">
         {[
-          { label: "Total Projects", value: projectCount ?? 0, icon: FolderOpen, color: "text-[#2997FF]" },
+          { label: "Total Projects", value: projectCount ?? 0, icon: FolderOpen, color: "text-[#BF5AF2]" },
           { label: "Bookings", value: bookingCount ?? 0, icon: CalendarCheck, color: "text-green-400" },
-          { label: "Deployed", value: deployedCount, icon: TrendingUp, color: "text-teal-400" },
-          { label: "In Progress", value: (recentProjects?.filter((p) => p.status === "in_dev").length ?? 0), icon: Users, color: "text-blue-400" },
+          { label: "Deployed", value: deployedCount, icon: TrendingUp, color: "text-fuchsia-400" },
+          { label: "In Progress", value: (recentProjects?.filter((p) => p.status === "in_dev").length ?? 0), icon: Users, color: "text-purple-400" },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
         <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-heading font-semibold">Recent Projects</h2>
-            <Link href="/admin/clients" className="text-[#2997FF] text-sm hover:underline">View all</Link>
+            <Link href="/admin/clients" className="text-[#BF5AF2] text-sm hover:underline">View all</Link>
           </div>
           {!recentProjects?.length ? (
             <p className="text-[#52525B] text-sm text-center py-4">No projects yet</p>
@@ -92,7 +92,7 @@ export default async function AdminDashboard() {
         <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-heading font-semibold">Recent Bookings</h2>
-            <Link href="/admin/bookings" className="text-[#2997FF] text-sm hover:underline">View all</Link>
+            <Link href="/admin/bookings" className="text-[#BF5AF2] text-sm hover:underline">View all</Link>
           </div>
           {!recentBookings?.length ? (
             <p className="text-[#52525B] text-sm text-center py-4">No bookings yet</p>
@@ -104,7 +104,7 @@ export default async function AdminDashboard() {
                     <p className="text-white text-sm font-medium">{b.name}</p>
                     <p className="text-[#71717A] text-xs mt-0.5">{b.email} · {b.time_slot}</p>
                   </div>
-                  <Link href="/admin/bookings" className="text-[#2997FF] text-xs hover:underline">View</Link>
+                  <Link href="/admin/bookings" className="text-[#BF5AF2] text-xs hover:underline">View</Link>
                 </div>
               ))}
             </div>

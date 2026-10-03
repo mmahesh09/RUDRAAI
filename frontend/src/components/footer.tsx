@@ -60,7 +60,7 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 const SOCIAL = [
   { icon: XIcon, label: "RudraAI on X", href: "https://x.com/Rudraai2" },
-  { icon: InstagramIcon, label: "RudraAI on Instagram", href: "https://www.instagram.com/rudrai.in?igsh=NmF3azZuNWJlenk4" },
+  { icon: InstagramIcon, label: "RudraAI on Instagram", href: "https://www.instagram.com/rudraai.online/" },
   { icon: LinkedInIcon, label: "RudraAI on LinkedIn", href: "https://www.linkedin.com/company/rudrai" },
 ];
 
@@ -75,7 +75,7 @@ export default function Footer() {
             </p>
             <a
               href={`mailto:${SITE.email}`}
-              className="mt-6 inline-block text-[15px] text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#2997FF]"
+              className="mt-6 inline-block text-[15px] text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#BF5AF2]"
             >
               {SITE.email}
             </a>
@@ -104,10 +104,10 @@ export default function Footer() {
 
         {/* Oversized wordmark — the footer's one bold move */}
         <p
-          className="mt-20 select-none font-heading font-semibold leading-[0.8] tracking-[-0.06em] text-[#F5F5F7] text-[clamp(4.5rem,21vw,19rem)]"
+          className="mt-20 select-none font-heading font-semibold leading-[0.8] tracking-[-0.06em] text-[#F5F5F7] text-[clamp(3.5rem,20vw,19rem)]"
           aria-hidden="true"
         >
-          Rudra<span className="text-[#2997FF]">AI</span>
+          Rudra<span className="text-[#BF5AF2]">AI</span>
         </p>
 
         <div className="mt-8 flex flex-col gap-4 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">

@@ -17,11 +17,11 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   audit: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
-  proposal: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  proposal: "text-purple-400 bg-purple-400/10 border-purple-400/20",
   signed: "text-purple-400 bg-purple-400/10 border-purple-400/20",
   in_dev: "text-orange-400 bg-orange-400/10 border-orange-400/20",
   deployed: "text-green-400 bg-green-400/10 border-green-400/20",
-  support: "text-teal-400 bg-teal-400/10 border-teal-400/20",
+  support: "text-fuchsia-400 bg-fuchsia-400/10 border-fuchsia-400/20",
 };
 
 const TYPE_ICONS: Record<string, string> = {
@@ -34,9 +34,9 @@ const TYPE_ICONS: Record<string, string> = {
 
 const DELIVERABLE_STATUS: Record<string, string> = {
   planned: "text-[#71717A] bg-white/[0.04] border-white/10",
-  in_progress: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  in_progress: "text-purple-400 bg-purple-400/10 border-purple-400/20",
   completed: "text-green-400 bg-green-400/10 border-green-400/20",
-  deployed: "text-teal-400 bg-teal-400/10 border-teal-400/20",
+  deployed: "text-fuchsia-400 bg-fuchsia-400/10 border-fuchsia-400/20",
 };
 
 const PIPELINE = ["audit", "proposal", "signed", "in_dev", "deployed", "support"];
@@ -79,7 +79,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="relative">
           <div className="absolute top-3 left-0 right-0 h-0.5 bg-white/[0.06]" />
           <div
-            className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#2997FF] to-[#5CB0FF]"
+            className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#BF5AF2] to-[#D08BF5]"
             style={{ width: `${(PIPELINE.indexOf(project.status) / (PIPELINE.length - 1)) * 100}%` }}
           />
           <div className="relative flex justify-between">
@@ -87,7 +87,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               const done = i <= PIPELINE.indexOf(project.status);
               return (
                 <div key={step} className="flex flex-col items-center gap-2">
-                  <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#2997FF] border-[#2997FF]" : "bg-[#09090B] border-white/20"}`}>
+                  <div className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#BF5AF2] border-[#BF5AF2]" : "bg-[#09090B] border-white/20"}`}>
                     {done && <CheckCircle2 className="w-4 h-4 text-white" />}
                   </div>
                   <span className={`text-[10px] font-medium text-center leading-tight max-w-[70px] ${done ? "text-white" : "text-[#52525B]"}`}>
@@ -185,13 +185,13 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       {/* Activity feed */}
       <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6">
         <h2 className="text-white font-heading font-semibold mb-4 flex items-center gap-2">
-          <MessageSquare className="w-4 h-4 text-[#2997FF]" /> Activity & Updates
+          <MessageSquare className="w-4 h-4 text-[#BF5AF2]" /> Activity & Updates
         </h2>
         {updates && updates.length > 0 && (
           <div className="space-y-4 mb-6">
             {updates.map((u) => (
               <div key={u.id} className="flex gap-3">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${u.author_role === "admin" ? "bg-[rgba(41,151,255,0.15)] text-[#2997FF]" : "bg-white/[0.06] text-[#A1A1AA]"}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${u.author_role === "admin" ? "bg-[rgba(191,90,242,0.15)] text-[#BF5AF2]" : "bg-white/[0.06] text-[#A1A1AA]"}`}>
                   {u.author_role === "admin" ? "R" : "Y"}
                 </div>
                 <div className="flex-1">

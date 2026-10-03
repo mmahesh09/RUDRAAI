@@ -51,7 +51,7 @@ export default function IndustriesSection() {
           {INDUSTRIES.map((ind, i) => (
             <Reveal as="li" key={ind.id} delay={0.04} className="border-t border-white/[0.08]">
               <div id={ind.id} className="grid scroll-mt-20 gap-6 py-12 lg:grid-cols-12 lg:gap-x-8">
-                <p className="font-mono text-[11px] tracking-[0.14em] text-[#2997FF] lg:col-span-1 lg:pt-3">{String(i + 1).padStart(2, "0")}</p>
+                <p className="font-mono text-[11px] tracking-[0.14em] text-[#BF5AF2] lg:col-span-1 lg:pt-3">{String(i + 1).padStart(2, "0")}</p>
                 <div className="lg:col-span-5">
                   <h2 className="font-heading text-[clamp(1.75rem,3.2vw,2.75rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-[#F5F5F7]">
                     {ind.label}

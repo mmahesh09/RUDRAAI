@@ -167,7 +167,7 @@ export async function POST(req: NextRequest) {
 
     const safeZoomLink = zoomLink ? escapeHtml(zoomLink) : null;
     const zoomSection = safeZoomLink
-      ? `<div style="background:#e8f4ff;border-left:4px solid #2D8CFF;padding:12px 16px;margin:16px 0;border-radius:4px"><strong style="color:#2D8CFF">📹 Zoom Link:</strong><br><a href="${safeZoomLink}" style="color:#2D8CFF;word-break:break-all">${safeZoomLink}</a></div>`
+      ? `<div style="background:#F6EEFC;border-left:4px solid #BF5AF2;padding:12px 16px;margin:16px 0;border-radius:4px"><strong style="color:#BF5AF2">📹 Zoom Link:</strong><br><a href="${safeZoomLink}" style="color:#BF5AF2;word-break:break-all">${safeZoomLink}</a></div>`
       : `<p><em>I'll send your Zoom link to this email within 1 hour.</em></p>`;
 
     if (process.env.RESEND_API_KEY) {
@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
             to: process.env.CONTACT_TO,
             subject: `New Booking: ${safeName} (${safeCompany}) — ${safeTimeSlot}`,
             html: `
-              <h2 style="color:#2997FF">New Automation Audit Booking</h2>
+              <h2 style="color:#BF5AF2">New Automation Audit Booking</h2>
               <table cellpadding="8" style="border-collapse:collapse">
                 <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
                 <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
@@ -195,9 +195,9 @@ export async function POST(req: NextRequest) {
           subject: "Your Automation Audit is Confirmed — RudraAI",
           html: `
             <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
-              <h2 style="color:#2997FF">You're booked, ${safeName}!</h2>
+              <h2 style="color:#BF5AF2">You're booked, ${safeName}!</h2>
               <p>Your <strong>Free Automation Audit</strong> is confirmed for:</p>
-              <div style="background:#fff8f0;border-left:4px solid #2997FF;padding:12px 16px;margin:16px 0;border-radius:4px">
+              <div style="background:#fff8f0;border-left:4px solid #BF5AF2;padding:12px 16px;margin:16px 0;border-radius:4px">
                 <strong style="font-size:1.1em">${safeTimeSlot}</strong>
               </div>
               ${zoomSection}

@@ -39,7 +39,7 @@ function supportsWebGL() {
 function StaticVortex() {
   return (
     <div className="absolute inset-0 flex items-center justify-center">
-      <div className="h-3/4 w-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(41,151,255,0.22),rgba(161,161,166,0.08)_45%,transparent_70%)] blur-2xl" />
+      <div className="h-3/4 w-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(191,90,242,0.22),rgba(161,161,166,0.08)_45%,transparent_70%)] blur-2xl" />
     </div>
   );
 }
@@ -100,7 +100,7 @@ export default function HeroTornado() {
             onError={() => setWebgl(false)}
             lineOptions={{ count: preset.lines, color: "#ffffff", glow: 8 }}
             dotOptions={{ count: preset.dots, size: 20, color: "#ffffff", glow: 9, flicker: 10 }}
-            cometOptions={{ count: preset.comets, color: "#2997FF", glow: 7 }}
+            cometOptions={{ count: preset.comets, color: "#BF5AF2", glow: 7 }}
           />
         </div>
       )}

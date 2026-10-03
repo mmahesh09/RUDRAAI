@@ -19,21 +19,21 @@ export default function QuoteSection() {
           transition={{ duration: 0.7 }}
           className="mx-auto max-w-5xl"
         >
-          <div className="relative flex flex-col items-center border border-[rgba(41,151,255,0.25)] rounded-3xl overflow-hidden">
+          <div className="relative flex flex-col items-center border border-[rgba(191,90,242,0.25)] rounded-3xl overflow-hidden">
             <DotPattern width={5} height={5} className="fill-white/[0.035]" />
 
             {/* Corner accents */}
-            <div className="absolute -left-1 -top-1 h-3 w-3 bg-[#2997FF]" />
-            <div className="absolute -bottom-1 -left-1 h-3 w-3 bg-[#2997FF]" />
-            <div className="absolute -right-1 -top-1 h-3 w-3 bg-[#2997FF]" />
-            <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-[#2997FF]" />
+            <div className="absolute -left-1 -top-1 h-3 w-3 bg-[#BF5AF2]" />
+            <div className="absolute -bottom-1 -left-1 h-3 w-3 bg-[#BF5AF2]" />
+            <div className="absolute -right-1 -top-1 h-3 w-3 bg-[#BF5AF2]" />
+            <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-[#BF5AF2]" />
 
             <div className="relative z-20 mx-auto w-full px-8 py-12 md:px-16 md:py-20">
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: 0.2 }}
-                className="text-sm font-subheading text-[#2997FF] uppercase tracking-widest mb-6"
+                className="text-sm font-subheading text-[#BF5AF2] uppercase tracking-widest mb-6"
               >
                 On automation
               </motion.p>
@@ -55,7 +55,7 @@ export default function QuoteSection() {
                   <span className="font-heading font-thin text-[#A1A1AA]">a business is that</span>
                 </div>
                 <div className="flex flex-wrap gap-2 md:gap-3 mb-1">
-                  <span className="font-heading font-semibold tracking-[-0.03em] text-[#2997FF]">automation</span>
+                  <span className="font-heading font-semibold tracking-[-0.03em] text-[#BF5AF2]">automation</span>
                   <span className="font-heading font-thin text-[#A1A1AA]">applied to</span>
                 </div>
                 <div className="flex flex-wrap gap-2 md:gap-3 mb-1">
@@ -73,7 +73,7 @@ export default function QuoteSection() {
                 transition={{ delay: 0.6 }}
                 className="mt-8 flex items-center gap-3"
               >
-                <div className="w-8 h-px bg-[#2997FF]" />
+                <div className="w-8 h-px bg-[#BF5AF2]" />
                 <span className="text-sm font-body text-[#8A8A93]">Bill Gates, Co-founder of Microsoft</span>
               </motion.div>
             </div>

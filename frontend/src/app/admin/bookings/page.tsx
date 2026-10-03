@@ -19,7 +19,7 @@ export default async function AdminBookings() {
           <p className="text-[#A1A1AA] mt-1 text-sm">{bookings?.length ?? 0} total bookings</p>
         </div>
         <Link href="/admin/clients/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2997FF] to-[#5CB0FF] text-white text-sm font-medium shadow-[0_4px_20px_rgba(41,151,255,0.3)]">
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#BF5AF2] to-[#D08BF5] text-white text-sm font-medium shadow-[0_4px_20px_rgba(191,90,242,0.3)]">
           <Plus className="w-4 h-4" /> Create Project
         </Link>
       </div>
@@ -52,7 +52,7 @@ export default async function AdminBookings() {
                   <td className="px-5 py-4">
                     <Link
                       href={`/admin/clients/new?email=${encodeURIComponent(b.email)}&company=${encodeURIComponent(b.company ?? "")}&bookingId=${b.id}`}
-                      className="text-[#2997FF] text-xs hover:underline whitespace-nowrap"
+                      className="text-[#BF5AF2] text-xs hover:underline whitespace-nowrap"
                     >
                       + Project
                     </Link>

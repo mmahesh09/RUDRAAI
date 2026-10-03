@@ -42,9 +42,9 @@ export default function BlogPage() {
               </div>
               <div className="flex flex-col justify-end lg:col-span-5">
                 <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
-                  <span className="text-[#2997FF]">Featured</span>&nbsp;&nbsp;·&nbsp;&nbsp;{featured.category}
+                  <span className="text-[#BF5AF2]">Featured</span>&nbsp;&nbsp;·&nbsp;&nbsp;{featured.category}
                 </p>
-                <h2 className="mt-4 font-heading text-[clamp(1.75rem,3.2vw,2.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF]">
+                <h2 className="mt-4 font-heading text-[clamp(1.75rem,3.2vw,2.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-[#F5F5F7] transition-colors group-hover:text-[#BF5AF2]">
                   {featured.title}
                 </h2>
                 <p className="mt-4 max-w-[48ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{featured.excerpt}</p>
@@ -62,7 +62,7 @@ export default function BlogPage() {
                 <Link href={`/blog/${post.slug}`} className="group grid gap-3 py-8 md:grid-cols-12 md:gap-x-8">
                   <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#8A8A93] md:col-span-2 md:pt-1.5">{post.date}</p>
                   <div className="md:col-span-7">
-                    <h3 className="font-heading text-xl font-semibold leading-snug tracking-[-0.02em] text-[#F5F5F7] transition-colors group-hover:text-[#2997FF] sm:text-2xl">
+                    <h3 className="font-heading text-xl font-semibold leading-snug tracking-[-0.02em] text-[#F5F5F7] transition-colors group-hover:text-[#BF5AF2] sm:text-2xl">
                       {post.title}
                     </h3>
                     <p className="mt-2 max-w-[60ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{post.excerpt}</p>
@@ -71,7 +71,7 @@ export default function BlogPage() {
                     <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#A1A1AA] md:pt-1.5">
                       {post.category} · {post.readTime}
                     </p>
-                    <ArrowUpRight className="h-5 w-5 shrink-0 text-[#A1A1AA] transition-[color,transform] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#2997FF]" aria-hidden="true" />
+                    <ArrowUpRight className="h-5 w-5 shrink-0 text-[#A1A1AA] transition-[color,transform] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#BF5AF2]" aria-hidden="true" />
                   </div>
                 </Link>
               </li>

@@ -70,7 +70,7 @@ export default function FeedbackView() {
                   </p>
                   <p className="text-sm font-body text-[#8A8A93]">
                     Looking to start a new project instead?{" "}
-                    <Link href="/services#contact" className="text-[#2997FF] hover:underline">
+                    <Link href="/services#contact" className="text-[#BF5AF2] hover:underline">
                       Contact us on the Services page
                     </Link>
                     .
@@ -93,7 +93,7 @@ export default function FeedbackView() {
                   </div>
 
                   <div className="flex items-center gap-2 mb-1">
-                    <MessageSquare className="w-5 h-5 text-[#2997FF]" />
+                    <MessageSquare className="w-5 h-5 text-[#BF5AF2]" />
                     <h2 className="font-heading font-semibold tracking-[-0.02em] text-[#F5F5F7] text-2xl">What&apos;s on your mind?</h2>
                   </div>
                   <p className="text-sm font-body text-[#8A8A93] mb-6">
@@ -128,8 +128,8 @@ export default function FeedbackView() {
                           <Star
                             className="w-7 h-7 transition-colors"
                             style={{
-                              fill: star <= (hoverRating || rating) ? "#2997FF" : "transparent",
-                              color: star <= (hoverRating || rating) ? "#2997FF" : "#3F3F46",
+                              fill: star <= (hoverRating || rating) ? "#BF5AF2" : "transparent",
+                              color: star <= (hoverRating || rating) ? "#BF5AF2" : "#3F3F46",
                             }}
                           />
                         </button>
@@ -199,7 +199,7 @@ export default function FeedbackView() {
 
                   <p className="text-xs font-body text-[#8A8A93] text-center">
                     Have a new project in mind instead?{" "}
-                    <Link href="/services#contact" className="text-[#2997FF] hover:underline">
+                    <Link href="/services#contact" className="text-[#BF5AF2] hover:underline">
                       Reach out via Services
                     </Link>
                     .

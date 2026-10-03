@@ -4,7 +4,6 @@ import ProblemSection from "@/components/problem-section";
 import ServicesSection from "@/components/services-section";
 import FeaturesSection from "@/components/features-section";
 import HowItWorksSection from "@/components/how-it-works-section";
-import FounderSection from "@/components/founder-section";
 import FaqSection from "@/components/faq-section";
 import CTASection from "@/components/cta-section";
 import Footer from "@/components/footer";
@@ -21,7 +20,7 @@ const organizationSchema = {
     "@type": "Offer",
     itemOffered: { "@type": "Service", name },
   })),
-  sameAs: ["https://twitter.com/GowriRudrai"],
+  sameAs: ["https://twitter.com/GowriRudrai", "https://www.instagram.com/rudraai.online/"],
   contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://www.rudraai.online/services#contact" },
 };
 
@@ -31,12 +30,11 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <Navbar />
       <Hero />
-      {/* The page reads as one run: problem → services → a live workflow → process → people → questions → close */}
+      {/* The page reads as one run: problem → services → a live workflow → process → questions → close */}
       <ProblemSection />
       <ServicesSection />
       <FeaturesSection />
       <HowItWorksSection />
-      <FounderSection />
       <FaqSection />
       <CTASection />
       <Footer />

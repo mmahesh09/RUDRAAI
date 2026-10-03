@@ -162,7 +162,7 @@ export default function AdminProjectEditor({
             <select
               value={form.status}
               onChange={(e) => setForm({ ...form, status: e.target.value })}
-              className="w-full h-11 rounded-xl bg-[rgba(255,255,255,0.05)] border border-white/10 px-4 text-sm text-white focus:outline-none focus:border-[rgba(41,151,255,0.5)]"
+              className="w-full h-11 rounded-xl bg-[rgba(255,255,255,0.05)] border border-white/10 px-4 text-sm text-white focus:outline-none focus:border-[rgba(191,90,242,0.5)]"
             >
               {STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
             </select>
@@ -186,7 +186,7 @@ export default function AdminProjectEditor({
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
               placeholder="Internal notes (not visible to client)"
               rows={3}
-              className="w-full bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#52525B] resize-none focus:outline-none focus:border-[rgba(41,151,255,0.4)] transition-colors"
+              className="w-full bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#52525B] resize-none focus:outline-none focus:border-[rgba(191,90,242,0.4)] transition-colors"
             />
           </div>
         </div>
@@ -284,7 +284,7 @@ export default function AdminProjectEditor({
             <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
               {updates.map((u) => (
                 <div key={u.id} className="flex gap-3 p-3 bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-xl">
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${u.author_role === "admin" ? "bg-[rgba(41,151,255,0.15)] text-[#2997FF]" : "bg-white/[0.06] text-[#A1A1AA]"}`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${u.author_role === "admin" ? "bg-[rgba(191,90,242,0.15)] text-[#BF5AF2]" : "bg-white/[0.06] text-[#A1A1AA]"}`}>
                     {u.author_role === "admin" ? "R" : "C"}
                   </div>
                   <div>
@@ -304,7 +304,7 @@ export default function AdminProjectEditor({
               onChange={(e) => setUpdateContent(e.target.value)}
               placeholder="Post an update visible to the client..."
               rows={2}
-              className="flex-1 bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#52525B] resize-none focus:outline-none focus:border-[rgba(41,151,255,0.4)] transition-colors"
+              className="flex-1 bg-[rgba(255,255,255,0.04)] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#52525B] resize-none focus:outline-none focus:border-[rgba(191,90,242,0.4)] transition-colors"
             />
             <Button size="icon" onClick={postUpdate} disabled={sendingUpdate || !updateContent.trim()}>
               {sendingUpdate ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

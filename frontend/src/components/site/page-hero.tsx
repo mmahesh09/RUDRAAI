@@ -18,14 +18,14 @@ const delay = (s: number) => ({ "--d": `${s}s` }) as CSSProperties;
 export default function PageHero({ label, title, intro, children }: PageHeroProps) {
   return (
     <section className="relative isolate overflow-hidden bg-black pt-36 pb-20 md:pt-44 md:pb-28">
-      <div className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+      <div className="pointer-events-none absolute inset-0 -z-10 mx-auto max-w-7xl px-5 sm:px-8 lg:px-10" aria-hidden="true">
         <div className="h-full border-x border-white/[0.06]" />
       </div>
       <div className="container-wide">
         <p style={delay(0.05)} className="hero-fade eyebrow">
-          <span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;{label}
+          <span className="text-[#BF5AF2]" aria-hidden="true">●</span>&nbsp;&nbsp;{label}
         </p>
-        <h1 className="mt-8 max-w-[18ch] font-heading font-semibold leading-[0.98] tracking-[-0.045em] text-[#F5F5F7] text-[clamp(2.75rem,7vw,6rem)] [text-wrap:balance]">
+        <h1 className="mt-8 max-w-[18ch] font-heading font-semibold leading-[0.98] tracking-[-0.045em] text-[#F5F5F7] text-[clamp(2.25rem,8vw,6rem)] [text-wrap:balance]">
           <span className="block overflow-hidden pb-[0.06em]">
             <span style={delay(0.15)} className="hero-rise inline-block">
               {title}

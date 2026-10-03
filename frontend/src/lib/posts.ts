@@ -22,7 +22,7 @@ export const posts: BlogPost[] = [
     date: "Jan 15, 2025",
     image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&q=80",
     featured: true,
-    color: "#2997FF",
+    color: "#BF5AF2",
     content: `
 <p>Choosing the right automation platform is one of the highest-leverage decisions an operations team can make. The wrong choice locks you into vendor pricing, limits your integration depth, and creates technical debt that costs months to unwind. In this guide, we'll break down <strong>n8n, Zapier, and Make (formerly Integromat)</strong> on the dimensions that actually matter in 2025.</p>
 
@@ -202,7 +202,7 @@ Lead data: {{JSON.stringify($json)}}</code></pre>
     date: "Dec 20, 2024",
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80",
     featured: false,
-    color: "#3B82F6",
+    color: "#A78BFA",
     content: `
 <p>Our client — a mid-sized DTC e-commerce brand doing $8M ARR — was drowning in support tickets. Their team of 4 agents was spending 70% of their time on questions that had the same 12 answers. Average first response time: 6.5 hours. Cart abandonment from frustrated customers waiting for support answers: measurable in revenue.</p>
 <p>Eight weeks later, the bot handles 80% of tickets autonomously, average first response is 47 seconds, and the team of 4 now handles only complex escalations — freeing them for proactive customer success work that's driving retention up 14%.</p>
@@ -494,7 +494,7 @@ export function getPostBySlug(slug: string): BlogPost | undefined {
 }
 
 export const categoryColors: Record<string, string> = {
-  Comparison: "#2997FF",
+  Comparison: "#BF5AF2",
   Tutorial: "#A1A1A6",
   Strategy: "#10B981",
   DevOps: "#F59E0B",

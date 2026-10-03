@@ -14,9 +14,9 @@ const TYPE_ICONS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   planned: "text-[#71717A] bg-white/[0.04] border-white/10",
-  in_progress: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  in_progress: "text-purple-400 bg-purple-400/10 border-purple-400/20",
   completed: "text-green-400 bg-green-400/10 border-green-400/20",
-  deployed: "text-teal-400 bg-teal-400/10 border-teal-400/20",
+  deployed: "text-fuchsia-400 bg-fuchsia-400/10 border-fuchsia-400/20",
 };
 
 export default async function DeliverablesPage() {

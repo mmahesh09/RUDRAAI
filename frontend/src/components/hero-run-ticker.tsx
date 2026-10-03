@@ -44,7 +44,7 @@ export default function HeroRunTicker() {
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0 flex items-center gap-2 whitespace-nowrap"
           >
-            <span className="text-[#2997FF]">{current.kind}</span>
+            <span className="text-[#BF5AF2]">{current.kind}</span>
             <span className="normal-case tracking-normal text-[#D4D4D8] truncate">{current.name}</span>
             <span className="text-[#22C55E]">✓</span>
             <span className="text-[#A1A1AA]">{current.duration}</span>

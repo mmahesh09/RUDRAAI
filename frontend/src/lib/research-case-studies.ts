@@ -41,7 +41,7 @@ export const researchCaseStudies: ResearchCaseStudy[] = [
     metrics: [
       { icon: MessageSquare, value: "2.3M", label: "Conversations handled, month 1", color: "#A1A1A6" },
       { icon: Clock, value: "<2 min", label: "Resolution time (was 11 min)", color: "#10B981" },
-      { icon: DollarSign, value: "$40M", label: "Estimated 2024 profit impact", color: "#2997FF" },
+      { icon: DollarSign, value: "$40M", label: "Estimated 2024 profit impact", color: "#BF5AF2" },
     ],
     tags: ["OpenAI", "LLM Agents", "Customer Support", "Fintech"],
     gradient: "from-[#A1A1A6]/10 to-transparent",
@@ -84,13 +84,13 @@ export const researchCaseStudies: ResearchCaseStudy[] = [
     description:
       "Google Cloud publishes United Wholesale Mortgage as a customer story on Vertex AI and Gemini. We break down what the published productivity gains actually imply about where document-heavy financial workflows are ripe for automation.",
     metrics: [
-      { icon: TrendingUp, value: "2x", label: "Underwriter productivity", color: "#3B82F6" },
+      { icon: TrendingUp, value: "2x", label: "Underwriter productivity", color: "#A78BFA" },
       { icon: Clock, value: "9 mo", label: "Time to measurable impact", color: "#10B981" },
       { icon: Users, value: "50K+", label: "Brokers affected downstream", color: "#F59E0B" },
     ],
     tags: ["Google Cloud", "Vertex AI", "Gemini", "Financial Services"],
-    gradient: "from-[#3B82F6]/10 to-transparent",
-    accentColor: "#3B82F6",
+    gradient: "from-[#A78BFA]/10 to-transparent",
+    accentColor: "#A78BFA",
     image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=1200&q=80",
     publishedContext: "Google Cloud published customer story",
     sources: [
@@ -127,8 +127,8 @@ export const researchCaseStudies: ResearchCaseStudy[] = [
       "n8n.io and Medium writers have documented dozens of production workflow-automation deployments. We reviewed three with disclosed numbers — Delivery Hero, Unbabel, and Koralplay — to find the pattern in what actually gets automated first.",
     metrics: [
       { icon: Clock, value: "200h", label: "Delivery Hero: hours saved/month", color: "#10B981" },
-      { icon: Percent, value: "51%", label: "Unbabel: manual ops reduced", color: "#3B82F6" },
-      { icon: DollarSign, value: "25:1", label: "Koralplay: reported ROI", color: "#2997FF" },
+      { icon: Percent, value: "51%", label: "Unbabel: manual ops reduced", color: "#A78BFA" },
+      { icon: DollarSign, value: "25:1", label: "Koralplay: reported ROI", color: "#BF5AF2" },
     ],
     tags: ["n8n", "Workflow Automation", "ROI Analysis", "SMB Automation"],
     gradient: "from-[#10B981]/10 to-transparent",

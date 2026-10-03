@@ -21,7 +21,7 @@ export default function SectionHead({ index, label, title, intro, as: H = "h2", 
     <div className={`grid gap-y-6 lg:grid-cols-12 lg:gap-x-8 ${className}`}>
       <Reveal className="lg:col-span-12 border-t border-white/[0.08] pt-5">
         <p className="eyebrow">
-          {index && <span className="text-[#2997FF]">{index}&nbsp;&nbsp;</span>}
+          {index && <span className="text-[#BF5AF2]">{index}&nbsp;&nbsp;</span>}
           {label}
         </p>
       </Reveal>

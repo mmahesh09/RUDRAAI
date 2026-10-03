@@ -16,11 +16,11 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   audit: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
-  proposal: "text-blue-400 bg-blue-400/10 border-blue-400/20",
+  proposal: "text-purple-400 bg-purple-400/10 border-purple-400/20",
   signed: "text-purple-400 bg-purple-400/10 border-purple-400/20",
   in_dev: "text-orange-400 bg-orange-400/10 border-orange-400/20",
   deployed: "text-green-400 bg-green-400/10 border-green-400/20",
-  support: "text-teal-400 bg-teal-400/10 border-teal-400/20",
+  support: "text-fuchsia-400 bg-fuchsia-400/10 border-fuchsia-400/20",
 };
 
 const PIPELINE = ["audit", "proposal", "signed", "in_dev", "deployed", "support"];
@@ -53,7 +53,7 @@ export default async function PortalDashboard() {
           <p className="text-[#A1A1AA] text-sm mb-6">Your project will appear here once your audit call is complete.</p>
           <Link
             href="/booking"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#2997FF] to-[#5CB0FF] text-white text-sm font-medium"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#BF5AF2] to-[#D08BF5] text-white text-sm font-medium"
           >
             Book your audit <ArrowRight className="w-4 h-4" />
           </Link>
@@ -63,9 +63,9 @@ export default async function PortalDashboard() {
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-4 mb-6">
             {[
-              { label: "Project Status", value: STATUS_LABELS[activeProject.status] ?? activeProject.status, icon: Clock, color: "text-[#2997FF]" },
+              { label: "Project Status", value: STATUS_LABELS[activeProject.status] ?? activeProject.status, icon: Clock, color: "text-[#BF5AF2]" },
               { label: "Deliverables Done", value: `${completedDeliverables} / ${totalDeliverables}`, icon: Package, color: "text-green-400" },
-              { label: "Active Projects", value: projects?.length ?? 0, icon: TrendingUp, color: "text-blue-400" },
+              { label: "Active Projects", value: projects?.length ?? 0, icon: TrendingUp, color: "text-purple-400" },
             ].map(({ label, value, icon: Icon, color }) => (
               <div key={label} className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-3">
@@ -89,7 +89,7 @@ export default async function PortalDashboard() {
               </div>
               <Link
                 href={`/portal/project/${activeProject.id}`}
-                className="flex items-center gap-1.5 text-[#2997FF] text-sm font-medium hover:underline"
+                className="flex items-center gap-1.5 text-[#BF5AF2] text-sm font-medium hover:underline"
               >
                 View details <ArrowRight className="w-4 h-4" />
               </Link>
@@ -99,7 +99,7 @@ export default async function PortalDashboard() {
             <div className="relative">
               <div className="absolute top-3 left-0 right-0 h-0.5 bg-white/[0.06]" />
               <div
-                className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#2997FF] to-[#5CB0FF] transition-all duration-500"
+                className="absolute top-3 left-0 h-0.5 bg-gradient-to-r from-[#BF5AF2] to-[#D08BF5] transition-all duration-500"
                 style={{ width: `${(PIPELINE.indexOf(activeProject.status) / (PIPELINE.length - 1)) * 100}%` }}
               />
               <div className="relative flex justify-between">
@@ -108,7 +108,7 @@ export default async function PortalDashboard() {
                   const done = i <= currentIdx;
                   return (
                     <div key={step} className="flex flex-col items-center gap-2">
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#2997FF] border-[#2997FF]" : "bg-[#09090B] border-white/20"}`}>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${done ? "bg-[#BF5AF2] border-[#BF5AF2]" : "bg-[#09090B] border-white/20"}`}>
                         {done && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
                       </div>
                       <span className={`text-[10px] font-medium text-center leading-tight max-w-[60px] ${done ? "text-white" : "text-[#52525B]"}`}>

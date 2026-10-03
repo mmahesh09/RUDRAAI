@@ -165,7 +165,7 @@ export default function AutomationGuidePage() {
               </ol>
             </nav>
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#2997FF]">Quick wins</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#BF5AF2]">Quick wins</p>
               <ul className="mt-3 ledger border-y border-white/[0.08]">
                 {QUICK_WINS.map((w) => (
                   <li key={w.task} className="flex items-baseline justify-between gap-3 py-2.5">
@@ -182,7 +182,7 @@ export default function AutomationGuidePage() {
         <article className="max-w-[68ch] space-y-20 lg:col-span-8 lg:col-start-5">
           {SECTIONS.map((s, i) => (
             <section key={s.id} id={s.id} className="scroll-mt-24">
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#2997FF]">{String(i + 1).padStart(2, "0")}</p>
+              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#BF5AF2]">{String(i + 1).padStart(2, "0")}</p>
               <h2 className="mt-3 font-heading text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#F5F5F7]">
                 {s.title}
               </h2>

@@ -35,11 +35,11 @@ const EDGES: { from: string; to: string; label?: "yes" | "no"; vertical?: boolea
 ];
 
 const STEPS = [
-  { title: "Something happens", body: "A visitor fills in your contact form. That's the trigger — no one has to be watching." },
-  { title: "AI reads it", body: "A language model reads the message and scores how ready this person is to buy, with a one-line reason." },
-  { title: "The workflow decides", body: "A simple rule splits the path. You set the threshold; we can change it in a minute." },
-  { title: "Hot leads get people", body: "Contact created in your CRM, a personal reply sent, and your sales channel pinged — in under ten seconds." },
-  { title: "Everyone else is looked after", body: "Not ready yet? They get a short, useful email sequence instead of silence. Nobody falls through." },
+  { title: "Something happens", body: "A visitor fills in your contact form." },
+  { title: "AI reads it", body: "A model scores how ready they are to buy." },
+  { title: "The workflow decides", body: "A simple rule you control splits the path." },
+  { title: "Hot leads get people", body: "CRM, reply and Slack alert in under ten seconds." },
+  { title: "Everyone else is looked after", body: "A short email sequence, so nobody falls through." },
 ];
 
 const byId = (id: string) => NODES.find((n) => n.id === id)!;
@@ -64,7 +64,7 @@ function Canvas({ active }: { active: number }) {
       <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-3 font-mono text-[11px] uppercase tracking-[0.12em]">
         <span className="text-[#A1A1AA]">lead_qualification.json</span>
         <span className="flex items-center gap-2 text-[#A1A1AA]">
-          <span className={`h-1.5 w-1.5 rounded-full ${active >= 4 ? "bg-[#22C55E]" : "bg-[#2997FF]"}`} aria-hidden="true" />
+          <span className={`h-1.5 w-1.5 rounded-full ${active >= 4 ? "bg-[#22C55E]" : "bg-[#BF5AF2]"}`} aria-hidden="true" />
           {active >= 4 ? "Run complete" : `Step ${active + 1} of 5`}
         </span>
       </div>
@@ -78,7 +78,7 @@ function Canvas({ active }: { active: number }) {
 
         {EDGES.map((e) => {
           const lit = byId(e.to).step <= active;
-          const color = e.label === "no" ? "#A1A1AA" : "#2997FF";
+          const color = e.label === "no" ? "#A1A1AA" : "#BF5AF2";
           return (
             <g key={`${e.from}-${e.to}`}>
               <path
@@ -117,11 +117,11 @@ function Canvas({ active }: { active: number }) {
                 height={NODE_H}
                 rx="10"
                 fill="#000"
-                stroke={current ? "#2997FF" : lit ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.12)"}
+                stroke={current ? "#BF5AF2" : lit ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.12)"}
                 strokeWidth={current ? 1.5 : 1}
                 style={{ transition: "stroke 0.5s ease" }}
               />
-              <circle cx={n.x + 22} cy={n.y + NODE_H / 2} r="4" fill={lit ? (current ? "#2997FF" : "#22C55E") : "rgba(255,255,255,0.2)"} />
+              <circle cx={n.x + 22} cy={n.y + NODE_H / 2} r="4" fill={lit ? (current ? "#BF5AF2" : "#22C55E") : "rgba(255,255,255,0.2)"} />
               <text x={n.x + 38} y={n.y + 23} fontSize="12" fontWeight="600" fill="#F5F5F7" fontFamily="var(--font-display), system-ui, sans-serif">
                 {n.label}
               </text>
@@ -168,8 +168,8 @@ export default function FeaturesSection() {
         <SectionHead
           index="03"
           label="Inside one workflow"
-          title="Watch a lead get handled — without anyone touching it."
-          intro="This is the shape of a real automation we build often. Scroll to run it."
+          title={<span>Watch a lead get handled <span className="text-[#BF5AF2]">— hands-free.</span></span>}
+          intro="Scroll to run it."
         />
       </div>
 
@@ -183,7 +183,7 @@ export default function FeaturesSection() {
                 return (
                   <li key={s.title} className="py-5" aria-current={pinned && state === "current" ? "step" : undefined}>
                     <div className="flex items-baseline gap-4">
-                      <span className={`font-mono text-[11px] tracking-[0.14em] ${state === "current" ? "text-[#2997FF]" : "text-[#8A8A93]"}`}>
+                      <span className={`font-mono text-[11px] tracking-[0.14em] ${state === "current" ? "text-[#BF5AF2]" : "text-[#8A8A93]"}`}>
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <div>

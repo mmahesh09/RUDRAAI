@@ -12,8 +12,7 @@ export default function ServicesSection({ index = "02" }: { index?: string } = {
         <SectionHead
           index={index}
           label="What we build"
-          title="Three things, built properly."
-          intro="Most businesses need some mix of the same three: a site that brings people in, an assistant that answers them, and automations that handle what happens next."
+          title={<span>Three things, <span className="text-[#BF5AF2]">built properly.</span></span>}
         />
 
         <ol className="mt-16 lg:mt-24 border-b border-white/[0.08]">
@@ -29,12 +28,11 @@ export default function ServicesSection({ index = "02" }: { index?: string } = {
                   </h3>
                   <p className="mt-4 max-w-[34ch] text-lg leading-snug text-[#F5F5F7]/90">{s.line}</p>
                 </div>
-                <div className="lg:col-span-4">
-                  <p className="max-w-[48ch] text-[15px] leading-[1.7] text-[#A1A1AA]">{s.detail}</p>
-                  <ul className="mt-5 flex flex-wrap gap-x-4 gap-y-2">
+                <div className="lg:col-span-4 lg:pt-3">
+                  <ul className="flex flex-wrap gap-x-4 gap-y-2">
                     {s.deliverables.map((d) => (
                       <li key={d} className="font-mono text-[11px] uppercase tracking-[0.12em] text-[#A1A1AA]">
-                        <span className="text-[#2997FF]" aria-hidden="true">+ </span>
+                        <span className="text-[#BF5AF2]" aria-hidden="true">+ </span>
                         {d}
                       </li>
                     ))}
@@ -48,7 +46,7 @@ export default function ServicesSection({ index = "02" }: { index?: string } = {
                   <Link
                     href={`/services#${s.slug}`}
                     aria-label={`More about ${s.name}`}
-                    className="group inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.18] text-[#F5F5F7] transition-colors hover:border-[#2997FF] hover:text-[#2997FF]"
+                    className="group inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.18] text-[#F5F5F7] transition-colors hover:border-[#BF5AF2] hover:text-[#BF5AF2]"
                   >
                     <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                   </Link>

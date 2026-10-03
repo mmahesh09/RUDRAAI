@@ -398,7 +398,7 @@ export function CoachSchedulingCard({
               <motion.button
                 whileHover={shouldAnimate ? { scale: 1.02 } : {}}
                 whileTap={shouldAnimate ? { scale: 0.98 } : {}}
-                className="flex-1 bg-[#0071E3] hover:bg-[#0077ED] text-white py-2.5 rounded-xl font-heading font-semibold text-sm transition-all"
+                className="flex-1 bg-[#8944AB] hover:bg-[#7A3A9A] text-white py-2.5 rounded-xl font-heading font-semibold text-sm transition-all"
               >
                 Next
               </motion.button>
@@ -449,11 +449,11 @@ export function CoachSchedulingCard({
                   <p className="text-xs font-subheading text-[#8A8A93] uppercase tracking-wider mb-3">
                     Your Selected Slot
                   </p>
-                  <div className="bg-[rgba(41,151,255,0.08)] border border-[rgba(41,151,255,0.2)] rounded-xl p-4">
+                  <div className="bg-[rgba(191,90,242,0.08)] border border-[rgba(191,90,242,0.2)] rounded-xl p-4">
                     <p className="text-base font-heading font-semibold text-white">
                       {selectedTimeSlot.dayName}, {selectedTimeSlot.day}
                     </p>
-                    <p className="text-2xl font-heading font-semibold tracking-[-0.03em] text-[#2997FF]">
+                    <p className="text-2xl font-heading font-semibold tracking-[-0.03em] text-[#BF5AF2]">
                       {selectedTimeSlot.time}
                     </p>
                     <p className="text-xs font-body text-[#8A8A93] mt-1">India Standard Time (IST)</p>
@@ -481,7 +481,7 @@ export function CoachSchedulingCard({
               whileHover={shouldAnimate ? { scale: 1.02, y: -1 } : {}}
               whileTap={shouldAnimate ? { scale: 0.98 } : {}}
               onClick={handleConfirmBooking}
-              className="w-full relative overflow-hidden py-3 rounded-xl font-heading font-bold text-white bg-[#0071E3] hover:bg-[#0077ED] transition-all group"
+              className="w-full relative overflow-hidden py-3 rounded-xl font-heading font-bold text-white bg-[#8944AB] hover:bg-[#7A3A9A] transition-all group"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 CONFIRM BOOKING

@@ -14,9 +14,9 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#2997FF",
-          hover: "#5CB0FF",
-          dark: "#0A7AE6",
+          DEFAULT: "#BF5AF2",
+          hover: "#D08BF5",
+          dark: "#A23FD6",
           foreground: "#FFFFFF",
         },
         // Apple Pro dark surfaces: pure black page, #161617 / #1D1D1F raised tiles
@@ -40,10 +40,10 @@ const config: Config = {
           tertiary: "#8A8A93",
         },
         accent: {
-          orange: "#2997FF",
-          "orange-glow": "rgba(41,151,255,0.2)",
+          orange: "#BF5AF2",
+          "orange-glow": "rgba(191,90,242,0.2)",
           purple: "#8B5CF6",
-          blue: "#3B82F6",
+          blue: "#A78BFA",
           green: "#10B981",
         },
         card: {
@@ -82,14 +82,14 @@ const config: Config = {
       backgroundImage: {
         "grid-pattern":
           "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-        "orange-gradient": "linear-gradient(135deg, #2997FF 0%, #5CB0FF 100%)",
+        "orange-gradient": "linear-gradient(135deg, #BF5AF2 0%, #D08BF5 100%)",
         "dark-gradient": "linear-gradient(180deg, #09090B 0%, #111117 100%)",
         "hero-glow":
-          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(41,151,255,0.15), transparent)",
+          "radial-gradient(ellipse 80% 60% at 50% -10%, rgba(191,90,242,0.15), transparent)",
         "card-gradient":
           "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)",
         shimmer:
-          "linear-gradient(90deg, transparent 0%, rgba(41,151,255,0.4) 50%, transparent 100%)",
+          "linear-gradient(90deg, transparent 0%, rgba(191,90,242,0.4) 50%, transparent 100%)",
       },
       backgroundSize: {
         "grid-sm": "24px 24px",
@@ -140,8 +140,8 @@ const config: Config = {
           "100%": { transform: "translateX(-50%)" },
         },
         "border-glow": {
-          "0%, 100%": { borderColor: "rgba(41,151,255,0.3)" },
-          "50%": { borderColor: "rgba(41,151,255,0.8)" },
+          "0%, 100%": { borderColor: "rgba(191,90,242,0.3)" },
+          "50%": { borderColor: "rgba(191,90,242,0.8)" },
         },
         "accordion-down": {
           from: { height: "0" },
@@ -158,8 +158,8 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        "glow-orange": "0 0 40px rgba(41,151,255,0.3)",
-        "glow-orange-sm": "0 0 20px rgba(41,151,255,0.2)",
+        "glow-orange": "0 0 40px rgba(191,90,242,0.3)",
+        "glow-orange-sm": "0 0 20px rgba(191,90,242,0.2)",
         "neo-dark":
           "8px 8px 16px rgba(0,0,0,0.6), -2px -2px 8px rgba(255,255,255,0.02)",
         "neo-card":

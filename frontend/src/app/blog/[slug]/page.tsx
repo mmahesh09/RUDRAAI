@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: Props) {
               All posts
             </Link>
             <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
-              <span className="text-[#2997FF]">{post.category}</span>&nbsp;&nbsp;·&nbsp;&nbsp;{post.date}&nbsp;&nbsp;·&nbsp;&nbsp;{post.readTime}
+              <span className="text-[#BF5AF2]">{post.category}</span>&nbsp;&nbsp;·&nbsp;&nbsp;{post.date}&nbsp;&nbsp;·&nbsp;&nbsp;{post.readTime}
             </p>
             <h1 className="mt-5 font-heading text-[clamp(2.25rem,5vw,3.75rem)] font-semibold leading-[1.02] tracking-[-0.04em] text-[#F5F5F7] [text-wrap:balance]">
               {post.title}

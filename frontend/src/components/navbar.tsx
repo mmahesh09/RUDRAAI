@@ -53,7 +53,7 @@ export default function Navbar() {
       <div className="container-wide flex h-14 items-center justify-between gap-6">
         {/* Wordmark */}
         <Link href="/" className="font-heading text-[17px] font-semibold tracking-[-0.02em] text-[#F5F5F7]" aria-label="RudraAI home">
-          Rudra<span className="text-[#2997FF]">AI</span>
+          Rudra<span className="text-[#BF5AF2]">AI</span>
         </Link>
 
         {/* Desktop nav */}
@@ -79,7 +79,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <Link
             href="/booking"
-            className="hidden sm:inline-flex h-8 items-center rounded-full bg-[#0071E3] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#0077ED]"
+            className="hidden sm:inline-flex h-8 items-center rounded-full bg-[#8944AB] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#7A3A9A]"
           >
             Book a call
           </Link>
@@ -107,7 +107,7 @@ export default function Navbar() {
                   aria-current={isActive(link.href) ? "page" : undefined}
                   className={cn(
                     "flex items-center justify-between py-4 font-heading text-2xl font-semibold tracking-[-0.02em]",
-                    isActive(link.href) ? "text-[#2997FF]" : "text-[#F5F5F7]"
+                    isActive(link.href) ? "text-[#BF5AF2]" : "text-[#F5F5F7]"
                   )}
                 >
                   {link.label}
@@ -118,7 +118,7 @@ export default function Navbar() {
           <div className="container-wide pb-6">
             <Link
               href="/booking"
-              className="flex h-12 w-full items-center justify-center rounded-full bg-[#0071E3] text-[15px] font-semibold text-white"
+              className="flex h-12 w-full items-center justify-center rounded-full bg-[#8944AB] text-[15px] font-semibold text-white"
             >
               Book a free call · {SITE.call.short}
             </Link>

@@ -10,21 +10,21 @@
     --card-foreground: 0 0% 98%;
     --popover: 240 10% 6%;
     --popover-foreground: 0 0% 98%;
-    --primary: 211 100% 58%;
+    --primary: 280 86% 65%;
     --primary-foreground: 0 0% 100%;
     --secondary: 240 5% 15%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 5% 15%;
     --muted-foreground: 240 5% 65%;
-    --accent: 211 100% 58%;
+    --accent: 280 86% 65%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 6% 12%;
     --input: 240 6% 12%;
-    --ring: 211 100% 58%;
+    --ring: 280 86% 65%;
     --radius: 0.75rem;
-    --chart-1: 211 100% 58%;
+    --chart-1: 280 86% 65%;
     --chart-2: 259 94% 51%;
     --chart-3: 158 64% 52%;
     --chart-4: 217 91% 60%;
@@ -50,7 +50,7 @@
   }
 
   ::selection {
-    background: rgba(41, 151, 255, 0.3);
+    background: rgba(191, 90, 242, 0.3);
     color: #fff;
   }
 
@@ -72,7 +72,7 @@
   }
 
   :focus-visible {
-    outline: 2px solid #2997FF;
+    outline: 2px solid #BF5AF2;
     outline-offset: 3px;
   }
 
@@ -114,7 +114,7 @@
 
   .text-gradient-orange {
     /* Legacy name; renders as the solid accent */
-    color: #2997FF;
+    color: #BF5AF2;
   }
 
   .text-gradient-white {
@@ -122,11 +122,11 @@
   }
 
   .section-padding {
-    @apply py-24 md:py-32 lg:py-40;
+    @apply py-20 sm:py-28 md:py-32 lg:py-40;
   }
 
   .container-wide {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-7xl px-5 sm:px-8 lg:px-10;
   }
 
   /* The hairline column frame from the hero, reused as a quiet section texture */
@@ -142,16 +142,16 @@
 
   .badge-orange {
     @apply font-mono inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.14em];
-    color: #2997FF;
+    color: #BF5AF2;
   }
 
-  /* Primary action — solid Apple-blue pill (white on #0071E3 = 4.7:1) */
+  /* Primary action — solid Apple-blue pill (white on #8944AB = 4.7:1) */
   .cta-button {
     @apply inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full font-heading font-semibold text-[15px] text-white transition-colors duration-200;
-    background: #0071E3;
+    background: #8944AB;
   }
   .cta-button:hover {
-    background: #0077ED;
+    background: #7A3A9A;
   }
 
   .outline-button {
@@ -198,12 +198,12 @@
     margin-bottom: 1.4rem;
   }
   .prose-blog a {
-    color: #2997FF;
+    color: #BF5AF2;
     text-decoration: underline;
     text-underline-offset: 3px;
   }
   .prose-blog a:hover {
-    color: #5CB0FF;
+    color: #D08BF5;
   }
   .prose-blog ul, .prose-blog ol {
     padding-left: 1.5rem;
@@ -231,7 +231,7 @@
     border-radius: 0.3rem;
     padding: 0.15em 0.4em;
     font-size: 0.875em;
-    color: #5CB0FF;
+    color: #D08BF5;
   }
   .prose-blog pre code {
     background: none;

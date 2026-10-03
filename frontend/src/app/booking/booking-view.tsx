@@ -196,7 +196,7 @@ export default function BookingView() {
         theme: "dark",
         hideEventTypeDetails: false,
         layout: "month_view",
-        styles: { branding: { brandColor: "#2997FF" } },
+        styles: { branding: { brandColor: "#BF5AF2" } },
       });
       Cal.ns!["booking-inline"]("on", {
         action: "bookingSuccessful",
@@ -293,15 +293,15 @@ export default function BookingView() {
 
       {/* Hero */}
       <div className="relative overflow-hidden pt-36 pb-12 md:pt-44">
-        <div className="pointer-events-none absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+        <div className="pointer-events-none absolute inset-0 mx-auto max-w-7xl px-5 sm:px-8 lg:px-10" aria-hidden="true">
           <div className="h-full border-x border-white/[0.06]" />
         </div>
         <div className="relative z-10 container-wide">
           <p className="hero-fade eyebrow">
-            <span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;Free call
+            <span className="text-[#BF5AF2]" aria-hidden="true">●</span>&nbsp;&nbsp;Free call
           </p>
           <h1 className="mt-8 max-w-[16ch] font-heading font-semibold leading-[0.98] tracking-[-0.045em] text-[#F5F5F7] text-[clamp(2.75rem,7vw,5.5rem)]">
-            Fifteen minutes. <span className="text-[#2997FF]">Saturday or Sunday.</span>
+            Fifteen minutes. <span className="text-[#BF5AF2]">Saturday or Sunday.</span>
           </h1>
           <p className="hero-fade mt-8 max-w-[52ch] text-lg leading-[1.65] text-[#A1A1AA]" style={{ "--d": "0.3s" } as React.CSSProperties}>
             Tell us what&apos;s slowing your business down. No slides, no sales pitch — just an honest view of what&apos;s
@@ -311,14 +311,14 @@ export default function BookingView() {
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[#A1A1AA]">
             {(CALCOM_LINK || usingRealSlots) && (
               <span className="inline-flex items-center gap-2">
-                <CalendarCheck className="w-3.5 h-3.5 text-[#2997FF]" aria-hidden="true" /> Live availability
+                <CalendarCheck className="w-3.5 h-3.5 text-[#BF5AF2]" aria-hidden="true" /> Live availability
               </span>
             )}
             <span className="inline-flex items-center gap-2">
-              <Video className="w-3.5 h-3.5 text-[#2997FF]" aria-hidden="true" /> Video link by email
+              <Video className="w-3.5 h-3.5 text-[#BF5AF2]" aria-hidden="true" /> Video link by email
             </span>
             <span className="inline-flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5 text-[#2997FF]" aria-hidden="true" /> Calendar invite
+              <FileText className="w-3.5 h-3.5 text-[#BF5AF2]" aria-hidden="true" /> Calendar invite
             </span>
           </div>
         </div>
@@ -334,7 +334,7 @@ export default function BookingView() {
                 <div
                   className={cn(
                     "w-7 h-7 rounded-full flex items-center justify-center text-sm font-heading font-bold transition-all duration-300",
-                    step >= s.n ? "bg-[#2997FF] text-white" : "bg-white/[0.08] text-[#8A8A93]"
+                    step >= s.n ? "bg-[#BF5AF2] text-white" : "bg-white/[0.08] text-[#8A8A93]"
                   )}
                 >
                   {s.n}
@@ -374,10 +374,10 @@ export default function BookingView() {
               {/* Integration status row */}
               <div className="grid sm:grid-cols-3 gap-3">
                 {(CALCOM_LINK || calUsed || usingRealSlots) && (
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-blue-500/05 border border-blue-500/15">
-                    <CalendarCheck className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-purple-500/05 border border-purple-500/15">
+                    <CalendarCheck className="w-5 h-5 text-purple-400 flex-shrink-0" />
                     <div>
-                      <p className="text-xs font-heading font-semibold text-blue-400">Cal.com</p>
+                      <p className="text-xs font-heading font-semibold text-purple-400">Cal.com</p>
                       <p className="text-xs font-body text-[#8A8A93]">Slot reserved</p>
                     </div>
                   </div>
@@ -387,19 +387,19 @@ export default function BookingView() {
                     href={zoomLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 rounded-xl bg-sky-500/10 border border-sky-500/30 hover:bg-sky-500/15 transition-colors"
+                    className="flex items-center gap-3 p-4 rounded-xl bg-violet-500/10 border border-violet-500/30 hover:bg-violet-500/15 transition-colors"
                   >
-                    <Video className="w-5 h-5 text-sky-400 flex-shrink-0" />
+                    <Video className="w-5 h-5 text-violet-400 flex-shrink-0" />
                     <div>
-                      <p className="text-xs font-heading font-semibold text-sky-400">Zoom — Join Meeting</p>
-                      <p className="text-xs font-body text-sky-300 underline truncate max-w-[160px]">{zoomLink}</p>
+                      <p className="text-xs font-heading font-semibold text-violet-400">Zoom — Join Meeting</p>
+                      <p className="text-xs font-body text-violet-300 underline truncate max-w-[160px]">{zoomLink}</p>
                     </div>
                   </a>
                 ) : (
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-sky-500/05 border border-sky-500/15">
-                    <Video className="w-5 h-5 text-sky-400 flex-shrink-0" />
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-violet-500/05 border border-violet-500/15">
+                    <Video className="w-5 h-5 text-violet-400 flex-shrink-0" />
                     <div>
-                      <p className="text-xs font-heading font-semibold text-sky-400">Zoom</p>
+                      <p className="text-xs font-heading font-semibold text-violet-400">Zoom</p>
                       <p className="text-xs font-body text-[#8A8A93]">Link sent to email</p>
                     </div>
                   </div>
@@ -454,7 +454,7 @@ export default function BookingView() {
                   </div>
                   <div className="mt-5 pt-5 border-t border-white/[0.06]">
                     <div className="flex items-center gap-2 text-sm font-body text-[#A1A1AA]">
-                      <Clock className="w-4 h-4 text-[#2997FF]" />
+                      <Clock className="w-4 h-4 text-[#BF5AF2]" />
                       <span>15 minutes · Free · No obligation</span>
                     </div>
                   </div>
@@ -480,7 +480,7 @@ export default function BookingView() {
                   <div className="relative">
                     {calSlotsLoading && (
                       <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/40 backdrop-blur-sm">
-                        <Loader2 className="w-6 h-6 animate-spin text-[#2997FF]" />
+                        <Loader2 className="w-6 h-6 animate-spin text-[#BF5AF2]" />
                       </div>
                     )}
                     <CoachSchedulingCard
@@ -518,7 +518,7 @@ export default function BookingView() {
                 {/* Selected slot summary */}
                 {timeSlot && (
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] mb-3">
-                    <Clock className="w-4 h-4 text-[#2997FF]" />
+                    <Clock className="w-4 h-4 text-[#BF5AF2]" />
                     <span className="text-sm font-body text-white flex-1">
                       <strong>{timeSlot}</strong>
                     </span>
@@ -526,7 +526,7 @@ export default function BookingView() {
                       <button
                         type="button"
                         onClick={() => { setStep(1); setSelectedSlot(null); setSelectedSlotISO(null); }}
-                        className="text-xs text-[#2997FF] hover:text-[#5CB0FF] font-body"
+                        className="text-xs text-[#BF5AF2] hover:text-[#D08BF5] font-body"
                       >
                         Change
                       </button>
@@ -536,7 +536,7 @@ export default function BookingView() {
 
                 {/* Cal.com used notice */}
                 {(calUsed || (usingRealSlots && selectedSlotISO)) && (
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-body">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-body">
                     <CalendarCheck className="w-3.5 h-3.5 flex-shrink-0" />
                     {calUsed
                       ? "Slot reserved via Cal.com — fill in the details below to complete your booking."

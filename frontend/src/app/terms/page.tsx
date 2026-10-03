@@ -18,11 +18,11 @@ export default function TermsPage() {
       <Navbar />
 
       <div className="relative pt-36 pb-8 overflow-hidden md:pt-44">
-        <div className="pointer-events-none absolute inset-0 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-hidden="true">
+        <div className="pointer-events-none absolute inset-0 mx-auto max-w-7xl px-5 sm:px-8 lg:px-10" aria-hidden="true">
           <div className="h-full border-x border-white/[0.06]" />
         </div>
         <div className="relative z-10 container-wide max-w-3xl">
-          <p className="eyebrow mb-8"><span className="text-[#2997FF]" aria-hidden="true">●</span>&nbsp;&nbsp;Legal</p>
+          <p className="eyebrow mb-8"><span className="text-[#BF5AF2]" aria-hidden="true">●</span>&nbsp;&nbsp;Legal</p>
           <h1 className="font-heading font-semibold leading-[1] tracking-[-0.045em] text-[#F5F5F7] text-[clamp(2.75rem,6vw,4.5rem)] mb-6">
             Terms of Service
           </h1>
@@ -118,7 +118,7 @@ export default function TermsPage() {
               },
               {
                 title: "15. Contact",
-                body: `For questions about these terms, email <a href="mailto:${CONTACT_EMAIL}" class="text-[#2997FF] hover:underline">${CONTACT_EMAIL}</a>.`,
+                body: `For questions about these terms, email <a href="mailto:${CONTACT_EMAIL}" class="text-[#BF5AF2] hover:underline">${CONTACT_EMAIL}</a>.`,
                 isHtml: true,
               },
             ].map((section) => (
@@ -130,7 +130,7 @@ export default function TermsPage() {
                   <p>{section.body}</p>
                 ) : null}
                 {section.list && (
-                  <ul className="mt-3 space-y-2 list-disc list-inside marker:text-[#2997FF]">
+                  <ul className="mt-3 space-y-2 list-disc list-inside marker:text-[#BF5AF2]">
                     {section.list.map((item) => (
                       <li key={item} className="pl-1">{item}</li>
                     ))}

@@ -22,7 +22,7 @@ const AnimatedShinyText: FC<AnimatedShinyTextProps> = ({
       className={cn(
         "mx-auto text-neutral-400/80",
         "animate-[shimmer_2.5s_linear_infinite] bg-clip-text bg-no-repeat [background-position:0_0] [background-size:var(--shimmer-width)_100%] [transition:background-position_1s_cubic-bezier(.6,.6,0,1)_infinite]",
-        "bg-gradient-to-r from-transparent via-[#2997FF]/90 via-50% to-transparent",
+        "bg-gradient-to-r from-transparent via-[#BF5AF2]/90 via-50% to-transparent",
         className
       )}
     >

@@ -39,12 +39,12 @@ export const caseStudies: CaseStudy[] = [
       "Within 90 days, their pipeline grew by $180K. SDRs now spend 80% of their time actually selling. High-intent leads receive a response within 8 minutes on average. The team closed 3 deals in the first month that would have been missed due to slow follow-up.",
     metrics: [
       { icon: TrendingUp, value: "340%", label: "More qualified leads", color: "#10B981" },
-      { icon: Clock, value: "92%", label: "Reduction in response time", color: "#3B82F6" },
-      { icon: DollarSign, value: "$180K", label: "Pipeline added in 90 days", color: "#2997FF" },
+      { icon: Clock, value: "92%", label: "Reduction in response time", color: "#A78BFA" },
+      { icon: DollarSign, value: "$180K", label: "Pipeline added in 90 days", color: "#BF5AF2" },
     ],
     tags: ["n8n", "GPT-4o", "HubSpot", "Clearbit"],
-    gradient: "from-[#2997FF]/10 to-transparent",
-    accentColor: "#2997FF",
+    gradient: "from-[#BF5AF2]/10 to-transparent",
+    accentColor: "#BF5AF2",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&q=80",
     timeline: "3 weeks build · 90-day results",
     content: `
@@ -91,7 +91,7 @@ export const caseStudies: CaseStudy[] = [
     metrics: [
       { icon: TrendingUp, value: "80%", label: "Tickets auto-resolved", color: "#A1A1A6" },
       { icon: Clock, value: "4 min", label: "Avg resolution time", color: "#10B981" },
-      { icon: DollarSign, value: "$95K", label: "Annual support savings", color: "#2997FF" },
+      { icon: DollarSign, value: "$95K", label: "Annual support savings", color: "#BF5AF2" },
     ],
     tags: ["AI Agent", "Zendesk", "Shopify", "OpenAI"],
     gradient: "from-[#A1A1A6]/10 to-transparent",
@@ -140,7 +140,7 @@ export const caseStudies: CaseStudy[] = [
       "No-show rate dropped from 28% to 15.4% — a 45% reduction. Front desk staff saved 28 hours per week. Patient satisfaction scores rose to 4.9 stars. The clinics onboarded 40 additional weekly appointments using the time freed up.",
     metrics: [
       { icon: TrendingUp, value: "45%", label: "No-show reduction", color: "#EC4899" },
-      { icon: Clock, value: "28h", label: "Staff hours saved/week", color: "#3B82F6" },
+      { icon: Clock, value: "28h", label: "Staff hours saved/week", color: "#A78BFA" },
       { icon: Users, value: "4.9★", label: "Patient satisfaction", color: "#F59E0B" },
     ],
     tags: ["n8n", "Twilio", "Google Calendar", "EHR API"],
@@ -190,13 +190,13 @@ export const caseStudies: CaseStudy[] = [
     outcome:
       "Open rates climbed from 19% to 41%. Click-through rates tripled. Email-attributed revenue across the 12 client accounts grew by 210% in 6 months. The team reallocated 18 hours per week from manual campaign ops to creative strategy.",
     metrics: [
-      { icon: TrendingUp, value: "210%", label: "Email revenue growth", color: "#3B82F6" },
+      { icon: TrendingUp, value: "210%", label: "Email revenue growth", color: "#A78BFA" },
       { icon: Mail, value: "41%", label: "Avg open rate (was 19%)", color: "#10B981" },
       { icon: Clock, value: "18h", label: "Strategist hours saved/week", color: "#A1A1A6" },
     ],
     tags: ["n8n", "GPT-4o", "Instantly", "Segment", "Klaviyo"],
-    gradient: "from-[#3B82F6]/10 to-transparent",
-    accentColor: "#3B82F6",
+    gradient: "from-[#A78BFA]/10 to-transparent",
+    accentColor: "#A78BFA",
     image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&q=80",
     timeline: "3 weeks build · 6-month results",
     content: `
@@ -291,7 +291,7 @@ export const caseStudies: CaseStudy[] = [
     metrics: [
       { icon: DollarSign, value: "73%", label: "Cost reduction per invoice", color: "#F59E0B" },
       { icon: FileText, value: "95%", label: "Invoices processed hands-free", color: "#10B981" },
-      { icon: BarChart3, value: "4h", label: "Processing time (was 6 days)", color: "#3B82F6" },
+      { icon: BarChart3, value: "4h", label: "Processing time (was 6 days)", color: "#A78BFA" },
     ],
     tags: ["n8n", "GPT-4o Vision", "Slack", "SAP", "PostgreSQL"],
     gradient: "from-[#F59E0B]/10 to-transparent",

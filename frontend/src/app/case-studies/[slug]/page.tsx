@@ -51,7 +51,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
             All case studies
           </Link>
           <p className="mt-10 font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
-            <span className="text-[#2997FF]">{study.industry}</span>&nbsp;&nbsp;·&nbsp;&nbsp;{study.timeline}
+            <span className="text-[#BF5AF2]">{study.industry}</span>&nbsp;&nbsp;·&nbsp;&nbsp;{study.timeline}
           </p>
           <h1 className="mt-5 max-w-[20ch] font-heading text-[clamp(2.25rem,5.5vw,4.5rem)] font-semibold leading-[1.0] tracking-[-0.045em] text-[#F5F5F7] [text-wrap:balance]">
             {study.title}
@@ -91,7 +91,7 @@ export default async function CaseStudyDetailPage({ params }: Props) {
               <div className="py-4">
                 <Link
                   href="/booking"
-                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] hover:decoration-[#2997FF]"
+                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] hover:decoration-[#BF5AF2]"
                 >
                   Build something similar
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" aria-hidden="true" />

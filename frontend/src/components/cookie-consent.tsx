@@ -50,8 +50,8 @@ export default function CookieConsent() {
             </button>
 
             <div className="flex items-start gap-3 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-[rgba(41,151,255,0.1)] border border-[rgba(41,151,255,0.2)] flex items-center justify-center flex-shrink-0 mt-0.5">
-                <Cookie className="w-4 h-4 text-[#2997FF]" />
+              <div className="w-8 h-8 rounded-lg bg-[rgba(191,90,242,0.1)] border border-[rgba(191,90,242,0.2)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Cookie className="w-4 h-4 text-[#BF5AF2]" />
               </div>
               <div>
                 <p className="text-sm font-subheading font-semibold text-white mb-1">
@@ -59,7 +59,7 @@ export default function CookieConsent() {
                 </p>
                 <p className="text-xs font-body text-[#8A8A93] leading-relaxed">
                   We use one cookie to remember your consent preference. No tracking, no ads.{" "}
-                  <Link href="/privacy" className="text-[#2997FF] hover:underline">
+                  <Link href="/privacy" className="text-[#BF5AF2] hover:underline">
                     Privacy Policy
                   </Link>
                 </p>
@@ -75,7 +75,7 @@ export default function CookieConsent() {
               </button>
               <button
                 onClick={accept}
-                className="flex-1 py-2 px-3 rounded-xl text-xs font-heading font-semibold text-white bg-[#0071E3] hover:bg-[#0077ED] transition-all"
+                className="flex-1 py-2 px-3 rounded-xl text-xs font-heading font-semibold text-white bg-[#8944AB] hover:bg-[#7A3A9A] transition-all"
               >
                 Accept
               </button>

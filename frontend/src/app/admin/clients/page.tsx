@@ -11,11 +11,11 @@ const STATUS_LABELS: Record<string, string> = {
 
 const STATUS_COLORS: Record<string, string> = {
   audit: "bg-yellow-400/10 text-yellow-400 border-yellow-400/20",
-  proposal: "bg-blue-400/10 text-blue-400 border-blue-400/20",
+  proposal: "bg-purple-400/10 text-purple-400 border-purple-400/20",
   signed: "bg-purple-400/10 text-purple-400 border-purple-400/20",
   in_dev: "bg-orange-400/10 text-orange-400 border-orange-400/20",
   deployed: "bg-green-400/10 text-green-400 border-green-400/20",
-  support: "bg-teal-400/10 text-teal-400 border-teal-400/20",
+  support: "bg-fuchsia-400/10 text-fuchsia-400 border-fuchsia-400/20",
 };
 
 export default async function AdminClients() {
@@ -33,7 +33,7 @@ export default async function AdminClients() {
           <p className="text-[#A1A1AA] mt-1 text-sm">{projects?.length ?? 0} active projects</p>
         </div>
         <Link href="/admin/clients/new"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#2997FF] to-[#5CB0FF] text-white text-sm font-medium shadow-[0_4px_20px_rgba(41,151,255,0.3)]">
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#BF5AF2] to-[#D08BF5] text-white text-sm font-medium shadow-[0_4px_20px_rgba(191,90,242,0.3)]">
           <Plus className="w-4 h-4" /> New Project
         </Link>
       </div>
@@ -68,7 +68,7 @@ export default async function AdminClients() {
                     {p.timeline_end ? new Date(p.timeline_end).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—"}
                   </td>
                   <td className="px-6 py-4">
-                    <Link href={`/admin/clients/${p.id}`} className="flex items-center gap-1 text-[#2997FF] text-sm hover:underline">
+                    <Link href={`/admin/clients/${p.id}`} className="flex items-center gap-1 text-[#BF5AF2] text-sm hover:underline">
                       Manage <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </td>
