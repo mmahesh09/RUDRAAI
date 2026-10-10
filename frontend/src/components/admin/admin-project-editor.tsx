@@ -281,7 +281,7 @@ export default function AdminProjectEditor({
         <div className="bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-2xl p-6">
           <h2 className="text-white font-heading font-semibold mb-4">Activity Feed</h2>
           {updates.length > 0 && (
-            <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+            <div data-lenis-prevent className="space-y-3 mb-4 max-h-64 overflow-y-auto">
               {updates.map((u) => (
                 <div key={u.id} className="flex gap-3 p-3 bg-[rgba(255,255,255,0.02)] border border-white/[0.06] rounded-xl">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${u.author_role === "admin" ? "bg-[rgba(191,90,242,0.15)] text-[#BF5AF2]" : "bg-white/[0.06] text-[#A1A1AA]"}`}>

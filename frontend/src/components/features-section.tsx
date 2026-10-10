@@ -205,7 +205,7 @@ export default function FeaturesSection() {
               })}
             </ol>
             <div className="lg:col-span-8">
-              <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+              <div data-lenis-prevent-wheel className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
                 <div className="min-w-[560px]">
                   <Canvas active={active} />
                 </div>

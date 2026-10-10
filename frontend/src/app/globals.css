@@ -40,10 +40,6 @@
     margin: 0;
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
   body {
     @apply bg-black text-foreground font-body antialiased;
     overflow-x: hidden;
