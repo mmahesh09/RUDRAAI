@@ -1,70 +1,30 @@
 import { NextRequest, NextResponse } from "next/server";
+import { calcomConfigured, fetchWeekendSlots } from "@/lib/booking/calcom";
+import { requestModeDays, upcomingWeekendKeys, type SlotsResponse } from "@/lib/booking/slots";
 
-const CALCOM_BASE = "https://api.cal.com/v2";
-const ISO_8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
+export const dynamic = "force-dynamic";
 
-function calHeaders(version = "2024-06-11") {
-  return {
-    Authorization: `Bearer ${process.env.CALCOM_API_KEY}`,
-    "cal-api-version": version,
-    "Content-Type": "application/json",
-  };
-}
-
-async function getEventTypeId(): Promise<number | null> {
-  const slug = process.env.CALCOM_EVENT_SLUG || "15min";
-  const res = await fetch(`${CALCOM_BASE}/event-types`, {
-    headers: calHeaders("2024-06-11"),
-    next: { revalidate: 300 }, // cache event type ID for 5 min
-  });
-  if (!res.ok) return null;
-
-  const data = (await res.json()) as {
-    data?: { eventTypeGroups?: { eventTypes?: { id: number; slug: string }[] }[] };
-  };
-
-  for (const group of data.data?.eventTypeGroups ?? []) {
-    const et = group.eventTypes?.find((e) => e.slug === slug);
-    if (et) return et.id;
-  }
-  return null;
-}
-
+// GET /api/cal/slots?weeks=4
+// Live weekend availability from Cal.com (IST). The booking page polls this, so it
+// is never cached. When Cal.com is down or unconfigured it answers in "request" mode:
+// a fixed weekend grid whose bookings are logged as requests, not confirmed calls.
 export async function GET(req: NextRequest) {
-  if (!process.env.CALCOM_API_KEY) {
-    return NextResponse.json({ error: "Cal.com not configured" }, { status: 503 });
-  }
+  const weeks = Math.min(Math.max(Number(req.nextUrl.searchParams.get("weeks")) || 4, 1), 8);
+  const headers = { "Cache-Control": "no-store" };
 
-  const { searchParams } = req.nextUrl;
-  const startTime = searchParams.get("startTime");
-  const endTime = searchParams.get("endTime");
-
-  if (!startTime || !endTime) {
-    return NextResponse.json({ error: "startTime and endTime are required" }, { status: 400 });
-  }
-  if (!ISO_8601.test(startTime) || !ISO_8601.test(endTime)) {
-    return NextResponse.json({ error: "startTime and endTime must be ISO-8601 strings" }, { status: 400 });
-  }
-
-  try {
-    const eventTypeId = await getEventTypeId();
-    if (!eventTypeId) {
-      return NextResponse.json({ error: "Event type not found — check CALCOM_EVENT_SLUG" }, { status: 404 });
+  if (calcomConfigured()) {
+    const keys = upcomingWeekendKeys(weeks);
+    if (keys.length) {
+      try {
+        const days = await fetchWeekendSlots(keys[0], keys[keys.length - 1]);
+        const body: SlotsResponse = { mode: "live", days, fetchedAt: new Date().toISOString() };
+        return NextResponse.json(body, { headers });
+      } catch (err) {
+        console.error("[slots] Cal.com unavailable, serving request mode:", (err as Error).message);
+      }
     }
-
-    const url = new URL(`${CALCOM_BASE}/slots/available`);
-    url.searchParams.set("startTime", startTime);
-    url.searchParams.set("endTime", endTime);
-    url.searchParams.set("eventTypeId", String(eventTypeId));
-
-    const slotsRes = await fetch(url.toString(), { headers: calHeaders() });
-    if (!slotsRes.ok) {
-      return NextResponse.json({ error: "Failed to fetch available slots" }, { status: 502 });
-    }
-
-    const data = await slotsRes.json();
-    return NextResponse.json(data);
-  } catch {
-    return NextResponse.json({ error: "Failed to fetch available slots" }, { status: 500 });
   }
+
+  const body: SlotsResponse = { mode: "request", days: requestModeDays(weeks), fetchedAt: new Date().toISOString() };
+  return NextResponse.json(body, { headers });
 }

@@ -135,3 +135,12 @@ CREATE POLICY "client_own_metrics" ON automation_metrics
 
 CREATE POLICY "client_own_updates" ON project_updates
   FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
+
+-- ── 2026-10 booking sync ──────────────────────────────────────────────────────
+-- booking_ref matches the "Booking ID" column in Google Sheets; cal_uid lets the
+-- Cal.com webhook find a booking on cancel/reschedule.
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS booking_ref TEXT UNIQUE;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS start_time  TIMESTAMPTZ;
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS cal_uid     TEXT;
+CREATE INDEX IF NOT EXISTS bookings_cal_uid_idx    ON bookings (cal_uid);
+CREATE INDEX IF NOT EXISTS bookings_start_time_idx ON bookings (start_time);

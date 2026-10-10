@@ -1,60 +1,41 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
+import { randomBytes } from "crypto";
 import { z } from "zod";
-import { escapeHtml, getSupabase, appendToSheet, sendEmail } from "@/lib/server-utils";
+import { escapeHtml, getSupabase, sendEmail } from "@/lib/server-utils";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
+import { calcomConfigured, createCalBooking, getEventTypeId, isSlotAvailable, SlotTakenError } from "@/lib/booking/calcom";
+import { appendBooking, type BookingStatus } from "@/lib/booking/sheets";
+import { isWeekendIST, slotLabel, SLOT_MINUTES } from "@/lib/booking/slots";
 
-async function autoOnboard({
-  email, name, company, timeSlot, bookingId,
-}: {
-  email: string; name: string; company: string; timeSlot: string; bookingId: string | null;
-}) {
-  const siteUrl = process.env.FRONTEND_URL ?? "";
-  if (!siteUrl) return;
-
-  const admin = createSupabaseAdminClient();
-
-  // Find or invite the user
-  const { data: usersData } = await admin.auth.admin.listUsers();
-  let userId: string | null = null;
-  const existing = usersData?.users?.find((u) => u.email === email);
-
-  if (existing) {
-    userId = existing.id;
-  } else {
-    const { data: invited } = await admin.auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${siteUrl}/auth/callback?next=/portal`,
-    });
-    userId = invited?.user?.id ?? null;
-  }
-
-  if (!userId) return;
-
-  // Create a project and link it to the booking + user
-  await admin.from("projects").insert({
-    user_id: userId,
-    booking_id: bookingId,
-    title: `Automation Audit — ${company || name}`,
-    status: "audit",
-  });
-
-  // Update booking with user_id
-  if (bookingId) {
-    await admin.from("bookings").update({ user_id: userId }).eq("id", bookingId);
-  }
-}
+export const dynamic = "force-dynamic";
 
 const bookingSchema = z.object({
-  name: z.string().min(2).max(100).trim(),
-  email: z.string().email().max(254).trim(),
-  company: z.string().max(100).trim().optional().default(""),
-  role: z.string().max(100).trim().optional(),
-  timeSlot: z.string().min(3).max(80).trim(),
-  isoTime: z.string().max(50).trim().optional(),
-  goal: z.string().min(20).max(2000).trim(),
-  website: z.string().max(0).optional(),
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().email().max(254),
+  company: z.string().trim().min(1).max(100),
+  role: z.string().trim().max(100).optional().default(""),
+  isoTime: z.string().datetime({ offset: true }),
+  goal: z.string().trim().min(20).max(2000),
+  website: z.string().max(500).optional(), // honeypot — any value means a bot
 });
 
-async function createZoomMeeting(topic: string, timeRef: string): Promise<string | null> {
+// Per-instance limiter: 5 booking attempts per IP per hour. Serverless instances
+// don't share memory, so this slows abuse rather than stopping it outright.
+const attempts = new Map<string, number[]>();
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const recent = (attempts.get(ip) ?? []).filter((t) => now - t < 3600_000);
+  recent.push(now);
+  attempts.set(ip, recent);
+  return recent.length > 5;
+}
+
+function newBookingId(): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  return "RA-" + Array.from(randomBytes(6), (b) => alphabet[b % alphabet.length]).join("");
+}
+
+async function createZoomMeeting(topic: string, startIso: string): Promise<string | null> {
   const { ZOOM_ACCOUNT_ID: accountId, ZOOM_CLIENT_ID: clientId, ZOOM_CLIENT_SECRET: clientSecret } = process.env;
   if (!accountId || !clientId || !clientSecret) return null;
   try {
@@ -64,25 +45,18 @@ async function createZoomMeeting(topic: string, timeRef: string): Promise<string
       { method: "POST", headers: { Authorization: `Basic ${credentials}`, "Content-Type": "application/x-www-form-urlencoded" } }
     );
     if (!tokenRes.ok) return null;
-    const { access_token } = await tokenRes.json() as { access_token: string };
-
-    const cleaned = timeRef.replace(/ IST$/i, "").replace(" at ", " ");
-    const parsed = new Date(`${cleaned} ${new Date().getFullYear()}`);
-    const startTime = !isNaN(parsed.getTime())
-      ? parsed.toISOString()
-      : new Date(Date.now() + 86400000).toISOString();
+    const { access_token } = (await tokenRes.json()) as { access_token: string };
 
     const meetRes = await fetch("https://api.zoom.us/v2/users/me/meetings", {
       method: "POST",
       headers: { Authorization: `Bearer ${access_token}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        topic, type: 2, start_time: startTime, duration: 15,
-        timezone: "Asia/Kolkata",
+        topic, type: 2, start_time: startIso, duration: SLOT_MINUTES, timezone: "Asia/Kolkata",
         settings: { join_before_host: true, waiting_room: false, host_video: true, participant_video: true },
       }),
     });
     if (!meetRes.ok) return null;
-    const meeting = await meetRes.json() as { join_url?: string };
+    const meeting = (await meetRes.json()) as { join_url?: string };
     return meeting.join_url ?? null;
   } catch {
     return null;
@@ -90,8 +64,8 @@ async function createZoomMeeting(topic: string, timeRef: string): Promise<string
 }
 
 async function logToNotion(data: {
-  name: string; email: string; company: string; role?: string;
-  timeSlot: string; goal: string; zoomLink: string | null;
+  name: string; email: string; company: string; role: string;
+  timeSlot: string; goal: string; meetingLink: string | null; status: BookingStatus;
 }): Promise<void> {
   const { NOTION_TOKEN: token, NOTION_DATABASE_ID: dbId } = process.env;
   if (!token || !dbId) return;
@@ -101,10 +75,10 @@ async function logToNotion(data: {
     Company: { rich_text: [{ text: { content: data.company } }] },
     "Time Slot": { rich_text: [{ text: { content: data.timeSlot } }] },
     Goal: { rich_text: [{ text: { content: data.goal.slice(0, 2000) } }] },
-    Status: { select: { name: "New" } },
+    Status: { select: { name: data.status === "Confirmed" ? "New" : data.status } },
   };
   if (data.role) properties["Role"] = { rich_text: [{ text: { content: data.role } }] };
-  if (data.zoomLink) properties["Zoom Link"] = { url: data.zoomLink };
+  if (data.meetingLink) properties["Zoom Link"] = { url: data.meetingLink };
   await fetch("https://api.notion.com/v1/pages", {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Notion-Version": "2022-06-28", "Content-Type": "application/json" },
@@ -112,132 +86,172 @@ async function logToNotion(data: {
   });
 }
 
+// Invites the client to the portal and opens an audit project for them
+async function autoOnboard({ email, name, company, bookingId }: {
+  email: string; name: string; company: string; bookingId: string | null;
+}) {
+  const siteUrl = process.env.FRONTEND_URL ?? "";
+  if (!siteUrl) return;
+
+  const admin = createSupabaseAdminClient();
+  const { data: usersData } = await admin.auth.admin.listUsers();
+  let userId = usersData?.users?.find((u) => u.email === email)?.id ?? null;
+
+  if (!userId) {
+    const { data: invited } = await admin.auth.admin.inviteUserByEmail(email, {
+      redirectTo: `${siteUrl}/auth/callback?next=/portal`,
+    });
+    userId = invited?.user?.id ?? null;
+  }
+  if (!userId) return;
+
+  await admin.from("projects").insert({
+    user_id: userId,
+    booking_id: bookingId,
+    title: `Automation Audit — ${company || name}`,
+    status: "audit",
+  });
+  if (bookingId) {
+    await admin.from("bookings").update({ user_id: userId }).eq("id", bookingId);
+  }
+}
+
+// Inserts the booking; retries without the newer columns if the
+// 2026-10 migration in backend/supabase/schema.sql hasn't been run yet.
+async function saveToSupabase(row: Record<string, unknown>, extended: Record<string, unknown>): Promise<string | null> {
+  const supabase = getSupabase();
+  if (!supabase) return null;
+  let { data, error } = await supabase.from("bookings").insert({ ...row, ...extended }).select("id").single();
+  if (error) {
+    console.warn("[booking] Supabase insert with extended columns failed, retrying base row:", error.message);
+    ({ data, error } = await supabase.from("bookings").insert(row).select("id").single());
+  }
+  if (error) console.error("[booking] Supabase insert failed:", error.message);
+  return data?.id ?? null;
+}
+
+function emailBody(p: { safeName: string; label: string; meetingLink: string | null; status: BookingStatus; bookingId: string }): string {
+  const consultantName = escapeHtml(process.env.CONSULTANT_NAME ?? "The RudraAI Team");
+  const link = p.meetingLink ? escapeHtml(p.meetingLink) : null;
+  const confirmed = p.status === "Confirmed";
+  return `
+    <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#222">
+      <p style="font-family:monospace;font-size:12px;letter-spacing:.12em;color:#777;text-transform:uppercase">Booking ${p.bookingId}</p>
+      <h2 style="margin:8px 0 16px">${confirmed ? `You're booked, ${p.safeName}.` : `Request received, ${p.safeName}.`}</h2>
+      <p>${confirmed ? "Your free 15-minute automation audit is confirmed for:" : "You asked for this time for your free 15-minute automation audit:"}</p>
+      <p style="font-size:18px;font-weight:600;border-left:3px solid #BF5AF2;padding:8px 14px">${escapeHtml(p.label)}</p>
+      ${link
+        ? `<p>Join link: <a href="${link}">${link}</a></p>`
+        : `<p><em>${confirmed ? "Your video link will follow by email within the hour." : "We'll confirm the time and send a video link within a few hours."}</em></p>`}
+      <p>Need a different time? Reply to this email.</p>
+      <p style="margin-top:28px">${consultantName}<br><span style="color:#888">RudraAI — Automation Agency</span></p>
+    </div>`;
+}
+
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (rateLimited(ip)) {
+    return NextResponse.json({ error: "Too many booking attempts. Please try again later." }, { status: 429 });
+  }
+
+  let parsed;
   try {
-    const body = await req.json();
-    const parsed = bookingSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Validation failed. Please check your input." }, { status: 400 });
+    parsed = bookingSchema.safeParse(await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Validation failed. Please check your input." }, { status: 400 });
+  }
+
+  const { name, email, company, role, isoTime, goal, website } = parsed.data;
+  const bookingId = newBookingId();
+
+  // Honeypot hit: look successful, do nothing
+  if (website) {
+    return NextResponse.json({ success: true, bookingId, status: "Confirmed", slotLabel: slotLabel(isoTime), meetingLink: null });
+  }
+
+  const start = new Date(isoTime);
+  if (!isWeekendIST(isoTime) || start.getTime() < Date.now() + 30 * 60_000 || start.getUTCMinutes() % SLOT_MINUTES !== 0) {
+    return NextResponse.json({ error: "Calls run on Saturdays and Sundays in 15-minute slots. Please pick another time." }, { status: 400 });
+  }
+
+  const label = slotLabel(isoTime);
+  let status: BookingStatus = "Requested";
+  let calUid = "";
+  let meetingLink: string | null = null;
+
+  // Live mode: reserve the slot in Cal.com first. A taken slot is a 409 so the page
+  // can refresh availability; any other Cal.com failure degrades to a request.
+  if (calcomConfigured() && (await getEventTypeId())) {
+    try {
+      if (!(await isSlotAvailable(isoTime))) throw new SlotTakenError("slot no longer listed");
+      const cal = await createCalBooking({ start: isoTime, name, email, notes: goal, company });
+      status = "Confirmed";
+      calUid = cal.uid;
+      meetingLink = cal.meetingUrl;
+    } catch (err) {
+      if (err instanceof SlotTakenError) {
+        return NextResponse.json(
+          { error: "Someone just booked that time. Pick another slot.", code: "SLOT_TAKEN" },
+          { status: 409 }
+        );
+      }
+      console.error("[booking] Cal.com failed, recording as request:", (err as Error).message);
     }
+  }
 
-    const { name, email, company, role, timeSlot, isoTime, goal, website } = parsed.data;
+  meetingLink ??= await createZoomMeeting(`Automation Audit — ${name} (${company})`, start.toISOString());
 
-    if (website && website.length > 0) {
-      return NextResponse.json({ success: true, message: "Booking confirmed." });
-    }
+  const supabaseId = await saveToSupabase(
+    { name, email, company, role, time_slot: label, goal, zoom_link: meetingLink, status: status.toLowerCase() },
+    { booking_ref: bookingId, start_time: start.toISOString(), cal_uid: calUid || null }
+  );
 
-    const safeName     = escapeHtml(name);
-    const safeCompany  = escapeHtml(company);
-    const safeRole     = role ? escapeHtml(role) : "—";
-    const safeTimeSlot = escapeHtml(timeSlot);
-    const safeGoal     = escapeHtml(goal).replace(/\n/g, "<br>");
-    const consultantName = process.env.CONSULTANT_NAME ?? "The RudraAI Team";
-
-    // Cal.com booking — fire-and-forget
-    if (process.env.CALCOM_API_KEY && isoTime) {
-      const slug = process.env.CALCOM_EVENT_SLUG ?? "15min";
-      const calHeaders = {
-        Authorization: `Bearer ${process.env.CALCOM_API_KEY}`,
-        "cal-api-version": "2024-06-11",
-        "Content-Type": "application/json",
-      };
-      fetch("https://api.cal.com/v2/event-types", { headers: calHeaders }).then(async (r) => {
-        if (!r.ok) return;
-        const data = await r.json() as { data?: { eventTypeGroups?: { eventTypes?: { id: number; slug: string }[] }[] } };
-        let eventTypeId: number | undefined;
-        for (const group of data.data?.eventTypeGroups ?? []) {
-          const et = group.eventTypes?.find((e) => e.slug === slug);
-          if (et) { eventTypeId = et.id; break; }
-        }
-        if (!eventTypeId) return;
-        return fetch("https://api.cal.com/v2/bookings", {
-          method: "POST",
-          headers: calHeaders,
-          body: JSON.stringify({
-            start: isoTime, eventTypeId,
-            attendee: { name, email, timeZone: "Asia/Kolkata", language: "en" },
-            metadata: goal ? { notes: goal } : {},
-          }),
-        });
-      }).catch(() => {});
-    }
-
-    const zoomLink = await createZoomMeeting(`Automation Audit — ${name} (${company})`, isoTime ?? timeSlot);
-    logToNotion({ name, email, company, role, timeSlot, goal, zoomLink }).catch(() => {});
-
-    const safeZoomLink = zoomLink ? escapeHtml(zoomLink) : null;
-    const zoomSection = safeZoomLink
-      ? `<div style="background:#F6EEFC;border-left:4px solid #BF5AF2;padding:12px 16px;margin:16px 0;border-radius:4px"><strong style="color:#BF5AF2">📹 Zoom Link:</strong><br><a href="${safeZoomLink}" style="color:#BF5AF2;word-break:break-all">${safeZoomLink}</a></div>`
-      : `<p><em>I'll send your Zoom link to this email within 1 hour.</em></p>`;
-
-    if (process.env.RESEND_API_KEY) {
-      try {
+  // Side effects run after the response is sent; Vercel keeps the function alive for them.
+  after(async () => {
+    const results = await Promise.allSettled([
+      appendBooking({
+        bookingId, status, slotLabel: label, slotIso: start.toISOString(),
+        name, email, company, role, goal, meetingLink: meetingLink ?? "", calUid, source: "Website",
+      }),
+      logToNotion({ name, email, company, role, timeSlot: label, goal, meetingLink, status }),
+      autoOnboard({ email, name, company, bookingId: supabaseId }),
+      (async () => {
+        if (!process.env.RESEND_API_KEY) return;
+        const safeName = escapeHtml(name);
         if (process.env.CONTACT_TO) {
           await sendEmail({
             to: process.env.CONTACT_TO,
-            subject: `New Booking: ${safeName} (${safeCompany}) — ${safeTimeSlot}`,
+            replyTo: email,
+            subject: `${status === "Confirmed" ? "New booking" : "Booking request"}: ${name} (${company}) — ${label}`,
             html: `
-              <h2 style="color:#BF5AF2">New Automation Audit Booking</h2>
-              <table cellpadding="8" style="border-collapse:collapse">
+              <h2>${status === "Confirmed" ? "New booking" : "Booking request — confirm manually"} · ${bookingId}</h2>
+              <table cellpadding="6" style="border-collapse:collapse">
                 <tr><td><strong>Name</strong></td><td>${safeName}</td></tr>
                 <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
-                <tr><td><strong>Company</strong></td><td>${safeCompany}</td></tr>
-                <tr><td><strong>Role</strong></td><td>${safeRole}</td></tr>
-                <tr><td><strong>Time Slot</strong></td><td>${safeTimeSlot}</td></tr>
-                ${safeZoomLink ? `<tr><td><strong>Zoom Link</strong></td><td><a href="${safeZoomLink}">${safeZoomLink}</a></td></tr>` : ""}
+                <tr><td><strong>Company</strong></td><td>${escapeHtml(company)}</td></tr>
+                <tr><td><strong>Role</strong></td><td>${escapeHtml(role || "—")}</td></tr>
+                <tr><td><strong>Slot</strong></td><td>${escapeHtml(label)}</td></tr>
+                ${meetingLink ? `<tr><td><strong>Meeting</strong></td><td>${escapeHtml(meetingLink)}</td></tr>` : ""}
               </table>
-              <h3>Automation Goal</h3>
-              <p style="background:#f5f5f5;padding:12px;border-radius:6px">${safeGoal}</p>`,
+              <h3>Goal</h3>
+              <p style="white-space:pre-wrap">${escapeHtml(goal)}</p>`,
           });
         }
         await sendEmail({
           to: email,
-          subject: "Your Automation Audit is Confirmed — RudraAI",
-          html: `
-            <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#333">
-              <h2 style="color:#BF5AF2">You're booked, ${safeName}!</h2>
-              <p>Your <strong>Free Automation Audit</strong> is confirmed for:</p>
-              <div style="background:#fff8f0;border-left:4px solid #BF5AF2;padding:12px 16px;margin:16px 0;border-radius:4px">
-                <strong style="font-size:1.1em">${safeTimeSlot}</strong>
-              </div>
-              ${zoomSection}
-              <p><strong>What happens next:</strong></p>
-              <ol style="line-height:1.8">
-                <li>Join the Zoom call at your booked time</li>
-                <li>You'll receive a short pre-call questionnaire 24 hours before</li>
-                <li>On the call, we'll map your workflows and identify your top automation opportunities</li>
-              </ol>
-              <p>Need to reschedule? Just reply to this email.</p>
-              <br>
-              <p>Looking forward to it!<br>
-              <strong>${escapeHtml(consultantName)}</strong><br>
-              <span style="color:#888">RudraAI — Automation Agency</span></p>
-            </div>`,
+          subject: status === "Confirmed" ? "Your automation audit is confirmed — RudraAI" : "We received your booking request — RudraAI",
+          html: emailBody({ safeName, label, meetingLink, status, bookingId }),
         });
-      } catch (emailErr) {
-        console.error("[booking] Email send failed:", (emailErr as Error).message);
-      }
-    }
+      })(),
+    ]);
+    const names = ["sheets", "notion", "onboard", "email"];
+    results.forEach((r, i) => {
+      if (r.status === "rejected") console.error(`[booking ${bookingId}] ${names[i]} failed:`, (r.reason as Error)?.message);
+    });
+  });
 
-    const submittedAt = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-    appendToSheet("Sheet1!A:I", [submittedAt, name, email, company, role ?? "", timeSlot, goal, zoomLink ?? "", "New"]).catch(() => {});
-
-    const supabase = getSupabase();
-    let bookingId: string | null = null;
-    if (supabase) {
-      const { data: booking } = await supabase.from("bookings")
-        .insert({ name, email, company, role, time_slot: timeSlot, goal, zoom_link: zoomLink })
-        .select("id")
-        .single();
-      bookingId = booking?.id ?? null;
-    }
-
-    // Auto-onboard: invite the client to the portal and create their project
-    autoOnboard({ email, name, company, timeSlot, bookingId }).catch(() => {});
-
-    return NextResponse.json({ success: true, message: "Booking confirmed.", zoomLink });
-  } catch (error) {
-    console.error("Booking error:", error);
-    return NextResponse.json({ error: "Failed to confirm booking. Please try again." }, { status: 500 });
-  }
+  return NextResponse.json({ success: true, bookingId, status, slotLabel: label, meetingLink });
 }
