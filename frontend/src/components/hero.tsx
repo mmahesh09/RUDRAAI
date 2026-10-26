@@ -7,6 +7,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import HeroTornado from "@/components/hero-tornado";
 import HeroRunTicker from "@/components/hero-run-ticker";
 import Magnetic from "@/components/site/magnetic";
+import { CLIENTS } from "@/components/client-logos";
 
 // The three services, each revealed from behind a mask — then the promise underneath
 const SERVICES = ["Websites.", "AI agents.", "Automations."];
@@ -106,6 +107,21 @@ export default function Hero() {
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 <span className="absolute -bottom-0.5 left-0 h-px w-full origin-left scale-x-[0.35] bg-white/40 transition-transform duration-500 ease-out group-hover:scale-x-100 group-hover:bg-[#BF5AF2]" />
               </Link>
+            </div>
+
+            {/* Clients — real shipped work, each logo opens its case */}
+            <div style={delay(1.05)} className="hero-fade mt-10 flex flex-wrap items-center gap-x-4 gap-y-3">
+              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">Trusted by</span>
+              <span className="h-px w-8 bg-white/15" aria-hidden="true" />
+              <ul className="flex flex-wrap items-center gap-x-8 gap-y-3">
+                {CLIENTS.map((c) => (
+                  <li key={c.name}>
+                    <Link href={c.href} aria-label={`${c.name}: see the work`} className="block transition-opacity hover:opacity-80">
+                      {c.logo}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
           </motion.div>
 

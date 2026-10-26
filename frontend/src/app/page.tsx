@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
-import ClientsSection from "@/components/clients-section";
 import ProblemSection from "@/components/problem-section";
 import ServicesSection from "@/components/services-section";
 import FeaturesSection from "@/components/features-section";
@@ -28,8 +27,7 @@ export default function HomePage() {
     <main>
       <Navbar />
       <Hero />
-      {/* The page reads as one run: clients → statement → problem → services → ticker → a live workflow → process → questions → close */}
-      <ClientsSection />
+      {/* The page reads as one run: statement → problem → services → ticker → a live workflow → process → questions → close */}
       <ScrollStatement />
       <ProblemSection />
       <ServicesSection />
