@@ -1,8 +1,8 @@
 # Claude.md
 
-## RudraAI — AI Automation Agency Website
+## RudraAI — AI Services Studio Website
 
-RudraAI is an **AI automation agency** that builds n8n workflows, AI agents, and automation systems for businesses.
+RudraAI is an **AI services studio** (Hyderabad) offering three services: **websites** (Next.js), **AI agents**, and **n8n automations**. Service facts (names, deliverables, timelines, call length) live in `frontend/src/lib/site.ts` — reuse them instead of retyping copy.
 
 ### Tech Stack
 
@@ -38,7 +38,7 @@ frontend/src/
   lib/
     booking/          weekend slot logic, Cal.com client, Sheets ledger
     supabase/         browser + server clients
-    posts.ts, showcase.ts, site.ts   static content + site config
+    posts.ts, showcase.ts, site.ts, service-pages.ts   static content + site config
   middleware.ts       Supabase session; guards /portal (login) and /admin (role=admin)
 
 backend/src/
@@ -55,8 +55,9 @@ backend/supabase/schema.sql
 
 ## Key Pages
 
-- `/` — Home (hero, problem, services, features, how it works, FAQ, CTA)
+- `/` — Home (hero, scroll statement, problem, services, velocity marquee, features, how it works, FAQ, CTA)
 - `/services` — Service offerings with process roadmap + contact form
+- `/services/[slug]` — Per-service pages (`websites`, `ai-agents`, `automations`), statically generated from `lib/service-pages.ts` + `SERVICES` in `lib/site.ts`
 - `/showcase` — Gallery of built n8n workflows / AI agents (`/pricing` and `/case-studies/*` 308-redirect here)
 - `/about` — Founder story
 - `/blog` + `/blog/[slug]` — static posts from `lib/posts.ts`
