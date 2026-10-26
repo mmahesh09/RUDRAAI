@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown } from "lucide-react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
@@ -153,6 +153,19 @@ export default async function ServicePage({ params }: Props) {
                         {t}
                       </li>
                     ))}
+                    {g.link && (
+                      <li>
+                        <a
+                          href={g.link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-full border border-[#BF5AF2]/40 px-3.5 py-1.5 text-[14px] text-[#BF5AF2] transition-colors hover:border-[#BF5AF2] hover:text-[#F5F5F7]"
+                        >
+                          {g.link.label}
+                          <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                        </a>
+                      </li>
+                    )}
                   </ul>
                   <p className="mt-4 text-[15px] leading-[1.65] text-[#A1A1AA] md:col-span-4 md:mt-0">{g.why}</p>
                 </dd>
