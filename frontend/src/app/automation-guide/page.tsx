@@ -3,13 +3,14 @@ import Footer from "@/components/footer";
 import CTASection from "@/components/cta-section";
 import PageHero from "@/components/site/page-hero";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "The Automation Guide — What to Automate First and How to Measure It",
+export const metadata: Metadata = pageMetadata({
+  title: "Business Automation Guide: What to Automate First",
   description:
-    "A practical guide to automating a small business with n8n and AI: what to automate first, the mistakes to avoid, the tools we use, and a simple way to work out if it pays off.",
-  alternates: { canonical: "/automation-guide" },
-};
+    "A practical guide to automating a small business with n8n and AI: what to automate first, mistakes to avoid, the tools to use and how to measure the payoff.",
+  path: "/automation-guide",
+});
 
 type Block = { kind: "p"; text: string } | { kind: "list"; items: { title: string; body: string }[] } | { kind: "formula"; lines: string[] };
 

@@ -1,4 +1,8 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { privateMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = privateMetadata;
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import AdminSidebar from "@/components/admin/admin-sidebar";
 

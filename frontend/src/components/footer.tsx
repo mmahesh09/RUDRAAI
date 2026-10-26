@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { SITE } from "@/lib/site";
+import { SERVICES, SITE } from "@/lib/site";
 
 const COLUMNS = [
   {
     title: "Work",
     links: [
       { label: "Services", href: "/services" },
+      ...SERVICES.map((s) => ({ label: s.name, href: `/services/${s.slug}` })),
       { label: "Showcase", href: "/showcase" },
       { label: "Industries", href: "/industries" },
     ],

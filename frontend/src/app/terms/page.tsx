@@ -1,12 +1,14 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms of Service — RudraAI",
-  description: "Terms and conditions for using RudraAI's website and services.",
-  alternates: { canonical: "/terms" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Terms of Service",
+  description:
+    "Terms and conditions for using RudraAI's website and services.",
+  path: "/terms",
+});
 
 const LAST_UPDATED = "June 15, 2026";
 const CONTACT_EMAIL = "legal@rudraai.online";

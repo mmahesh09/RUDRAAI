@@ -125,7 +125,7 @@ export default function Navbar() {
                       {SERVICES.map((s) => (
                         <li key={s.slug}>
                           <Link
-                            href={`/services#${s.slug}`}
+                            href={`/services/${s.slug}`}
                             onClick={() => setIsServicesOpen(false)}
                             className="block rounded-xl px-3.5 py-3 transition-colors hover:bg-white/[0.06] focus-visible:bg-white/[0.06]"
                           >
@@ -207,7 +207,7 @@ export default function Navbar() {
                     {SERVICES.map((s) => (
                       <li key={s.slug}>
                         <Link
-                          href={`/services#${s.slug}`}
+                          href={`/services/${s.slug}`}
                           onClick={() => setIsMobileOpen(false)}
                           className="block py-2 pl-4 text-[16px] font-medium text-[#A1A1AA] hover:text-[#F5F5F7]"
                         >

@@ -8,6 +8,7 @@ import ChatWidget from "@/components/chat-widget";
 import GaScript from "@/components/ga-script";
 import ChatwootWidget from "@/components/chatwoot-widget";
 import SiteEffects from "@/components/site/site-effects";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
 
 // Display + subheads: Inter Tight (neo-grotesque, tight metrics for large sizes).
 // Body: Google Sans (linked below — not yet in next/font). JetBrains Mono: labels, data, run logs.
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     template: "%s | RudraAI",
   },
   description:
-    "RudraAI builds intelligent n8n workflows and AI agents that run 24/7, eliminate human error, and scale with your business. Book a free automation audit today.",
+    "RudraAI is an AI services studio in Hyderabad building fast Next.js websites, custom AI agents and n8n workflow automations. Fixed price. Book a free call.",
   keywords: [
     "AI services company",
     "AI development services",
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
     "n8n automation services",
     "business process automation",
   ],
-  alternates: { canonical: "/" },
+  // No canonical here: each page sets its own via pageMetadata(), so nothing inherits "/"
   openGraph: {
     title: "RudraAI — Websites, AI Agents & AI Automations",
     description:
@@ -87,6 +88,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }} />
       </head>
       <body className="bg-black text-white antialiased overflow-x-hidden" suppressHydrationWarning>
         <SmoothScrollProvider>

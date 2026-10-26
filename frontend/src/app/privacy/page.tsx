@@ -1,12 +1,14 @@
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy — RudraAI",
-  description: "How RudraAI collects, uses, and protects your personal data.",
-  alternates: { canonical: "/privacy" },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy Policy",
+  description:
+    "How RudraAI collects, uses, and protects your personal data.",
+  path: "/privacy",
+});
 
 const LAST_UPDATED = "June 15, 2026";
 const CONTACT_EMAIL = "privacy@rudraai.online";

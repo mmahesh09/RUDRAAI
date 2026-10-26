@@ -4,14 +4,15 @@ import PageHero from "@/components/site/page-hero";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 import { posts } from "@/lib/posts";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "AI Engineering Blog: RAG, LLM Evals & MCP Guides",
   description:
-    "Plain-English, hands-on guides to RAG architecture, choosing and evaluating LLMs, and building MCP servers — what works and how to ship it — from the RudraAI studio.",
-  alternates: { canonical: "/blog" },
-};
+    "Hands-on guides to RAG architecture, choosing and evaluating LLMs, and building MCP servers — what works in production and how to ship it, from RudraAI.",
+  path: "/blog",
+});
 
 export default function BlogPage() {
   const featured = posts.find((p) => p.featured) ?? posts[0];

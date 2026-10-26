@@ -3,14 +3,15 @@ import Footer from "@/components/footer";
 import ShowcaseSection from "@/components/showcase-section";
 import PageHero from "@/components/site/page-hero";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Showcase — Client Websites We've Shipped",
   description:
     "Live client work from RudraAI, including Mindbodymedworks — a holistic health and wellness website designed and built in Next.js.",
-  alternates: { canonical: "/showcase" },
-  openGraph: { url: "/showcase", images: ["/showcase/mindbodymedworks-desktop.webp"] },
-};
+  path: "/showcase",
+  image: "/showcase/mindbodymedworks-desktop.webp",
+});
 
 export default function ShowcasePage() {
   return (

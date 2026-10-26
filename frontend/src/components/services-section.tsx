@@ -49,7 +49,7 @@ export default function ServicesSection({ index = "02" }: { index?: string } = {
                     <p className="mt-1 font-heading text-xl font-semibold tracking-[-0.02em] text-[#F5F5F7]">{s.timeline}</p>
                   </div>
                   <Link
-                    href={`/services#${s.slug}`}
+                    href={`/services/${s.slug}`}
                     aria-label={`More about ${s.name}`}
                     className="group inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/[0.18] text-[#F5F5F7] transition-colors hover:border-[#BF5AF2] hover:text-[#BF5AF2]"
                   >

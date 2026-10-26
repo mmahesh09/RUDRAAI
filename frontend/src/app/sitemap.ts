@@ -1,11 +1,13 @@
 ﻿import type { MetadataRoute } from "next";
 import { posts } from "@/lib/posts";
+import { SERVICES } from "@/lib/site";
 
 const BASE = "https://www.rudraai.online";
 
 const staticRoutes = [
   { url: BASE, priority: 1.0 },
   { url: `${BASE}/services`, priority: 0.9 },
+  ...SERVICES.map((s) => ({ url: `${BASE}/services/${s.slug}`, priority: 0.9 })),
   { url: `${BASE}/booking`, priority: 0.9 },
   { url: `${BASE}/blog`, priority: 0.8 },
   { url: `${BASE}/about`, priority: 0.7 },

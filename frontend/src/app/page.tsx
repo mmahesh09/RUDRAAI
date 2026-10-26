@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
 import ProblemSection from "@/components/problem-section";
@@ -9,27 +10,21 @@ import CTASection from "@/components/cta-section";
 import Footer from "@/components/footer";
 import ScrollStatement from "@/components/site/scroll-statement";
 import VelocityMarquee from "@/components/site/velocity-marquee";
+import { pageMetadata } from "@/lib/seo";
 
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "RudraAI",
-  url: "https://www.rudraai.online",
-  logo: "https://www.rudraai.online/logo.png",
-  description: "AI services company that designs and builds websites, custom AI agents and AI workflow automations for businesses.",
-  knowsAbout: ["Website design and development", "AI agents", "AI chatbots", "AI workflow automation", "n8n"],
-  makesOffer: ["Website Creation", "AI Agents", "AI Automations"].map((name) => ({
-    "@type": "Offer",
-    itemOffered: { "@type": "Service", name },
-  })),
-  sameAs: ["https://twitter.com/GowriRudrai", "https://www.instagram.com/rudraai.online/"],
-  contactPoint: { "@type": "ContactPoint", contactType: "customer support", url: "https://www.rudraai.online/services#contact" },
+export const metadata: Metadata = {
+  ...pageMetadata({
+    title: "AI Services: Websites, AI Agents & Automation",
+    description:
+      "RudraAI is an AI services studio in Hyderabad building fast Next.js websites, custom AI agents and n8n workflow automations. Fixed price. Book a free call.",
+    path: "/",
+  }),
+  title: { absolute: "AI Services: Websites, AI Agents & Automation | RudraAI" },
 };
 
 export default function HomePage() {
   return (
     <main>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
       <Navbar />
       <Hero />
       {/* The page reads as one run: statement → problem → services → ticker → a live workflow → process → questions → close */}

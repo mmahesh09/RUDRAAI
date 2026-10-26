@@ -87,13 +87,21 @@ export default function ServicesView() {
                 </ul>
               </Reveal>
               <Reveal delay={0.2} className="sm:col-span-2">
-                <Link
-                  href="/booking"
-                  className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#BF5AF2]"
-                >
-                  Talk about {s.name.toLowerCase()}
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                </Link>
+                <div className="flex flex-wrap gap-x-8 gap-y-4">
+                  <Link
+                    href={`/services/${s.slug}`}
+                    className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#F5F5F7] underline decoration-white/30 underline-offset-[6px] transition-colors hover:decoration-[#BF5AF2]"
+                  >
+                    How we build {s.name.toLowerCase()}, tech stack &amp; FAQs
+                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                  </Link>
+                  <Link
+                    href="/booking"
+                    className="group inline-flex items-center gap-2 text-[15px] font-medium text-[#A1A1AA] underline decoration-white/20 underline-offset-[6px] transition-colors hover:text-[#F5F5F7] hover:decoration-[#BF5AF2]"
+                  >
+                    Talk about {s.name.toLowerCase()}
+                  </Link>
+                </div>
               </Reveal>
             </div>
           </div>

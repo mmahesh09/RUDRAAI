@@ -4,13 +4,14 @@ import IndustriesSection from "@/components/industries-section";
 import CTASection from "@/components/cta-section";
 import PageHero from "@/components/site/page-hero";
 import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Industries — AI Automation for SaaS, E-commerce, Clinics & More",
+export const metadata: Metadata = pageMetadata({
+  title: "AI Automation by Industry: SaaS, Clinics & More",
   description:
     "Where AI agents and automation help first in SaaS, e-commerce, agencies, clinics, finance and operations teams — with concrete starting points for each.",
-  alternates: { canonical: "/industries" },
-};
+  path: "/industries",
+});
 
 export default function IndustriesPage() {
   return (
