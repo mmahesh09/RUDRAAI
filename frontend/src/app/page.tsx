@@ -7,6 +7,7 @@ import FeaturesSection from "@/components/features-section";
 import HowItWorksSection from "@/components/how-it-works-section";
 import FaqSection from "@/components/faq-section";
 import CTASection from "@/components/cta-section";
+import TestimonialsSection from "@/components/testimonials-section";
 import Footer from "@/components/footer";
 import ScrollStatement from "@/components/site/scroll-statement";
 import VelocityMarquee from "@/components/site/velocity-marquee";
@@ -27,7 +28,7 @@ export default function HomePage() {
     <main>
       <Navbar />
       <Hero />
-      {/* The page reads as one run: statement → problem → services → ticker → a live workflow → process → questions → close */}
+      {/* The page reads as one run: statement → problem → services → ticker → a live workflow → process → questions → testimonials → close */}
       <ScrollStatement />
       <ProblemSection />
       <ServicesSection />
@@ -35,6 +36,7 @@ export default function HomePage() {
       <FeaturesSection />
       <HowItWorksSection />
       <FaqSection />
+      <TestimonialsSection />
       <CTASection />
       <Footer />
     </main>
