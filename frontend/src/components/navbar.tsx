@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SITE } from "@/lib/site";
+import { SERVICES, SITE } from "@/lib/site";
 
 const navLinks = [
   { label: "Services", href: "/services" },
@@ -17,6 +17,8 @@ const navLinks = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const servicesRef = useRef<HTMLLIElement>(null);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -28,7 +30,23 @@ export default function Navbar() {
 
   useEffect(() => {
     setIsMobileOpen(false);
+    setIsServicesOpen(false);
   }, [pathname]);
+
+  // Close the services dropdown on Escape or a click outside it
+  useEffect(() => {
+    if (!isServicesOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setIsServicesOpen(false);
+    const onPointer = (e: PointerEvent) => {
+      if (!servicesRef.current?.contains(e.target as Node)) setIsServicesOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointer);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointer);
+    };
+  }, [isServicesOpen]);
 
   // Close the menu on Escape
   useEffect(() => {
@@ -60,20 +78,89 @@ export default function Navbar() {
         {/* Desktop nav */}
         <nav className="hidden md:block" aria-label="Main">
           <ul className="flex items-center gap-1">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  aria-current={isActive(link.href) ? "page" : undefined}
-                  className={cn(
-                    "rounded-full px-3.5 py-2 text-[13px] font-medium transition-colors",
-                    isActive(link.href) ? "text-[#F5F5F7]" : "text-[#A1A1AA] hover:text-[#F5F5F7]"
-                  )}
+            {navLinks.map((link) =>
+              link.href === "/services" ? (
+                <li
+                  key={link.href}
+                  ref={servicesRef}
+                  className="relative"
+                  onMouseEnter={() => setIsServicesOpen(true)}
+                  onMouseLeave={() => setIsServicesOpen(false)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget as Node)) setIsServicesOpen(false);
+                  }}
                 >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
+                  <div className="flex items-center">
+                    <Link
+                      href={link.href}
+                      aria-current={isActive(link.href) ? "page" : undefined}
+                      className={cn(
+                        "rounded-full py-2 pl-3.5 pr-1 text-[13px] font-medium transition-colors",
+                        isActive(link.href) || isServicesOpen ? "text-[#F5F5F7]" : "text-[#A1A1AA] hover:text-[#F5F5F7]"
+                      )}
+                    >
+                      {link.label}
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setIsServicesOpen((o) => !o)}
+                      aria-expanded={isServicesOpen}
+                      aria-controls="services-menu"
+                      aria-label="Show services"
+                      className="-ml-0.5 mr-1 flex h-7 w-6 items-center justify-center rounded-full text-[#A1A1AA] transition-colors hover:text-[#F5F5F7]"
+                    >
+                      <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-200", isServicesOpen && "rotate-180")} />
+                    </button>
+                  </div>
+
+                  {/* pt-2 bridges the gap so the pointer can travel into the panel without closing it */}
+                  <div
+                    id="services-menu"
+                    className={cn(
+                      "absolute left-1/2 top-full w-[340px] -translate-x-1/2 pt-2 transition-[opacity,transform] duration-200",
+                      isServicesOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
+                    )}
+                  >
+                    <ul className="rounded-2xl border border-white/[0.08] bg-black/90 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl">
+                      {SERVICES.map((s) => (
+                        <li key={s.slug}>
+                          <Link
+                            href={`/services#${s.slug}`}
+                            onClick={() => setIsServicesOpen(false)}
+                            className="block rounded-xl px-3.5 py-3 transition-colors hover:bg-white/[0.06] focus-visible:bg-white/[0.06]"
+                          >
+                            <span className="block text-[14px] font-semibold text-[#F5F5F7]">{s.name}</span>
+                            <span className="mt-0.5 block text-[12.5px] leading-snug text-[#A1A1AA]">{s.line}</span>
+                          </Link>
+                        </li>
+                      ))}
+                      <li className="mt-1 border-t border-white/[0.08] pt-1">
+                        <Link
+                          href="/services"
+                          onClick={() => setIsServicesOpen(false)}
+                          className="block rounded-xl px-3.5 py-2.5 text-[13px] font-medium text-[#BF5AF2] transition-colors hover:bg-white/[0.06]"
+                        >
+                          All services →
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              ) : (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    aria-current={isActive(link.href) ? "page" : undefined}
+                    className={cn(
+                      "rounded-full px-3.5 py-2 text-[13px] font-medium transition-colors",
+                      isActive(link.href) ? "text-[#F5F5F7]" : "text-[#A1A1AA] hover:text-[#F5F5F7]"
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              )
+            )}
           </ul>
         </nav>
 
@@ -115,6 +202,21 @@ export default function Navbar() {
                 >
                   {link.label}
                 </Link>
+                {link.href === "/services" && (
+                  <ul className="-mt-2 pb-3">
+                    {SERVICES.map((s) => (
+                      <li key={s.slug}>
+                        <Link
+                          href={`/services#${s.slug}`}
+                          onClick={() => setIsMobileOpen(false)}
+                          className="block py-2 pl-4 text-[16px] font-medium text-[#A1A1AA] hover:text-[#F5F5F7]"
+                        >
+                          {s.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             ))}
           </ul>
