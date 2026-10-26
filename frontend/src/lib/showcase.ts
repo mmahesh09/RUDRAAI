@@ -28,4 +28,17 @@ export const showcaseProjects: ShowcaseProject[] = [
       full: { src: "/showcase/mindbodymedworks-full.webp", width: 1600, height: 6400 },
     },
   },
+  {
+    slug: "rankwise",
+    client: "Rankwise",
+    url: "https://rankwise-xi.vercel.app",
+    sector: "SEO & AI search tools",
+    year: "2026",
+    scope: ["Product design", "Build", "Audit engine"],
+    stack: ["Next.js", "Tailwind CSS", "Vercel"],
+    line: "An audit tool that checks how Google and AI assistants read a site, then ranks every fix by impact.",
+    images: {
+      full: { src: "/showcase/rankwise-full.webp", width: 1600, height: 3382 },
+    },
+  },
 ];

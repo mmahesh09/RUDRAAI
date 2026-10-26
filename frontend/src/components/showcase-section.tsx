@@ -7,14 +7,15 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { showcaseProjects, type ShowcaseProject } from "@/lib/showcase";
 
-// Frame is 16:10 over a 1:4 screenshot, so the last frame sits at 1 - 0.625/4 of its height
-const SCROLL_END = "-84.375%";
+// Frame is 16:10, so the last frame of a screenshot sits at 1 - 0.625 × width/height of its height
+const scrollEnd = ({ width, height }: { width: number; height: number }) =>
+  `${-(1 - (0.625 * width) / height) * 100}%`;
 
 /** A browser window whose page scrolls as you scroll ours — the site, shown as it really is. */
 function BrowserFrame({ project, pinned }: { project: ShowcaseProject; pinned: boolean }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
-  const y = useTransform(scrollYProgress, [0.05, 0.95], ["0%", SCROLL_END]);
+  const y = useTransform(scrollYProgress, [0.05, 0.95], ["0%", scrollEnd(project.images.full)]);
   const host = project.url.replace(/^https?:\/\//, "");
 
   const frame = (
@@ -47,11 +48,10 @@ function BrowserFrame({ project, pinned }: { project: ShowcaseProject; pinned: b
     </div>
   );
 
-  if (!pinned) return frame;
-
+  // The track is always mounted so useScroll measures this case, not the whole page
   return (
-    <div ref={trackRef} className="relative h-[260vh]">
-      <div className="sticky top-0 flex h-screen items-start pt-28">{frame}</div>
+    <div ref={trackRef} className={pinned ? "relative h-[260vh]" : "relative"}>
+      {pinned ? <div className="sticky top-0 flex h-screen items-start pt-28">{frame}</div> : frame}
     </div>
   );
 }
@@ -77,7 +77,7 @@ function Project({ project, index }: { project: ShowcaseProject; index: number }
   ];
 
   return (
-    <article id={project.slug} className="scroll-mt-16">
+    <article id={project.slug} className={index > 0 ? "mt-32 scroll-mt-16 lg:mt-48" : "scroll-mt-16"}>
       {/* Case — marginalia on the left stays put while the site scrolls on the right */}
       <div className="container-wide grid gap-12 lg:grid-cols-12 lg:gap-x-10">
         <div className="lg:col-span-4">
