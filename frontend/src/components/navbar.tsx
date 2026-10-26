@@ -121,7 +121,8 @@ export default function Navbar() {
                       isServicesOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1 opacity-0"
                     )}
                   >
-                    <ul className="rounded-2xl border border-white/[0.08] bg-black/90 p-2 shadow-2xl shadow-black/50 backdrop-blur-xl">
+                    {/* Solid fill: the header's backdrop-blur stops this panel from blurring the page, so translucency let text bleed through */}
+                    <ul className="rounded-2xl border border-white/[0.08] bg-black p-2 shadow-2xl shadow-black/50">
                       {SERVICES.map((s) => (
                         <li key={s.slug}>
                           <Link

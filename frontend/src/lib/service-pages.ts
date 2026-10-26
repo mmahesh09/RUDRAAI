@@ -6,7 +6,7 @@ import { SERVICES, SITE } from "@/lib/site";
 export type ServiceSlug = (typeof SERVICES)[number]["slug"];
 
 type Step = { title: string; body: string };
-type StackGroup = { group: string; tools: string[]; why: string };
+type StackGroup = { group: string; tools: string[]; why: string; link?: { label: string; href: string } };
 type Outcome = { title: string; body: string };
 type Faq = { q: string; a: string };
 
@@ -73,7 +73,7 @@ export const SERVICE_PAGES: Record<ServiceSlug, ServicePage> = {
       { group: "Design", tools: ["Tailwind CSS", "Framer Motion", "Figma"], why: "A consistent design system with motion that never slows the page down." },
       { group: "Hosting", tools: ["Vercel", "Global CDN"], why: "Pages served from the edge closest to your visitor, with automatic HTTPS." },
       { group: "Forms & data", tools: ["Supabase", "Resend", "WhatsApp"], why: "Enquiries stored safely and delivered to your inbox or phone in seconds." },
-      { group: "SEO & analytics", tools: ["Schema.org", "Google Search Console", "Google Analytics 4"], why: "Rich results in Google and clear reporting on where enquiries come from." },
+      { group: "SEO & analytics", tools: ["Schema.org", "Google Search Console", "Google Analytics 4"], why: "Rich results in Google and clear reporting on where enquiries come from.", link: { label: "RankWise", href: "https://rankwise-xi.vercel.app" } },
     ],
     growth: [
       { title: "Get found on Google", body: "Each service and location gets its own page targeting what people actually search, with titles, structured data and internal links done properly." },
