@@ -41,4 +41,17 @@ export const showcaseProjects: ShowcaseProject[] = [
       full: { src: "/showcase/rankwise-full.webp", width: 1600, height: 3382 },
     },
   },
+  {
+    slug: "parastransforms",
+    client: "ParasTransforms",
+    url: "https://parastransforms.in",
+    sector: "Life coaching & wellbeing",
+    year: "2026",
+    scope: ["Design", "Build", "Booking & WhatsApp"],
+    stack: ["Next.js", "Tailwind CSS", "Vercel"],
+    line: "A warm, unhurried home for 1:1 coaching that helps people let go of guilt and regret and rebuild their confidence.",
+    images: {
+      full: { src: "/showcase/parastransforms-full.webp", width: 1600, height: 4696 },
+    },
+  },
 ];
