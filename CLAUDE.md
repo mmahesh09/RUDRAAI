@@ -105,7 +105,7 @@ Express also has `contact`, `booking`, `cal`, `chat`, `newsletter` routes. They 
 ## Important Rules
 
 - Booking is **Saturday and Sunday only**, **15 minute slots**
-- No personal names hardcoded — use `NEXT_PUBLIC_CONSULTANT_NAME` env var or "Automation Consultant"
+- No personal names hardcoded — use `NEXT_PUBLIC_CONSULTANT_NAME` env var or "Automation Consultant". Exception: the co-founder, Avnish Mishra, is named at the owner's request via `SITE.coFounder` (`NEXT_PUBLIC_COFOUNDER_NAME` overrides it)
 - OpenRouter and other API keys stay server-side (route handlers / backend) — never in client code or `NEXT_PUBLIC_*`
 - Use environment variables for all secrets
 - Keep Express backend and Next.js frontend decoupled via API proxy in `next.config.ts`

@@ -7,6 +7,8 @@ export const SITE = {
   location: "Hyderabad, India",
   // Never hardcode a personal name (see CLAUDE.md)
   consultant: process.env.NEXT_PUBLIC_CONSULTANT_NAME || "Automation Consultant",
+  // Named at the owner's request; override with the env var like the founder's name
+  coFounder: process.env.NEXT_PUBLIC_COFOUNDER_NAME || "Avnish Mishra",
   call: {
     minutes: 15,
     days: "Saturday & Sunday",

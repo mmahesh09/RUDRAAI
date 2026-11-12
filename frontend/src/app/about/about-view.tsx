@@ -67,9 +67,18 @@ export default function AboutView() {
                 </p>
               </Reveal>
             </div>
-            <Reveal className="mt-10">
-              <p className="font-heading text-base font-semibold text-[#F5F5F7]">{SITE.consultant}</p>
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">Founder, {SITE.name}</p>
+            <Reveal className="mt-10 flex flex-wrap gap-x-14 gap-y-6">
+              {[
+                { name: SITE.consultant, role: "Founder" },
+                { name: SITE.coFounder, role: "Co-founder" },
+              ].map((p) => (
+                <div key={p.role}>
+                  <p className="font-heading text-base font-semibold text-[#F5F5F7]">{p.name}</p>
+                  <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A8A93]">
+                    {p.role}, {SITE.name}
+                  </p>
+                </div>
+              ))}
             </Reveal>
           </div>
         </div>
